@@ -199,7 +199,7 @@ export const VolunteersPage: React.FC = () => {
     setCreateLoading(true);
 
     // Get an organization ID
-    let orgId = user?.orgId;
+    let orgId = (user as any)?.orgId || (user as any)?.organizationId;
     if (!orgId) {
       const orgsRes = await ApiClient.request<any[]>('/organizations');
       if (orgsRes.success && orgsRes.data && orgsRes.data.length > 0) {

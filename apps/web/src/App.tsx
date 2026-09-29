@@ -2,7 +2,7 @@ import React from 'react';
 import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { RoleType } from '@al-husseiniya/types';
 import { Header } from './components/Header';
-import { Sidebar } from './components/Sidebar';
+import { Footer } from './components/Footer';
 import { ProtectedRoute } from './components/ProtectedRoute';
 
 // Pages
@@ -22,12 +22,10 @@ const AppLayout: React.FC = () => {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: 'var(--bg-app)' }}>
       <Header />
-      <div style={{ display: 'flex', flex: 1 }}>
-        <Sidebar />
-        <main style={{ flex: 1, overflowY: 'auto', minWidth: 0 }}>
-          <Outlet />
-        </main>
-      </div>
+      <main style={{ flex: 1, minWidth: 0 }}>
+        <Outlet />
+      </main>
+      <Footer />
     </div>
   );
 };

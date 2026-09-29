@@ -11,9 +11,13 @@ import {
   CheckCircle2,
   XCircle,
   ArrowRight,
+  ArrowLeft,
   History,
   AlertTriangle,
   Filter,
+  ShieldCheck,
+  Heart,
+  ChevronRight,
 } from 'lucide-react';
 
 const CANONICAL_STEPS = [
@@ -37,13 +41,16 @@ export const RequestsPage: React.FC = () => {
   const [filterCategory, setFilterCategory] = useState('ALL');
   const [filterStatus, setFilterStatus] = useState('ALL');
 
-  // Form state
+  // Progressive Disclosure Multi-Step Form state
+  const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
   const [categoryId, setCategoryId] = useState('');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [location, setLocation] = useState('');
   const [isPrivate, setIsPrivate] = useState(true);
   const [formError, setFormError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [submissionSuccess, setSubmissionSuccess] = useState(false);
 
   // History modal state
   const [selectedHistory, setSelectedHistory] = useState<{
@@ -58,7 +65,7 @@ export const RequestsPage: React.FC = () => {
         RoleType.COMMUNITY_ADMIN,
         RoleType.ORGANIZATION_ADMIN,
         RoleType.ORGANIZATION_STAFF,
-      ].includes(r),
+      ].includes(r as RoleType)
     ) ||
     user?.role === RoleType.ORGANIZATION_ADMIN ||
     user?.role === RoleType.ORGANIZATION_STAFF ||
@@ -87,9 +94,17 @@ export const RequestsPage: React.FC = () => {
     loadData();
   }, []);
 
+  const handleOpenCreateModal = () => {
+    setStep(1);
+    setSubmissionSuccess(false);
+    setFormError('');
+    setShowModal(true);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError('');
+    setSubmitting(true);
 
     const res = await ApiClient.request('/requests', {
       method: 'POST',
@@ -102,8 +117,9 @@ export const RequestsPage: React.FC = () => {
       }),
     });
 
+    setSubmitting(false);
     if (res.success) {
-      setShowModal(false);
+      setSubmissionSuccess(true);
       setTitle('');
       setDescription('');
       setLocation('');
@@ -169,20 +185,46 @@ export const RequestsPage: React.FC = () => {
     }
   };
 
+  const selectedCategoryObj = categories.find((c) => c.id === categoryId);
+
   return (
-    <div style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+    <div style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.75rem', maxWidth: '1200px', margin: '0 auto' }}>
+      {/* Top Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#0b1b2b' }}>Humanitarian Aid Requests</h2>
-          <p style={{ color: '#64748b', fontSize: '0.875rem' }}>
-            {user ? 'Track your active requests and review community assistance workflows' : 'Explore community assistance needs'}
+          <h2 style={{ fontSize: '1.75rem', fontWeight: 700, color: '#0b1f2a', letterSpacing: '-0.02em', margin: 0 }}>
+            Find Help & Relief Assistance
+          </h2>
+          <p style={{ color: '#64748b', fontSize: '0.875rem', marginTop: '0.25rem' }}>
+            A safe, dignified space to request essential support from verified community organizations.
           </p>
         </div>
 
-        <button onClick={() => setShowModal(true)} className="btn btn-teal">
+        <button onClick={handleOpenCreateModal} className="btn btn-primary" style={{ padding: '0.55rem 1.25rem' }}>
           <Plus size={16} />
-          <span>New Request</span>
+          <span>Request Assistance</span>
         </button>
+      </div>
+
+      {/* Privacy Pledge Banner */}
+      <div
+        style={{
+          backgroundColor: '#f0fdf4',
+          border: '1px solid #bbf7d0',
+          borderRadius: '10px',
+          padding: '0.85rem 1.25rem',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.75rem',
+          fontSize: '0.8125rem',
+          color: '#166534',
+        }}
+      >
+        <ShieldCheck size={20} color="#16a34a" style={{ flexShrink: 0 }} />
+        <div>
+          <strong>Privacy Assured:</strong> Your request details are strictly confidential and only accessible by
+          authorized, verified organization coordinators. We never publish private contact information.
+        </div>
       </div>
 
       {actionError && (
@@ -192,10 +234,21 @@ export const RequestsPage: React.FC = () => {
       )}
 
       {/* Filters Bar */}
-      <div className="card" style={{ padding: '1rem', display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '1rem',
+          flexWrap: 'wrap',
+          backgroundColor: '#ffffff',
+          padding: '0.75rem 1rem',
+          borderRadius: '8px',
+          border: '1px solid #e2e8f0',
+        }}
+      >
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#64748b', fontSize: '0.8125rem' }}>
           <Filter size={15} />
-          <span>Filters:</span>
+          <span>Filter:</span>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -229,8 +282,6 @@ export const RequestsPage: React.FC = () => {
             <option value="IN_PROGRESS">IN_PROGRESS</option>
             <option value="COMPLETED">COMPLETED</option>
             <option value="CANCELLED">CANCELLED</option>
-            <option value="REJECTED">REJECTED</option>
-            <option value="ESCALATED">ESCALATED</option>
           </select>
         </div>
 
@@ -239,6 +290,7 @@ export const RequestsPage: React.FC = () => {
         </span>
       </div>
 
+      {/* Requests List */}
       {loading ? (
         <div className="card" style={{ textAlign: 'center', padding: '3rem' }}>
           <p style={{ color: '#64748b' }}>Loading humanitarian requests...</p>
@@ -246,179 +298,403 @@ export const RequestsPage: React.FC = () => {
       ) : filteredRequests.length === 0 ? (
         <div className="card" style={{ textAlign: 'center', padding: '3.5rem 1rem' }}>
           <AlertCircle size={40} color="#94a3b8" style={{ margin: '0 auto 1rem' }} />
-          <h3 style={{ fontSize: '1.125rem', marginBottom: '0.5rem' }}>No Requests Match Filter</h3>
+          <h3 style={{ fontSize: '1.125rem', marginBottom: '0.5rem' }}>No Requests Matching Criteria</h3>
           <p style={{ color: '#64748b', fontSize: '0.875rem', marginBottom: '1.5rem' }}>
-            Submit an emergency food or healthcare assistance request to connect with community relief.
+            No assistance requests match your active filters.
           </p>
-          <button onClick={() => setShowModal(true)} className="btn btn-primary">
-            Create First Request
+          <button onClick={handleOpenCreateModal} className="btn btn-primary">
+            Submit New Request
           </button>
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: '1.25rem' }}>
-          {filteredRequests.map((r) => {
-            const isRequester = user && (r.requesterId === user.id || (r as any).requester?.id === user.id);
-            const isTerminal = ['COMPLETED', 'FULFILLED', 'CANCELLED', 'REJECTED'].includes(r.status);
-            const isCurrentStep = (step: string) => r.status === step;
-            const currentStepIdx = CANONICAL_STEPS.indexOf(r.status as RequestStatus);
-
-            return (
-              <div key={r.id} className="card" style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                  <span className={`badge ${getStatusBadgeClass(r.status)}`}>
-                    {r.status}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          {filteredRequests.map((req) => (
+            <div
+              key={req.id}
+              className="card"
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '1rem',
+                borderRadius: '12px',
+                border: '1px solid #e2e8f0',
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.5rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <span className={`badge ${getStatusBadgeClass(req.status)}`}>
+                    {req.status}
                   </span>
-
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.75rem', color: '#64748b' }}>
-                    {r.isPrivate ? (
-                      <>
-                        <Lock size={12} color="#c29b38" />
-                        <span>Confidential</span>
-                      </>
+                  <span style={{ fontSize: '0.75rem', color: '#64748b' }}>
+                    {req.isPrivate ? (
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}>
+                        <Lock size={12} /> Confidential
+                      </span>
                     ) : (
-                      <>
-                        <Globe size={12} color="#1b6b63" />
-                        <span>Public</span>
-                      </>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}>
+                        <Globe size={12} /> Community Visible
+                      </span>
                     )}
-                  </div>
+                  </span>
                 </div>
 
-                {/* Status Progression Bar */}
-                {['CANCELLED', 'REJECTED', 'ESCALATED'].includes(r.status) ? (
-                  <div
-                    style={{
-                      padding: '0.4rem 0.6rem',
-                      borderRadius: '6px',
-                      backgroundColor: r.status === 'ESCALATED' ? '#fffbeb' : '#fef2f2',
-                      color: r.status === 'ESCALATED' ? '#b45309' : '#b91c1c',
-                      fontSize: '0.75rem',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.4rem',
-                    }}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <button
+                    onClick={() => handleViewHistory(req)}
+                    className="btn btn-secondary"
+                    style={{ fontSize: '0.75rem', padding: '0.3rem 0.6rem' }}
                   >
-                    {r.status === 'ESCALATED' ? <AlertTriangle size={14} /> : <XCircle size={14} />}
-                    <span>Status: {r.status}</span>
-                  </div>
-                ) : (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '2px', margin: '0.25rem 0' }}>
-                    {CANONICAL_STEPS.map((step, idx) => {
-                      const isPastOrCurrent = currentStepIdx >= idx;
-                      return (
+                    <History size={13} style={{ marginRight: '0.2rem' }} /> History
+                  </button>
+                  <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
+                    {new Date(req.createdAt).toLocaleDateString()}
+                  </span>
+                </div>
+              </div>
+
+              <div>
+                <h3 style={{ fontSize: '1.15rem', fontWeight: 600, color: '#0b1b2b', marginBottom: '0.35rem' }}>
+                  {req.title}
+                </h3>
+                <p style={{ fontSize: '0.875rem', color: '#475569', lineHeight: 1.5, margin: 0 }}>
+                  {req.description}
+                </p>
+                {req.location && (
+                  <p style={{ fontSize: '0.8125rem', color: '#64748b', marginTop: '0.4rem' }}>
+                    <strong>Location:</strong> {req.location}
+                  </p>
+                )}
+              </div>
+
+              {/* Progress Stepper Bar */}
+              <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '0.75rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.25rem', overflowX: 'auto' }}>
+                  {CANONICAL_STEPS.map((s, idx) => {
+                    const currentIdx = CANONICAL_STEPS.indexOf(req.status as any);
+                    const isDone = currentIdx >= idx;
+                    const isCurrent = req.status === s;
+                    return (
+                      <div key={s} style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.7rem', whiteSpace: 'nowrap' }}>
                         <div
-                          key={step}
-                          title={step}
                           style={{
-                            flex: 1,
-                            height: '5px',
-                            borderRadius: '3px',
-                            backgroundColor: isPastOrCurrent ? '#1b6b63' : '#e2e8f0',
-                            transition: 'background-color 0.2s',
+                            width: '18px',
+                            height: '18px',
+                            borderRadius: '50%',
+                            backgroundColor: isCurrent ? '#087f78' : isDone ? '#10b981' : '#e2e8f0',
+                            color: isDone || isCurrent ? '#ffffff' : '#64748b',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '0.65rem',
+                            fontWeight: 700,
                           }}
-                        />
-                      );
-                    })}
+                        >
+                          {idx + 1}
+                        </div>
+                        <span style={{ color: isCurrent ? '#087f78' : isDone ? '#1e293b' : '#94a3b8', fontWeight: isCurrent ? 700 : 500 }}>
+                          {s.replace('_', ' ')}
+                        </span>
+                        {idx < CANONICAL_STEPS.length - 1 && <span style={{ color: '#cbd5e1', margin: '0 0.2rem' }}>&rarr;</span>}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Staff / Coordinator Status Controls */}
+              {isStaffOrAdmin && (
+                <div style={{ backgroundColor: '#f8fafc', padding: '0.6rem 0.75rem', borderRadius: '6px', display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#475569' }}>Staff Actions:</span>
+                  {req.status === 'SUBMITTED' && (
+                    <button onClick={() => handleUpdateStatus(req.id, 'UNDER_REVIEW')} className="btn btn-secondary" style={{ fontSize: '0.75rem', padding: '0.25rem 0.5rem' }}>
+                      Mark In Review
+                    </button>
+                  )}
+                  {req.status === 'UNDER_REVIEW' && (
+                    <button onClick={() => handleUpdateStatus(req.id, 'MATCHED')} className="btn btn-secondary" style={{ fontSize: '0.75rem', padding: '0.25rem 0.5rem' }}>
+                      Match Responders
+                    </button>
+                  )}
+                  {req.status === 'MATCHED' && (
+                    <button onClick={() => handleUpdateStatus(req.id, 'ACCEPTED')} className="btn btn-secondary" style={{ fontSize: '0.75rem', padding: '0.25rem 0.5rem' }}>
+                      Accept Assignment
+                    </button>
+                  )}
+                  {req.status === 'ACCEPTED' && (
+                    <button onClick={() => handleUpdateStatus(req.id, 'IN_PROGRESS')} className="btn btn-secondary" style={{ fontSize: '0.75rem', padding: '0.25rem 0.5rem' }}>
+                      Start Delivery
+                    </button>
+                  )}
+                  {req.status === 'IN_PROGRESS' && (
+                    <button onClick={() => handleUpdateStatus(req.id, 'COMPLETED')} className="btn btn-primary" style={{ fontSize: '0.75rem', padding: '0.25rem 0.5rem' }}>
+                      Complete Request
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Progressive Multi-Step Help Request Modal */}
+      {showModal && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0,0,0,0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 100,
+            padding: '1rem',
+          }}
+        >
+          <div
+            className="card"
+            style={{
+              maxWidth: '650px',
+              width: '100%',
+              padding: '2rem',
+              maxHeight: '90vh',
+              overflowY: 'auto',
+            }}
+          >
+            {/* Modal Header */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+              <div>
+                <h3 style={{ fontSize: '1.35rem', fontWeight: 700, color: '#0b1f2a', margin: 0 }}>
+                  {submissionSuccess ? 'Request Confirmed' : 'Request Humanitarian Assistance'}
+                </h3>
+                <p style={{ fontSize: '0.8125rem', color: '#64748b', margin: '0.2rem 0 0' }}>
+                  {submissionSuccess
+                    ? 'Your needs have been received with utmost dignity.'
+                    : `Step ${step} of 4: Dignified Community Support`}
+                </p>
+              </div>
+              <button
+                onClick={() => setShowModal(false)}
+                style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', color: '#64748b' }}
+              >
+                &times;
+              </button>
+            </div>
+
+            {formError && (
+              <div style={{ backgroundColor: '#fee2e2', color: '#b91c1c', padding: '0.75rem', borderRadius: '6px', fontSize: '0.875rem', marginBottom: '1rem' }}>
+                {formError}
+              </div>
+            )}
+
+            {/* Success State Screen */}
+            {submissionSuccess ? (
+              <div style={{ textAlign: 'center', padding: '1.5rem 0' }}>
+                <CheckCircle2 size={54} color="#16a34a" style={{ margin: '0 auto 1rem' }} />
+                <h4 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#0b1f2a', marginBottom: '0.5rem' }}>
+                  Your request has been securely recorded.
+                </h4>
+                <p style={{ fontSize: '0.875rem', color: '#475569', lineHeight: 1.6, maxWidth: '480px', margin: '0 auto 1.5rem' }}>
+                  A verified coordinator from our community team will review your needs discreetly. You will be
+                  notified on this platform as soon as support is dispatched.
+                </p>
+                <button onClick={() => setShowModal(false)} className="btn btn-primary">
+                  Return to Requests
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit}>
+                {/* Step 1: Category Selection */}
+                {step === 1 && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    <h4 style={{ fontSize: '1.05rem', fontWeight: 600, color: '#0b1f2a' }}>
+                      What kind of support is needed?
+                    </h4>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.75rem' }}>
+                      {categories.map((c) => {
+                        const selected = categoryId === c.id;
+                        return (
+                          <div
+                            key={c.id}
+                            onClick={() => setCategoryId(c.id)}
+                            style={{
+                              padding: '1rem',
+                              borderRadius: '8px',
+                              border: selected ? '2px solid #087f78' : '1px solid #cbd5e1',
+                              backgroundColor: selected ? '#f0fbf9' : '#ffffff',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              flexDirection: 'column',
+                              gap: '0.25rem',
+                              transition: 'all 0.15s ease',
+                            }}
+                          >
+                            <span style={{ fontWeight: 600, fontSize: '0.9rem', color: selected ? '#087f78' : '#0b1f2a' }}>
+                              {c.nameEn}
+                            </span>
+                            <span style={{ fontSize: '0.75rem', color: '#64748b' }}>
+                              {c.descriptionEn || 'Essential community relief'}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1rem' }}>
+                      <button
+                        type="button"
+                        onClick={() => setStep(2)}
+                        disabled={!categoryId}
+                        className="btn btn-primary"
+                        style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+                      >
+                        <span>Continue</span> <ArrowRight size={15} />
+                      </button>
+                    </div>
                   </div>
                 )}
 
-                <h4 style={{ fontSize: '1.05rem', fontWeight: 600, color: '#0b1b2b', margin: 0 }}>{r.title}</h4>
-                <p style={{ fontSize: '0.85rem', color: '#475569', lineHeight: 1.5, flexGrow: 1, margin: 0 }}>
-                  {r.description}
-                </p>
-
-                <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '0.65rem', fontSize: '0.75rem', color: '#64748b', display: 'flex', justifyContent: 'space-between' }}>
-                  <span>Location: {r.location}</span>
-                  <span>Priority: {r.priority}</span>
-                </div>
-
-                {/* Actions Bar */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', borderTop: '1px solid #f8fafc', paddingTop: '0.5rem' }}>
-                  <button
-                    onClick={() => handleViewHistory(r)}
-                    style={{
-                      background: 'none',
-                      border: 'none',
-                      color: '#1d3557',
-                      fontSize: '0.75rem',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.25rem',
-                      cursor: 'pointer',
-                      padding: '0.25rem 0',
-                    }}
-                  >
-                    <History size={13} />
-                    <span>View History</span>
-                  </button>
-
-                  <div style={{ display: 'flex', gap: '0.4rem', marginLeft: 'auto' }}>
-                    {/* Requester Cancel Action */}
-                    {isRequester && !isTerminal && (
-                      <button
-                        onClick={() => handleUpdateStatus(r.id, 'CANCELLED', 'Cancelled by requester')}
-                        className="btn btn-secondary"
-                        style={{ fontSize: '0.75rem', padding: '0.25rem 0.5rem', color: '#ef4444', borderColor: '#fca5a5' }}
-                      >
-                        Cancel
+                {/* Step 2: Details */}
+                {step === 2 && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    <h4 style={{ fontSize: '1.05rem', fontWeight: 600, color: '#0b1f2a' }}>
+                      Tell us a little more about the situation.
+                    </h4>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.25rem' }}>
+                        Request Summary *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        placeholder="e.g. Urgent baby formula and winter blankets for family of four"
+                        style={{ width: '100%', padding: '0.6rem', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.875rem' }}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.25rem' }}>
+                        Description & Details *
+                      </label>
+                      <textarea
+                        required
+                        rows={4}
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        placeholder="Share any pertinent context, dietary requirements, or urgency details..."
+                        style={{ width: '100%', padding: '0.6rem', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.875rem' }}
+                      />
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1rem' }}>
+                      <button type="button" onClick={() => setStep(1)} className="btn btn-secondary">
+                        <ArrowLeft size={15} /> Back
                       </button>
-                    )}
-
-                    {/* Staff/Admin Next Stage Actions */}
-                    {isStaffOrAdmin && !isTerminal && (
-                      <>
-                        {r.status === 'SUBMITTED' && (
-                          <button
-                            onClick={() => handleUpdateStatus(r.id, 'UNDER_REVIEW', 'Reviewed by organization staff')}
-                            className="btn btn-teal"
-                            style={{ fontSize: '0.75rem', padding: '0.25rem 0.6rem' }}
-                          >
-                            Review
-                          </button>
-                        )}
-                        {r.status === 'UNDER_REVIEW' && (
-                          <button
-                            onClick={() => handleUpdateStatus(r.id, 'ACCEPTED', 'Accepted by organization')}
-                            className="btn btn-teal"
-                            style={{ fontSize: '0.75rem', padding: '0.25rem 0.6rem' }}
-                          >
-                            Accept
-                          </button>
-                        )}
-                        {r.status === 'ACCEPTED' && (
-                          <button
-                            onClick={() => handleUpdateStatus(r.id, 'IN_PROGRESS', 'Relief work in progress')}
-                            className="btn btn-teal"
-                            style={{ fontSize: '0.75rem', padding: '0.25rem 0.6rem' }}
-                          >
-                            Start Aid
-                          </button>
-                        )}
-                        {r.status === 'IN_PROGRESS' && (
-                          <button
-                            onClick={() => handleUpdateStatus(r.id, 'COMPLETED', 'Assistance completed successfully')}
-                            className="btn btn-teal"
-                            style={{ fontSize: '0.75rem', padding: '0.25rem 0.6rem' }}
-                          >
-                            Complete
-                          </button>
-                        )}
-                        {['SUBMITTED', 'UNDER_REVIEW'].includes(r.status) && (
-                          <button
-                            onClick={() => handleUpdateStatus(r.id, 'REJECTED', 'Aid criteria not met')}
-                            className="btn btn-secondary"
-                            style={{ fontSize: '0.75rem', padding: '0.25rem 0.5rem', color: '#ef4444' }}
-                          >
-                            Reject
-                          </button>
-                        )}
-                      </>
-                    )}
+                      <button
+                        type="button"
+                        disabled={!title.trim() || !description.trim()}
+                        onClick={() => setStep(3)}
+                        className="btn btn-primary"
+                      >
+                        Continue <ArrowRight size={15} />
+                      </button>
+                    </div>
                   </div>
-                </div>
-              </div>
-            );
-          })}
+                )}
+
+                {/* Step 3: Location & Privacy */}
+                {step === 3 && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    <h4 style={{ fontSize: '1.05rem', fontWeight: 600, color: '#0b1f2a' }}>
+                      Where can responders deliver or reach out?
+                    </h4>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.25rem' }}>
+                        Location / General Neighborhood *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={location}
+                        onChange={(e) => setLocation(e.target.value)}
+                        placeholder="e.g. Al-Adhamiya, Baghdad or Najaf Old City"
+                        style={{ width: '100%', padding: '0.6rem', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.875rem' }}
+                      />
+                    </div>
+
+                    <div style={{ backgroundColor: '#f8fafc', padding: '1rem', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', cursor: 'pointer' }}>
+                        <input
+                          type="checkbox"
+                          checked={isPrivate}
+                          onChange={(e) => setIsPrivate(e.target.checked)}
+                          style={{ width: '16px', height: '16px' }}
+                        />
+                        <span style={{ fontSize: '0.875rem', fontWeight: 600, color: '#0b1f2a' }}>
+                          Keep this request private & confidential (Recommended)
+                        </span>
+                      </label>
+                      <p style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '0.35rem', marginLeft: '1.6rem' }}>
+                        Private requests are only visible to authorized coordinators from verified organizations.
+                      </p>
+                    </div>
+
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1rem' }}>
+                      <button type="button" onClick={() => setStep(2)} className="btn btn-secondary">
+                        <ArrowLeft size={15} /> Back
+                      </button>
+                      <button
+                        type="button"
+                        disabled={!location.trim()}
+                        onClick={() => setStep(4)}
+                        className="btn btn-primary"
+                      >
+                        Review Request <ArrowRight size={15} />
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Step 4: Review & Submit */}
+                {step === 4 && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    <h4 style={{ fontSize: '1.05rem', fontWeight: 600, color: '#0b1f2a' }}>
+                      Please review your details before submitting.
+                    </h4>
+
+                    <div style={{ backgroundColor: '#f8fafc', padding: '1rem', borderRadius: '8px', display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.875rem' }}>
+                      <div>
+                        <strong>Category:</strong> {selectedCategoryObj?.nameEn || 'General'}
+                      </div>
+                      <div>
+                        <strong>Title:</strong> {title}
+                      </div>
+                      <div>
+                        <strong>Details:</strong> {description}
+                      </div>
+                      <div>
+                        <strong>Location:</strong> {location}
+                      </div>
+                      <div>
+                        <strong>Confidentiality:</strong> {isPrivate ? 'Confidential (Private to Responders)' : 'Public'}
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1rem' }}>
+                      <button type="button" onClick={() => setStep(3)} className="btn btn-secondary" disabled={submitting}>
+                        <ArrowLeft size={15} /> Edit
+                      </button>
+                      <button type="submit" className="btn btn-primary" disabled={submitting}>
+                        {submitting ? 'Submitting...' : 'Confirm & Submit Request'}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </form>
+            )}
+          </div>
         </div>
       )}
 
@@ -427,8 +703,11 @@ export const RequestsPage: React.FC = () => {
         <div
           style={{
             position: 'fixed',
-            inset: 0,
-            backgroundColor: 'rgba(11, 27, 43, 0.5)',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0,0,0,0.5)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -436,160 +715,48 @@ export const RequestsPage: React.FC = () => {
             padding: '1rem',
           }}
         >
-          <div className="card" style={{ maxWidth: '480px', width: '100%', maxHeight: '80vh', overflowY: 'auto' }}>
-            <h3 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '0.25rem' }}>
-              Status Lifecycle Trail
+          <div className="card" style={{ maxWidth: '550px', width: '100%', padding: '1.75rem', maxHeight: '80vh', overflowY: 'auto' }}>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#0b1b2b', marginBottom: '0.5rem' }}>
+              Status Lifecycle History
             </h3>
-            <p style={{ fontSize: '0.8125rem', color: '#64748b', marginBottom: '1rem' }}>
-              {selectedHistory.requestTitle}
+            <p style={{ fontSize: '0.875rem', color: '#64748b', marginBottom: '1.25rem' }}>
+              For request: <strong>{selectedHistory.requestTitle}</strong>
             </p>
 
             {selectedHistory.history.length === 0 ? (
-              <p style={{ fontSize: '0.8125rem', color: '#64748b', textAlign: 'center', padding: '1.5rem 0' }}>
-                Initial submission state recorded.
-              </p>
+              <p style={{ color: '#64748b', fontSize: '0.875rem' }}>No status transitions recorded yet.</p>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                 {selectedHistory.history.map((h, i) => (
                   <div
                     key={h.id || i}
                     style={{
-                      borderLeft: '3px solid #1b6b63',
-                      paddingLeft: '0.75rem',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '0.2rem',
+                      padding: '0.75rem',
+                      borderRadius: '6px',
+                      backgroundColor: '#f8fafc',
+                      border: '1px solid #e2e8f0',
+                      fontSize: '0.8125rem',
                     }}
                   >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.8125rem', fontWeight: 600 }}>
-                      <span className="badge badge-neutral" style={{ fontSize: '0.7rem' }}>{h.fromStatus}</span>
-                      <ArrowRight size={12} />
-                      <span className="badge badge-info" style={{ fontSize: '0.7rem' }}>{h.toStatus}</span>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span className="badge badge-info">{h.newStatus}</span>
+                      <span style={{ color: '#94a3b8', fontSize: '0.75rem' }}>
+                        {new Date(h.timestamp || h.createdAt).toLocaleString()}
+                      </span>
                     </div>
-                    {h.notes && (
-                      <p style={{ fontSize: '0.75rem', color: '#475569', margin: 0 }}>
-                        {h.notes}
-                      </p>
+                    {h.reason && (
+                      <p style={{ color: '#475569', margin: '0.35rem 0 0' }}>Notes: {h.reason}</p>
                     )}
-                    <span style={{ fontSize: '0.7rem', color: '#94a3b8' }}>
-                      {new Date(h.changedAt || h.createdAt).toLocaleString()}
-                    </span>
                   </div>
                 ))}
               </div>
             )}
 
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1.5rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1.25rem' }}>
               <button onClick={() => setSelectedHistory(null)} className="btn btn-secondary">
                 Close
               </button>
             </div>
-          </div>
-        </div>
-      )}
-
-      {/* Submit Request Modal */}
-      {showModal && (
-        <div
-          style={{
-            position: 'fixed',
-            inset: 0,
-            backgroundColor: 'rgba(11, 27, 43, 0.5)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 100,
-            padding: '1rem',
-          }}
-        >
-          <div className="card" style={{ maxWidth: '520px', width: '100%', maxHeight: '90vh', overflowY: 'auto' }}>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '0.5rem' }}>
-              Submit Humanitarian Request
-            </h3>
-            <p style={{ fontSize: '0.8125rem', color: '#64748b', marginBottom: '1.5rem' }}>
-              Request emergency aid. Private requests are protected and only visible to you and verified reviewers.
-            </p>
-
-            {formError && (
-              <div style={{ backgroundColor: '#fef2f2', border: '1px solid #fca5a5', color: '#ef4444', padding: '0.75rem', borderRadius: '6px', fontSize: '0.8125rem', marginBottom: '1rem' }}>
-                {formError}
-              </div>
-            )}
-
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <div>
-                <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 500, marginBottom: '0.35rem' }}>Category</label>
-                <select
-                  value={categoryId}
-                  onChange={(e) => setCategoryId(e.target.value)}
-                  style={{ width: '100%', padding: '0.5rem', borderRadius: '6px', border: '1px solid #cbd5e1' }}
-                  required
-                >
-                  {categories.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.nameEn} ({c.nameAr})
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 500, marginBottom: '0.35rem' }}>Title</label>
-                <input
-                  type="text"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder="e.g. Monthly dry ration assistance"
-                  style={{ width: '100%', padding: '0.5rem', borderRadius: '6px', border: '1px solid #cbd5e1' }}
-                  required
-                />
-              </div>
-
-              <div>
-                <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 500, marginBottom: '0.35rem' }}>Description</label>
-                <textarea
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Provide essential details about the assistance required..."
-                  rows={3}
-                  style={{ width: '100%', padding: '0.5rem', borderRadius: '6px', border: '1px solid #cbd5e1' }}
-                  required
-                />
-              </div>
-
-              <div>
-                <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 500, marginBottom: '0.35rem' }}>Location / District</label>
-                <input
-                  type="text"
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  placeholder="e.g. West Sector, Neighborhood 5"
-                  style={{ width: '100%', padding: '0.5rem', borderRadius: '6px', border: '1px solid #cbd5e1' }}
-                  required
-                />
-              </div>
-
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <input
-                  type="checkbox"
-                  id="isPrivate"
-                  checked={isPrivate}
-                  onChange={(e) => setIsPrivate(e.target.checked)}
-                />
-                <label htmlFor="isPrivate" style={{ fontSize: '0.8125rem', color: '#334155' }}>
-                  Keep request confidential (private to reviewers only)
-                </label>
-              </div>
-
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '1rem' }}>
-                <button type="button" onClick={() => setShowModal(false)} className="btn btn-secondary">
-                  Cancel
-                </button>
-                <button type="submit" className="btn btn-teal">
-                  Submit Request
-                </button>
-              </div>
-            </form>
           </div>
         </div>
       )}
