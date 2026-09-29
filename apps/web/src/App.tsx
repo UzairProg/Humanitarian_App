@@ -20,9 +20,19 @@ import { LoginPage } from './pages/LoginPage';
 
 const AppLayout: React.FC = () => {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: 'var(--bg-app)' }}>
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        minHeight: '100vh',
+        backgroundColor: 'var(--bg-app)',
+        width: '100%',
+        maxWidth: '100vw',
+        overflowX: 'clip',
+      }}
+    >
       <Header />
-      <main style={{ flex: 1, minWidth: 0 }}>
+      <main style={{ flex: 1, minWidth: 0, width: '100%' }}>
         <Outlet />
       </main>
       <Footer />

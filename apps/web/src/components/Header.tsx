@@ -23,7 +23,6 @@ import {
   ClipboardList,
   ChevronDown,
   Home,
-  Award,
 } from 'lucide-react';
 import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { BrandLogo } from './BrandLogo';
@@ -57,7 +56,9 @@ export const Header: React.FC = () => {
   const [searchResults, setSearchResults] = useState<SearchResults | null>(null);
   const [searchLoading, setSearchLoading] = useState(false);
   const [showSearchDropdown, setShowSearchDropdown] = useState(false);
+  const [searchExpanded, setSearchExpanded] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   // Notifications state
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -81,7 +82,9 @@ export const Header: React.FC = () => {
   const isParticipateActive =
     location.pathname.startsWith('/volunteers') ||
     location.pathname.startsWith('/events') ||
-    location.pathname.startsWith('/businesses');
+    location.pathname.startsWith('/businesses') ||
+    location.pathname.startsWith('/organizations') ||
+    location.pathname.startsWith('/knowledge');
 
   const isAdminActive =
     location.pathname.startsWith('/moderation') ||
@@ -122,6 +125,7 @@ export const Header: React.FC = () => {
       }
       if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
         setShowSearchDropdown(false);
+        setSearchExpanded(false);
       }
       if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
         setShowUserMenu(false);
@@ -174,6 +178,7 @@ export const Header: React.FC = () => {
   const handleNavigateResult = (url: string) => {
     setShowSearchDropdown(false);
     setSearchQuery('');
+    setSearchExpanded(false);
     navigate(url);
   };
 
@@ -188,6 +193,8 @@ export const Header: React.FC = () => {
           top: 0,
           zIndex: 50,
           width: '100%',
+          maxWidth: '100vw',
+          boxSizing: 'border-box',
           overflowX: 'clip',
         }}
       >
@@ -197,41 +204,41 @@ export const Header: React.FC = () => {
             width: '100%',
             marginInline: 'auto',
             paddingInline: '1rem',
-            paddingBlock: '0.6rem',
+            paddingBlock: '0.55rem',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            gap: '0.75rem',
+            gap: '0.65rem',
             boxSizing: 'border-box',
           }}
         >
           {/* Brand Identity: Custom Arabic Monogram Logo + Name */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexShrink: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexShrink: 0 }}>
             <Link
               to="/"
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '0.65rem',
+                gap: '0.55rem',
                 textDecoration: 'none',
                 color: '#0b1f2a',
               }}
             >
-              <BrandLogo size={38} />
+              <BrandLogo size={36} />
               <div>
-                <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0b1f2a', lineHeight: 1.15 }}>
+                <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0b1f2a', lineHeight: 1.15, whiteSpace: 'nowrap' }}>
                   {t('app.title')}
                 </div>
-                <div style={{ fontSize: '0.6875rem', color: '#64748b', fontWeight: 500, letterSpacing: '0.01em' }}>
+                <div className="brand-tagline" style={{ fontSize: '0.625rem', color: '#64748b', fontWeight: 500, letterSpacing: '0.01em', whiteSpace: 'nowrap' }}>
                   {t('app.tagline')}
                 </div>
               </div>
             </Link>
           </div>
 
-          {/* Center: Desktop Navigation Links (Single line, logically grouped) */}
+          {/* Center: Desktop Navigation Links (Adaptive, concise labels, zero overflow) */}
           <nav className="desktop-nav" aria-label="Main Navigation">
-            {/* 1. Home */}
+            {/* Primary Link 1: Home */}
             <NavLink
               to="/"
               end
@@ -240,7 +247,7 @@ export const Header: React.FC = () => {
               {t('nav.home')}
             </NavLink>
 
-            {/* 2. Request Help */}
+            {/* Primary Link 2: Request Help */}
             <NavLink
               to="/requests"
               className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
@@ -248,7 +255,7 @@ export const Header: React.FC = () => {
               {t('nav.help')}
             </NavLink>
 
-            {/* 3. Community Meals */}
+            {/* Primary Link 3: Community Meals */}
             <NavLink
               to="/food-programs"
               className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
@@ -256,23 +263,23 @@ export const Header: React.FC = () => {
               {t('nav.meals')}
             </NavLink>
 
-            {/* 4. Organizations */}
+            {/* Secondary Link 4: Organizations (Auto-condenses into Participate on compact screens) */}
             <NavLink
               to="/organizations"
-              className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+              className={({ isActive }) => `nav-link nav-item-secondary ${isActive ? 'active' : ''}`}
             >
               {t('nav.organizations')}
             </NavLink>
 
-            {/* 5. Knowledge from Karbala */}
+            {/* Secondary Link 5: Knowledge (Auto-condenses into Participate on compact screens) */}
             <NavLink
               to="/knowledge"
-              className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+              className={({ isActive }) => `nav-link nav-item-secondary ${isActive ? 'active' : ''}`}
             >
               {t('nav.knowledge')}
             </NavLink>
 
-            {/* 6. Participate Group Dropdown */}
+            {/* Participate / More Group Dropdown */}
             <div className="nav-dropdown" ref={participateRef}>
               <button
                 type="button"
@@ -285,7 +292,7 @@ export const Header: React.FC = () => {
                   cursor: 'pointer',
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: '0.25rem',
+                  gap: '0.2rem',
                 }}
               >
                 <span>{t('nav.participate')}</span>
@@ -294,6 +301,27 @@ export const Header: React.FC = () => {
 
               {showParticipateMenu && (
                 <div className="nav-dropdown-menu">
+                  {/* Shown in dropdown on medium screens where secondary top links are hidden */}
+                  <div className="dropdown-secondary-only">
+                    <Link
+                      to="/organizations"
+                      className="nav-dropdown-item"
+                      onClick={() => setShowParticipateMenu(false)}
+                    >
+                      <Building2 size={15} color="#087f78" />
+                      <span>{t('nav.organizations')}</span>
+                    </Link>
+                    <Link
+                      to="/knowledge"
+                      className="nav-dropdown-item"
+                      onClick={() => setShowParticipateMenu(false)}
+                    >
+                      <BookOpen size={15} color="#c6a24a" />
+                      <span>{t('nav.knowledge')}</span>
+                    </Link>
+                    <div style={{ borderTop: '1px solid #f1f5f9', margin: '0.25rem 0' }} />
+                  </div>
+
                   <Link
                     to="/volunteers"
                     className="nav-dropdown-item"
@@ -322,7 +350,7 @@ export const Header: React.FC = () => {
               )}
             </div>
 
-            {/* 7. Admin / Moderation Group Dropdown (Staff only) */}
+            {/* Admin / Moderation Group Dropdown (Staff only) */}
             {isModeratorOrAdmin && (
               <div className="nav-dropdown" ref={adminRef}>
                 <button
@@ -336,7 +364,7 @@ export const Header: React.FC = () => {
                     cursor: 'pointer',
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: '0.25rem',
+                    gap: '0.2rem',
                   }}
                 >
                   <ShieldAlert size={14} color="#b45309" />
@@ -368,9 +396,9 @@ export const Header: React.FC = () => {
             )}
           </nav>
 
-          {/* Right Section: Search, Language Switcher, Notifications, User */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem', flexShrink: 0 }}>
-            {/* Global Search Bar */}
+          {/* Right Section: Responsive Search, Language Switcher, Notifications, User */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', flexShrink: 0 }}>
+            {/* Global Search Bar (Smoothly responsive, never pushes actions offscreen) */}
             <div style={{ position: 'relative' }} ref={searchRef}>
               <div
                 style={{
@@ -379,22 +407,33 @@ export const Header: React.FC = () => {
                   backgroundColor: '#faf8f2',
                   border: '1px solid #e5dfd2',
                   borderRadius: '20px',
-                  paddingInline: '0.65rem',
-                  paddingBlock: '0.35rem',
-                  gap: '0.35rem',
-                  width: '145px',
+                  paddingInline: '0.55rem',
+                  paddingBlock: '0.3rem',
+                  gap: '0.3rem',
+                  width: searchExpanded ? '160px' : '110px',
                   transition: 'width 0.2s ease, border-color 0.2s ease',
+                  boxSizing: 'border-box',
                 }}
               >
-                <Search size={14} color="#64748b" />
+                <Search
+                  size={14}
+                  color="#64748b"
+                  style={{ flexShrink: 0, cursor: 'pointer' }}
+                  onClick={() => {
+                    setSearchExpanded(true);
+                    searchInputRef.current?.focus();
+                  }}
+                />
                 <input
+                  ref={searchInputRef}
                   type="text"
                   value={searchQuery}
                   onFocus={() => {
+                    setSearchExpanded(true);
                     if (searchResults) setShowSearchDropdown(true);
                   }}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder={t('search.placeholder')}
+                  placeholder={locale === 'ar' ? 'بحث...' : 'Search...'}
                   style={{
                     background: 'none',
                     border: 'none',
@@ -402,6 +441,7 @@ export const Header: React.FC = () => {
                     fontSize: '0.785rem',
                     color: '#0b1f2a',
                     width: '100%',
+                    minWidth: 0,
                   }}
                 />
               </div>
@@ -413,8 +453,8 @@ export const Header: React.FC = () => {
                     position: 'absolute',
                     top: 'calc(100% + 8px)',
                     insetInlineEnd: 0,
-                    width: '360px',
-                    maxHeight: '440px',
+                    width: '320px',
+                    maxHeight: '400px',
                     overflowY: 'auto',
                     backgroundColor: '#ffffff',
                     borderRadius: '10px',
@@ -545,34 +585,35 @@ export const Header: React.FC = () => {
               )}
             </div>
 
-            {/* Language Switcher: In Arabic mode shows 'English', in English mode shows 'العربية' */}
+            {/* Language Switcher: Compact pill */}
             <button
               type="button"
               onClick={() => setLocale(locale === 'ar' ? 'en' : 'ar')}
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '0.35rem',
+                gap: '0.3rem',
                 backgroundColor: '#faf8f2',
                 border: '1px solid #e5dfd2',
                 color: '#0b1f2a',
-                paddingInline: '0.65rem',
-                paddingBlock: '0.35rem',
+                paddingInline: '0.55rem',
+                paddingBlock: '0.32rem',
                 borderRadius: '6px',
                 cursor: 'pointer',
-                fontSize: '0.8125rem',
+                fontSize: '0.785rem',
                 fontWeight: 600,
                 whiteSpace: 'nowrap',
+                flexShrink: 0,
               }}
               title={locale === 'ar' ? 'التحويل إلى الإنجليزية' : 'Switch to Arabic'}
             >
-              <Globe size={14} color="#087f78" />
+              <Globe size={13} color="#087f78" />
               <span>{locale === 'ar' ? 'English' : 'العربية'}</span>
             </button>
 
             {/* Authenticated user items: Notifications & Profile */}
             {isAuthenticated && user ? (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexShrink: 0 }}>
                 {/* Notifications */}
                 <div style={{ position: 'relative' }} ref={notifRef}>
                   <button
@@ -583,7 +624,7 @@ export const Header: React.FC = () => {
                       backgroundColor: '#faf8f2',
                       border: '1px solid #e5dfd2',
                       color: '#0b1f2a',
-                      padding: '0.45rem',
+                      padding: '0.4rem',
                       borderRadius: '6px',
                       cursor: 'pointer',
                       display: 'flex',
@@ -592,7 +633,7 @@ export const Header: React.FC = () => {
                     }}
                     aria-label={t('notif.title')}
                   >
-                    <Bell size={16} />
+                    <Bell size={15} />
                     {unreadCount > 0 && (
                       <span
                         style={{
@@ -602,11 +643,11 @@ export const Header: React.FC = () => {
                           backgroundColor: '#ef4444',
                           color: '#ffffff',
                           borderRadius: '9999px',
-                          fontSize: '0.65rem',
+                          fontSize: '0.625rem',
                           fontWeight: 700,
-                          minWidth: '16px',
-                          height: '16px',
-                          padding: '0 3px',
+                          minWidth: '15px',
+                          height: '15px',
+                          padding: '0 2px',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
@@ -625,8 +666,8 @@ export const Header: React.FC = () => {
                         position: 'absolute',
                         top: 'calc(100% + 8px)',
                         insetInlineEnd: 0,
-                        width: '320px',
-                        maxHeight: '400px',
+                        width: '300px',
+                        maxHeight: '380px',
                         backgroundColor: '#ffffff',
                         color: '#0f172a',
                         borderRadius: '8px',
@@ -640,7 +681,7 @@ export const Header: React.FC = () => {
                     >
                       <div
                         style={{
-                          padding: '0.75rem 1rem',
+                          padding: '0.65rem 0.85rem',
                           borderBottom: '1px solid #e2e8f0',
                           display: 'flex',
                           alignItems: 'center',
@@ -648,7 +689,7 @@ export const Header: React.FC = () => {
                           backgroundColor: '#f8fafc',
                         }}
                       >
-                        <span style={{ fontSize: '0.875rem', fontWeight: 600 }}>{t('notif.title')}</span>
+                        <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>{t('notif.title')}</span>
                         {unreadCount > 0 && (
                           <button
                             type="button"
@@ -657,7 +698,7 @@ export const Header: React.FC = () => {
                               background: 'none',
                               border: 'none',
                               color: '#087f78',
-                              fontSize: '0.75rem',
+                              fontSize: '0.725rem',
                               cursor: 'pointer',
                               fontWeight: 600,
                             }}
@@ -667,9 +708,9 @@ export const Header: React.FC = () => {
                         )}
                       </div>
 
-                      <div style={{ overflowY: 'auto', maxHeight: '320px' }}>
+                      <div style={{ overflowY: 'auto', maxHeight: '300px' }}>
                         {notifications.length === 0 ? (
-                          <div style={{ padding: '2rem 1rem', textAlign: 'center', color: '#64748b', fontSize: '0.8125rem' }}>
+                          <div style={{ padding: '1.75rem 1rem', textAlign: 'center', color: '#64748b', fontSize: '0.8125rem' }}>
                             {t('notif.empty')}
                           </div>
                         ) : (
@@ -678,37 +719,37 @@ export const Header: React.FC = () => {
                               key={n.id}
                               onClick={() => !n.isRead && handleMarkAsRead(n.id)}
                               style={{
-                                padding: '0.75rem 1rem',
+                                padding: '0.65rem 0.85rem',
                                 borderBottom: '1px solid #f1f5f9',
                                 backgroundColor: n.isRead ? '#ffffff' : '#f0fbf9',
                                 cursor: n.isRead ? 'default' : 'pointer',
                                 display: 'flex',
                                 flexDirection: 'column',
-                                gap: '0.25rem',
+                                gap: '0.2rem',
                               }}
                             >
                               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                                <span style={{ fontSize: '0.8125rem', fontWeight: n.isRead ? 500 : 700, color: '#0b1f2a' }}>
+                                <span style={{ fontSize: '0.8rem', fontWeight: n.isRead ? 500 : 700, color: '#0b1f2a' }}>
                                   {n.title}
                                 </span>
                                 {!n.isRead && (
                                   <span
                                     style={{
-                                      width: '8px',
-                                      height: '8px',
+                                      width: '7px',
+                                      height: '7px',
                                       borderRadius: '50%',
                                       backgroundColor: '#087f78',
                                       flexShrink: 0,
-                                      marginTop: '4px',
+                                      marginTop: '3px',
                                     }}
                                   />
                                 )}
                               </div>
-                              <p style={{ fontSize: '0.75rem', color: '#475569', margin: 0, lineHeight: 1.4 }}>
+                              <p style={{ fontSize: '0.725rem', color: '#475569', margin: 0, lineHeight: 1.4 }}>
                                 {n.message}
                               </p>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.7rem', color: '#94a3b8' }}>
-                                <Clock size={11} />
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.685rem', color: '#94a3b8' }}>
+                                <Clock size={10} />
                                 <span>{new Date(n.createdAt).toLocaleDateString(locale === 'ar' ? 'ar-EG' : undefined)}</span>
                               </div>
                             </div>
@@ -727,18 +768,18 @@ export const Header: React.FC = () => {
                     style={{
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '0.4rem',
+                      gap: '0.35rem',
                       background: 'none',
                       border: 'none',
                       cursor: 'pointer',
-                      padding: '0.2rem 0.35rem',
+                      padding: '0.15rem 0.25rem',
                       borderRadius: '6px',
                     }}
                   >
                     <div
                       style={{
-                        width: '32px',
-                        height: '32px',
+                        width: '30px',
+                        height: '30px',
                         borderRadius: '50%',
                         backgroundColor: '#0b1f2a',
                         color: '#deb95f',
@@ -746,13 +787,13 @@ export const Header: React.FC = () => {
                         alignItems: 'center',
                         justifyContent: 'center',
                         fontWeight: 700,
-                        fontSize: '0.8125rem',
+                        fontSize: '0.785rem',
                         border: '1px solid #c6a24a',
                       }}
                     >
                       {user.firstName ? user.firstName[0].toUpperCase() : 'U'}
                     </div>
-                    <ChevronDown size={13} color="#64748b" />
+                    <ChevronDown size={12} color="#64748b" />
                   </button>
 
                   {showUserMenu && (
@@ -761,22 +802,22 @@ export const Header: React.FC = () => {
                         position: 'absolute',
                         top: 'calc(100% + 8px)',
                         insetInlineEnd: 0,
-                        width: '220px',
+                        width: '210px',
                         backgroundColor: '#ffffff',
                         borderRadius: '8px',
                         boxShadow: '0 10px 25px rgba(0,0,0,0.12)',
                         border: '1px solid #e2e8f0',
-                        padding: '0.5rem 0',
+                        padding: '0.4rem 0',
                         zIndex: 100,
                         display: 'flex',
                         flexDirection: 'column',
                       }}
                     >
-                      <div style={{ padding: '0.5rem 1rem', borderBottom: '1px solid #f1f5f9' }}>
-                        <div style={{ fontSize: '0.875rem', fontWeight: 600, color: '#0b1f2a' }}>
+                      <div style={{ padding: '0.45rem 0.85rem', borderBottom: '1px solid #f1f5f9' }}>
+                        <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#0b1f2a' }}>
                           {user.firstName} {user.lastName}
                         </div>
-                        <div style={{ fontSize: '0.75rem', color: '#64748b' }}>{user.email}</div>
+                        <div style={{ fontSize: '0.725rem', color: '#64748b' }}>{user.email}</div>
                       </div>
 
                       {isModeratorOrAdmin && (
@@ -785,13 +826,13 @@ export const Header: React.FC = () => {
                             to="/moderation"
                             onClick={() => setShowUserMenu(false)}
                             style={{
-                              padding: '0.5rem 1rem',
-                              fontSize: '0.8125rem',
+                              padding: '0.45rem 0.85rem',
+                              fontSize: '0.785rem',
                               color: '#1e293b',
                               textDecoration: 'none',
                               display: 'flex',
                               alignItems: 'center',
-                              gap: '0.5rem',
+                              gap: '0.45rem',
                             }}
                           >
                             <ShieldAlert size={14} color="#087f78" /> {t('nav.moderation')}
@@ -800,18 +841,18 @@ export const Header: React.FC = () => {
                             to="/audit"
                             onClick={() => setShowUserMenu(false)}
                             style={{
-                              padding: '0.5rem 1rem',
-                              fontSize: '0.8125rem',
+                              padding: '0.45rem 0.85rem',
+                              fontSize: '0.785rem',
                               color: '#1e293b',
                               textDecoration: 'none',
                               display: 'flex',
                               alignItems: 'center',
-                              gap: '0.5rem',
+                              gap: '0.45rem',
                             }}
                           >
                             <ClipboardList size={14} color="#087f78" /> {t('nav.audit')}
                           </Link>
-                          <div style={{ borderTop: '1px solid #f1f5f9', margin: '0.25rem 0' }} />
+                          <div style={{ borderTop: '1px solid #f1f5f9', margin: '0.2rem 0' }} />
                         </>
                       )}
 
@@ -822,8 +863,8 @@ export const Header: React.FC = () => {
                           logout();
                         }}
                         style={{
-                          padding: '0.5rem 1rem',
-                          fontSize: '0.8125rem',
+                          padding: '0.45rem 0.85rem',
+                          fontSize: '0.785rem',
                           color: '#ef4444',
                           background: 'none',
                           border: 'none',
@@ -831,11 +872,11 @@ export const Header: React.FC = () => {
                           cursor: 'pointer',
                           display: 'flex',
                           alignItems: 'center',
-                          gap: '0.5rem',
+                          gap: '0.45rem',
                           width: '100%',
                         }}
                       >
-                        <LogOut size={14} /> {t('auth.logout')}
+                        <LogOut size={13} /> {t('auth.logout')}
                       </button>
                     </div>
                   )}
@@ -846,11 +887,12 @@ export const Header: React.FC = () => {
                 to="/login"
                 className="btn btn-navy"
                 style={{
-                  fontSize: '0.8125rem',
-                  paddingInline: '0.85rem',
+                  fontSize: '0.785rem',
+                  paddingInline: '0.75rem',
                   paddingBlock: '0.35rem',
                   borderRadius: '6px',
                   whiteSpace: 'nowrap',
+                  flexShrink: 0,
                 }}
               >
                 {t('auth.login')}
@@ -866,12 +908,13 @@ export const Header: React.FC = () => {
                 background: 'none',
                 border: 'none',
                 cursor: 'pointer',
-                padding: '0.3rem',
+                padding: '0.25rem',
                 color: '#0b1f2a',
+                flexShrink: 0,
               }}
               aria-label="Toggle Navigation Menu"
             >
-              {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+              {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
           </div>
         </div>
