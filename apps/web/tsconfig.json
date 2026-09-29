@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "useDefineForClassFields": true,
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": false,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "strict": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noFallthroughCasesInSwitch": true,
+    "baseUrl": "./",
+    "paths": {
+      "@al-husseiniya/types": ["../../packages/types/src"],
+      "@al-husseiniya/config": ["../../packages/config/src"],
+      "@al-husseiniya/utils": ["../../packages/utils/src"],
+      "@al-husseiniya/ui": ["../../packages/ui/src"]
+    }
+  },
+  "include": ["src"]
+}

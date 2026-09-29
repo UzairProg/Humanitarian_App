@@ -1,0 +1,15 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "baseUrl": "./",
+    "strictPropertyInitialization": false,
+    "paths": {
+      "@al-husseiniya/types": ["../packages/types/dist"],
+      "@al-husseiniya/config": ["../packages/config/dist"],
+      "@al-husseiniya/utils": ["../packages/utils/dist"],
+      "@al-husseiniya/ui": ["../packages/ui/dist"]
+    }
+  },
+  "include": ["src/**/*", "test/**/*"]
+}

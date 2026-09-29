@@ -1,0 +1,46 @@
+{
+  "name": "al-husseiniya-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Al-Husseiniya — Year-round humanitarian & community platform architecture (Phase 1)",
+  "workspaces": [
+    "packages/*",
+    "backend",
+    "apps/web"
+  ],
+  "scripts": {
+    "dev:backend": "npm --workspace=backend run dev",
+    "dev:web": "npm --workspace=apps/web run dev",
+    "dev": "npm --workspace=backend run dev",
+    "build:packages": "npm run --workspaces --if-present build:pkg",
+    "build:backend": "npm --workspace=backend run build",
+    "build:web": "npm --workspace=apps/web run build",
+    "build": "npm run build:packages && npm run build:backend && npm run build:web",
+    "test:backend": "npm --workspace=backend run test",
+    "test:web": "npm --workspace=apps/web run test",
+    "test:security": "npm --workspace=backend run test:security",
+    "test": "npm run test:backend",
+    "typecheck": "npm run --workspaces --if-present typecheck",
+    "lint": "npm run --workspaces --if-present lint",
+    "format": "prettier --write \"**/*.{ts,tsx,js,json,md}\"",
+    "db:migrate": "npm --workspace=backend run db:migrate",
+    "db:seed": "npm --workspace=backend run db:seed",
+    "clean": "npm run --workspaces --if-present clean"
+  },
+  "devDependencies": {
+    "prettier": "^3.2.5",
+    "rimraf": "^5.0.5",
+    "typescript": "^5.4.0"
+  },
+  "keywords": [
+    "al-husseiniya",
+    "humanitarian",
+    "community",
+    "modular-monolith",
+    "nestjs",
+    "react",
+    "flutter"
+  ],
+  "author": "Al-Husseiniya Engineering Team",
+  "license": "UNLICENSED"
+}
