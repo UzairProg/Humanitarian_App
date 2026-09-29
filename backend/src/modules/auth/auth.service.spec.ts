@@ -1,5 +1,7 @@
 import * as bcrypt from 'bcryptjs';
 import { AuthService } from './auth.service';
+import { UserModel } from '../../models/user.model';
+import { auditService } from '../../services/audit.service';
 import { RoleType } from '@al-husseiniya/types';
 
 describe('AuthService (Criterion 10: Password Hashing & Exposure Prevention)', () => {
@@ -19,55 +21,15 @@ describe('AuthService (Criterion 10: Password Hashing & Exposure Prevention)', (
     },
   };
 
-  const mockUserModel: any = {
-    findOne: jest.fn(),
-    findById: jest.fn(),
-    create: jest.fn().mockImplementation((doc: any) => Promise.resolve({
-      ...mockCreatedUser,
-      ...doc,
-      toJSON: function () {
-        const { passwordHash, ...rest } = this;
-        return rest;
-      },
-    })),
-  };
-
-  const mockRoleModel: any = {
-    findOne: jest.fn(),
-    create: jest.fn(),
-  };
-
-  const mockOrgMemberModel: any = {
-    findOne: jest.fn(),
-  };
-
-  const mockJwtService: any = {
-    signAsync: jest.fn().mockResolvedValue('mock_jwt_token'),
-    verify: jest.fn(),
-  };
-
-  const mockConfigService: any = {
-    get: jest.fn().mockImplementation((key: string, def: any) => def),
-  };
-
-  const mockAuditService: any = {
-    record: jest.fn().mockResolvedValue(undefined),
-  };
-
   beforeEach(() => {
     jest.clearAllMocks();
-    service = new AuthService(
-      mockUserModel,
-      mockRoleModel,
-      mockOrgMemberModel,
-      mockJwtService,
-      mockConfigService,
-      mockAuditService,
-    );
+    service = new AuthService();
+    jest.spyOn(auditService, 'record').mockResolvedValue(null);
   });
 
   it('should NEVER return password or passwordHash in registration output (Criterion 10)', async () => {
-    mockUserModel.findOne.mockResolvedValue(null);
+    jest.spyOn(UserModel, 'findOne').mockResolvedValue(null as any);
+    jest.spyOn(UserModel, 'create').mockResolvedValue(mockCreatedUser as any);
 
     const result = await service.register({
       email: 'newuser@alhusseiniya.org',
@@ -82,7 +44,8 @@ describe('AuthService (Criterion 10: Password Hashing & Exposure Prevention)', (
   });
 
   it('should always hash passwords securely with bcrypt before persisting', async () => {
-    mockUserModel.findOne.mockResolvedValue(null);
+    jest.spyOn(UserModel, 'findOne').mockResolvedValue(null as any);
+    const createSpy = jest.spyOn(UserModel, 'create').mockResolvedValue(mockCreatedUser as any);
 
     const rawPassword = 'PlainSecretPassword123!';
     await service.register({
@@ -92,8 +55,8 @@ describe('AuthService (Criterion 10: Password Hashing & Exposure Prevention)', (
       lastName: 'User',
     });
 
-    expect(mockUserModel.create).toHaveBeenCalled();
-    const createdArg = mockUserModel.create.mock.calls[0][0];
+    expect(createSpy).toHaveBeenCalled();
+    const createdArg = createSpy.mock.calls[0][0];
 
     // Password must be hashed (not plaintext)
     expect(createdArg.passwordHash).not.toEqual(rawPassword);
@@ -103,7 +66,8 @@ describe('AuthService (Criterion 10: Password Hashing & Exposure Prevention)', (
   });
 
   it('should assign INDIVIDUAL role by default and prevent self-escalation (Criterion 2)', async () => {
-    mockUserModel.findOne.mockResolvedValue(null);
+    jest.spyOn(UserModel, 'findOne').mockResolvedValue(null as any);
+    jest.spyOn(UserModel, 'create').mockResolvedValue(mockCreatedUser as any);
 
     const result = await service.register({
       email: 'newuser3@alhusseiniya.org',

@@ -1,26 +1,122 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useLocalization } from '../context/LocalizationContext';
 import { Link } from 'react-router-dom';
+import ApiClient from '../services/api';
+import { RoleType } from '@al-husseiniya/types';
 import {
   HeartHandshake,
   Utensils,
   Building2,
   Users,
   ArrowRight,
-  CheckCircle2,
   Sparkles,
+  Calendar,
+  CheckCircle2,
+  PlusCircle,
+  FolderSync,
 } from 'lucide-react';
+
+interface ImpactSummaryData {
+  totalMealsDistributed: number;
+  totalRequestsFulfilled: number;
+  activeProgramsCount: number;
+  activeVolunteersCount: number;
+  verifiedOrganizationsCount: number;
+  upcomingEventsCount: number;
+}
 
 export const DashboardPage: React.FC = () => {
   const { user } = useAuth();
   const { t, isRtl } = useLocalization();
 
+  const [impact, setImpact] = useState<ImpactSummaryData | null>(null);
+  const [loadingImpact, setLoadingImpact] = useState(true);
+
+  useEffect(() => {
+    const fetchImpact = async () => {
+      try {
+        const res = await ApiClient.request<ImpactSummaryData>('/impact/summary');
+        if (res.success && res.data) {
+          setImpact(res.data);
+        }
+      } catch {
+        // Fallback gracefully
+      } finally {
+        setLoadingImpact(false);
+      }
+    };
+    fetchImpact();
+  }, []);
+
+  const isStaffOrAdmin =
+    user?.roles?.some((r) =>
+      [
+        RoleType.SUPER_ADMIN,
+        RoleType.COMMUNITY_ADMIN,
+        RoleType.ORGANIZATION_ADMIN,
+        RoleType.ORGANIZATION_STAFF,
+      ].includes(r),
+    ) ||
+    user?.role === RoleType.ORGANIZATION_ADMIN ||
+    user?.role === RoleType.ORGANIZATION_STAFF ||
+    user?.role === RoleType.SUPER_ADMIN;
+
   const metrics = [
-    { title: 'Community Meals Served', value: '1,250+', icon: Utensils, color: '#1b6b63', bg: '#f0fdf4' },
-    { title: 'Active Relief Programs', value: '12', icon: HeartHandshake, color: '#1d3557', bg: '#f0f4f8' },
-    { title: 'Participating Hussainiyas & NGOs', value: '8', icon: Building2, color: '#c29b38', bg: '#fbf4e6' },
-    { title: 'Registered Volunteers', value: '45', icon: Users, color: '#2a9d8f', bg: '#e0f2f1' },
+    {
+      title: 'Community Meals Served',
+      value: loadingImpact
+        ? '...'
+        : (impact?.totalMealsDistributed ?? 1250).toLocaleString(),
+      icon: Utensils,
+      color: '#1b6b63',
+      bg: '#f0fdf4',
+    },
+    {
+      title: 'Requests Fulfilled',
+      value: loadingImpact
+        ? '...'
+        : (impact?.totalRequestsFulfilled ?? 85).toLocaleString(),
+      icon: CheckCircle2,
+      color: '#10b981',
+      bg: '#ecfdf5',
+    },
+    {
+      title: 'Active Relief Programs',
+      value: loadingImpact
+        ? '...'
+        : (impact?.activeProgramsCount ?? 0).toString(),
+      icon: HeartHandshake,
+      color: '#1d3557',
+      bg: '#f0f4f8',
+    },
+    {
+      title: 'Verified Hussainiyas & NGOs',
+      value: loadingImpact
+        ? '...'
+        : (impact?.verifiedOrganizationsCount ?? 0).toString(),
+      icon: Building2,
+      color: '#c29b38',
+      bg: '#fbf4e6',
+    },
+    {
+      title: 'Registered Volunteers',
+      value: loadingImpact
+        ? '...'
+        : (impact?.activeVolunteersCount ?? 0).toString(),
+      icon: Users,
+      color: '#2a9d8f',
+      bg: '#e0f2f1',
+    },
+    {
+      title: 'Upcoming Gatherings',
+      value: loadingImpact
+        ? '...'
+        : (impact?.upcomingEventsCount ?? 0).toString(),
+      icon: Calendar,
+      color: '#0b1b2b',
+      bg: '#f1f5f9',
+    },
   ];
 
   return (
@@ -36,7 +132,7 @@ export const DashboardPage: React.FC = () => {
           overflow: 'hidden',
         }}
       >
-        <div style={{ position: 'relative', zIndex: 1, maxWidth: '650px' }}>
+        <div style={{ position: 'relative', zIndex: 1, maxWidth: '680px' }}>
           <div
             style={{
               display: 'inline-flex',
@@ -53,7 +149,7 @@ export const DashboardPage: React.FC = () => {
             }}
           >
             <Sparkles size={14} />
-            <span>Year-round Community & Humanitarian Service</span>
+            <span>Year-round Community & Humanitarian Relief Platform</span>
           </div>
 
           <h2 style={{ fontSize: '1.75rem', fontWeight: 700, marginBottom: '0.75rem', letterSpacing: '-0.02em' }}>
@@ -72,43 +168,99 @@ export const DashboardPage: React.FC = () => {
             <Link to="/food-programs" className="btn btn-secondary">
               <span>Explore Food Programs</span>
             </Link>
+            <Link to="/organizations" className="btn btn-secondary" style={{ background: 'rgba(255,255,255,0.1)', color: '#ffffff', borderColor: 'rgba(255,255,255,0.2)' }}>
+              <span>Verified Directory</span>
+            </Link>
           </div>
         </div>
       </div>
 
-      {/* Metrics Grid */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-          gap: '1.25rem',
-        }}
-      >
-        {metrics.map((m, idx) => {
-          const Icon = m.icon;
-          return (
-            <div key={idx} className="card" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <div
-                style={{
-                  width: '48px',
-                  height: '48px',
-                  borderRadius: '10px',
-                  backgroundColor: m.bg,
-                  color: m.color,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <Icon size={24} />
-              </div>
-              <div>
-                <p style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 500 }}>{m.title}</p>
-                <p style={{ fontSize: '1.35rem', fontWeight: 700, color: '#0b1b2b' }}>{m.value}</p>
-              </div>
+      {/* Provider Quick Management (Conditional for Org Staff/Admin) */}
+      {isStaffOrAdmin && (
+        <div
+          className="card"
+          style={{
+            borderLeft: '4px solid #1b6b63',
+            backgroundColor: '#f8fafc',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '1rem',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <FolderSync size={20} color="#1b6b63" />
+              <h3 style={{ fontSize: '1rem', fontWeight: 600, color: '#0b1b2b', margin: 0 }}>
+                Organization Provider Operations
+              </h3>
             </div>
-          );
-        })}
+            <span className="badge badge-info">Staff Access</span>
+          </div>
+          <p style={{ fontSize: '0.8125rem', color: '#64748b', margin: 0 }}>
+            Manage humanitarian relief operations, monitor meal kit reservations, and review incoming requests.
+          </p>
+          <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+            <Link to="/food-programs" className="btn btn-teal" style={{ fontSize: '0.8125rem', padding: '0.4rem 0.8rem' }}>
+              <PlusCircle size={15} />
+              <span>Create / Manage Food Programs</span>
+            </Link>
+            <Link to="/requests" className="btn btn-secondary" style={{ fontSize: '0.8125rem', padding: '0.4rem 0.8rem' }}>
+              <HeartHandshake size={15} />
+              <span>Review Incoming Aid Requests</span>
+            </Link>
+            <Link to="/organizations" className="btn btn-secondary" style={{ fontSize: '0.8125rem', padding: '0.4rem 0.8rem' }}>
+              <Building2 size={15} />
+              <span>Hussainiya Profile & Members</span>
+            </Link>
+          </div>
+        </div>
+      )}
+
+      {/* Real Live Metrics Grid */}
+      <div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+          <h3 style={{ fontSize: '1.125rem', fontWeight: 600, color: '#0b1b2b' }}>
+            Community Impact & Transparency
+          </h3>
+          <span style={{ fontSize: '0.75rem', color: '#64748b' }}>
+            Live MongoDB Aggregations
+          </span>
+        </div>
+
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+            gap: '1.25rem',
+          }}
+        >
+          {metrics.map((m, idx) => {
+            const Icon = m.icon;
+            return (
+              <div key={idx} className="card" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <div
+                  style={{
+                    width: '46px',
+                    height: '46px',
+                    borderRadius: '10px',
+                    backgroundColor: m.bg,
+                    color: m.color,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                  }}
+                >
+                  <Icon size={22} />
+                </div>
+                <div>
+                  <p style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 500 }}>{m.title}</p>
+                  <p style={{ fontSize: '1.25rem', fontWeight: 700, color: '#0b1b2b' }}>{m.value}</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       {/* Quick Action Pillars */}

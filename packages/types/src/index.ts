@@ -11,8 +11,11 @@ export enum RoleType {
   INDIVIDUAL = 'INDIVIDUAL',
   ORGANIZATION_ADMIN = 'ORGANIZATION_ADMIN',
   ORGANIZATION_STAFF = 'ORGANIZATION_STAFF',
+  COMMUNITY_ADMIN = 'COMMUNITY_ADMIN',
   BUSINESS_ADMIN = 'BUSINESS_ADMIN',
   VOLUNTEER = 'VOLUNTEER',
+  BENEFICIARY = 'BENEFICIARY',
+  PUBLIC_USER = 'PUBLIC_USER',
   CONTRIBUTOR = 'CONTRIBUTOR',
   MODERATOR = 'MODERATOR',
   ADMIN = 'ADMIN',
@@ -207,6 +210,7 @@ export interface IUser {
   phoneVerified: boolean;
   avatarUrl?: string | null;
   roles: RoleType[];
+  role?: string | RoleType;
   createdAt: Date;
   updatedAt: Date;
   deletedAt?: Date | null;
@@ -430,6 +434,8 @@ export interface INotification {
   type: string;
   title: string;
   body: string;
+  message?: string;
+  isRead?: boolean;
   payload?: Record<string, any> | null;
   readAt?: Date | null;
   createdAt: Date;

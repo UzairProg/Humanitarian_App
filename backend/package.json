@@ -10,7 +10,7 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint \"src/**/*.ts\"",
     "test": "jest --config jest.config.js --runInBand",
-    "test:security": "jest --config jest.config.js test/security.e2e-spec.ts --runInBand",
+    "test:security": "jest --config jest.config.js src/tests/e2e-scenarios.spec.ts --runInBand",
     "test:cov": "jest --coverage",
     "db:migrate": "ts-node src/database/scripts/run-migrations.ts",
     "db:seed": "ts-node src/database/scripts/run-seed.ts"

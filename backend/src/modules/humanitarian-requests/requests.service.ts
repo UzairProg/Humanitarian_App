@@ -12,6 +12,7 @@ import {
 } from '../../models/humanitarian-request.model';
 import { RequestCategoryModel, RequestCategoryDocument } from '../../models/request-category.model';
 import { RequestStatusHistoryModel } from '../../models/request-status-history.model';
+import { OrganizationMemberModel } from '../../models/organization-member.model';
 import { authorizationService } from '../../services/authorization.service';
 import { auditService } from '../../services/audit.service';
 import { notificationService } from '../../services/notification.service';
@@ -258,22 +259,21 @@ export class RequestsService {
 
     const isAdmin = authorizationService.isSuperAdminOrAdmin(currentUser);
     const isOwner = request.requesterId === currentUser.sub;
+
+    const userMemberships = await OrganizationMemberModel.find({
+      userId: currentUser.sub,
+    }).exec();
+    const userOrgIds = userMemberships.map((m) => m.organizationId);
+    if (currentUser.orgId) userOrgIds.push(currentUser.orgId);
+
     const isOrgStaff =
-      currentUser.orgId &&
-      (request.organizationId === currentUser.orgId ||
-        request.matchedOrganizationId === currentUser.orgId);
+      (currentUser.roles?.includes(RoleType.ORGANIZATION_ADMIN) ||
+        currentUser.roles?.includes(RoleType.ORGANIZATION_STAFF)) &&
+      (userOrgIds.includes(request.organizationId || '') ||
+        userOrgIds.includes(request.matchedOrganizationId || '') ||
+        !request.organizationId);
 
-    // 1. Enforce State Machine Transitions
-    const allowedNext = this.validTransitions[request.status as RequestStatus] || [];
-    if (!allowedNext.includes(input.status) && !isAdmin) {
-      throw new AppError(
-        `Invalid status transition from '${request.status}' to '${input.status}'`,
-        400,
-        'INVALID_STATUS_TRANSITION',
-      );
-    }
-
-    // 2. Enforce Role and Ownership Permissions
+    // 1. Enforce Role and Ownership Authorization FIRST
     if (!isAdmin) {
       if (isOwner) {
         // Individual requesters can ONLY cancel their own requests
@@ -285,8 +285,11 @@ export class RequestsService {
           );
         }
       } else if (isOrgStaff) {
-        // Org staff can accept, start, complete, or reject
+        // Org staff can review, match, accept, start, complete, or reject
         const allowedOrgStatuses: RequestStatus[] = [
+          RequestStatus.UNDER_REVIEW,
+          RequestStatus.IN_REVIEW,
+          RequestStatus.MATCHED,
           RequestStatus.ACCEPTED,
           RequestStatus.IN_PROGRESS,
           RequestStatus.COMPLETED,
@@ -295,7 +298,7 @@ export class RequestsService {
         ];
         if (!allowedOrgStatuses.includes(input.status)) {
           throw new AppError(
-            'Organization staff can only accept, advance, complete, or reject requests',
+            'Organization staff can only review, match, accept, advance, complete, or reject requests',
             403,
             'FORBIDDEN',
           );
@@ -307,6 +310,16 @@ export class RequestsService {
           'FORBIDDEN',
         );
       }
+    }
+
+    // 2. Enforce Canonical State Machine Transitions
+    const allowedNext = this.validTransitions[request.status as RequestStatus] || [];
+    if (!allowedNext.includes(input.status) && !isAdmin) {
+      throw new AppError(
+        `Invalid status transition from '${request.status}' to '${input.status}'`,
+        400,
+        'INVALID_STATUS_TRANSITION',
+      );
     }
 
     const previousStatus = request.status;

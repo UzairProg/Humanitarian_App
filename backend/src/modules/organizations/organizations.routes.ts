@@ -20,6 +20,12 @@ router.patch(
   requireRoles(RoleType.ADMIN, RoleType.SUPER_ADMIN),
   (req, res, next) => organizationsController.verify(req, res, next),
 );
+router.post(
+  '/:id/verify',
+  authenticateJwt,
+  requireRoles(RoleType.ADMIN, RoleType.SUPER_ADMIN),
+  (req, res, next) => organizationsController.verify(req, res, next),
+);
 router.get('/:id/dashboard', authenticateJwt, (req, res, next) =>
   organizationsController.getDashboard(req, res, next),
 );
