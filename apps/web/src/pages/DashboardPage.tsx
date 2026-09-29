@@ -17,15 +17,15 @@ import {
   Clock,
   ShieldCheck,
   Info,
-  Sparkles,
   ChevronRight,
   Compass,
   Award,
   Heart,
   Scale,
-  Sun,
-  Flame,
-  Globe2,
+  Sparkles,
+  Search,
+  Check,
+  X,
 } from 'lucide-react';
 
 interface ImpactSummaryData {
@@ -85,6 +85,16 @@ export const DashboardPage: React.FC = () => {
   // Around You active tab: 'meals' | 'events' | 'orgs'
   const [aroundTab, setAroundTab] = useState<'meals' | 'events' | 'orgs'>('meals');
 
+  // Dismissable first-time community onboarding
+  const [showOnboarding, setShowOnboarding] = useState(() => {
+    return !localStorage.getItem('al_husseiniya_onboarded');
+  });
+
+  const handleDismissOnboarding = () => {
+    localStorage.setItem('al_husseiniya_onboarded', 'true');
+    setShowOnboarding(false);
+  };
+
   useEffect(() => {
     const loadHomeData = async () => {
       setLoading(true);
@@ -112,7 +122,7 @@ export const DashboardPage: React.FC = () => {
   }, [locale]);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', width: '100%', overflowX: 'clip' }}>
       {/* =========================================================================
           1. HERO SECTION (Warm Ivory Background with Split Layout & Authentic Imagery)
           ========================================================================= */}
@@ -120,28 +130,31 @@ export const DashboardPage: React.FC = () => {
         className="section-ivory"
         style={{
           borderBottom: '1px solid #e8e3d8',
-          paddingBlock: '4.5rem 4rem',
-          paddingInline: '1.5rem',
+          paddingBlock: '4rem 3.5rem',
+          paddingInline: '1.25rem',
+          width: '100%',
         }}
       >
         <div
           style={{
             maxWidth: '1280px',
+            width: '100%',
             marginInline: 'auto',
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-            gap: '3rem',
+            gap: '2.5rem',
             alignItems: 'center',
+            boxSizing: 'border-box',
           }}
         >
-          {/* Hero Content Left / Right depending on RTL */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-            {/* Eyebrow Tag */}
+          {/* Hero Content: In RTL appears on the RIGHT, in LTR appears on the LEFT */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+            {/* Eyebrow Tag: Culturally dignified */}
             <div
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: '0.5rem',
+                gap: '0.45rem',
                 backgroundColor: '#fbf5e6',
                 border: '1px solid #fae8be',
                 color: '#85530f',
@@ -153,15 +166,15 @@ export const DashboardPage: React.FC = () => {
                 alignSelf: 'flex-start',
               }}
             >
-              <Sparkles size={14} color="#c6a24a" />
+              <Award size={15} color="#c6a24a" />
               <span>{t('home.eyebrow')}</span>
             </div>
 
             <h1
               style={{
-                fontSize: 'clamp(2.2rem, 4.5vw, 3.4rem)',
+                fontSize: 'clamp(2.1rem, 4.2vw, 3.25rem)',
                 fontWeight: 800,
-                lineHeight: 1.2,
+                lineHeight: 1.22,
                 color: '#0b1f2a',
                 margin: 0,
               }}
@@ -171,7 +184,7 @@ export const DashboardPage: React.FC = () => {
 
             <p
               style={{
-                fontSize: 'clamp(1rem, 1.8vw, 1.18rem)',
+                fontSize: 'clamp(0.975rem, 1.6vw, 1.15rem)',
                 color: '#475569',
                 lineHeight: 1.75,
                 margin: 0,
@@ -180,8 +193,8 @@ export const DashboardPage: React.FC = () => {
               {t('home.hero.desc')}
             </p>
 
-            {/* CTAs */}
-            <div style={{ display: 'flex', gap: '0.85rem', flexWrap: 'wrap', marginTop: '0.5rem' }}>
+            {/* CTAs with clear priority */}
+            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginTop: '0.5rem' }}>
               <Link
                 to="/requests"
                 className="btn btn-primary"
@@ -236,7 +249,7 @@ export const DashboardPage: React.FC = () => {
           </div>
 
           {/* Hero Visual Imagery */}
-          <div style={{ position: 'relative' }}>
+          <div style={{ position: 'relative', width: '100%' }}>
             <div
               style={{
                 borderRadius: '16px',
@@ -251,12 +264,12 @@ export const DashboardPage: React.FC = () => {
                 alt={locale === 'ar' ? 'ضيافة مجتمعية وخدمة إنسانية' : 'Community hospitality and humanitarian service'}
                 style={{
                   width: '100%',
-                  height: '420px',
+                  height: '400px',
                   objectFit: 'cover',
                   display: 'block',
                 }}
               />
-              {/* Image Badge Overlay */}
+              {/* Image Badge Overlay: Uses authentic service/heart icon instead of generic sparkle */}
               <div
                 style={{
                   position: 'absolute',
@@ -271,15 +284,16 @@ export const DashboardPage: React.FC = () => {
                   display: 'flex',
                   alignItems: 'center',
                   gap: '0.65rem',
+                  boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
                 }}
               >
-                <Sparkles size={16} color="#deb95f" />
+                <HeartHandshake size={20} color="#deb95f" />
                 <div>
                   <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#deb95f' }}>
-                    {locale === 'ar' ? 'ضيافة وتكافل دائم' : 'Enduring Community Hospitality'}
+                    {t('home.badge.hospitality')}
                   </div>
                   <div style={{ fontSize: '0.725rem', color: '#cbd5e1' }}>
-                    {locale === 'ar' ? 'خدمة بروح كربلاء طوال العام' : 'Serving with Karbala spirit year-round'}
+                    {t('home.badge.spirit')}
                   </div>
                 </div>
               </div>
@@ -295,22 +309,24 @@ export const DashboardPage: React.FC = () => {
         className="section-sand"
         style={{
           borderBottom: '1px solid #e8e3d8',
-          paddingBlock: '1.5rem',
-          paddingInline: '1.5rem',
+          paddingBlock: '1.35rem',
+          paddingInline: '1.25rem',
+          width: '100%',
         }}
       >
         <div
           style={{
             maxWidth: '1280px',
+            width: '100%',
             marginInline: 'auto',
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-            gap: '1.5rem',
+            gap: '1.25rem',
             alignItems: 'center',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <div style={{ width: '38px', height: '38px', borderRadius: '8px', backgroundColor: '#e5ddd0', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#087f78' }}>
+            <div style={{ width: '38px', height: '38px', borderRadius: '8px', backgroundColor: '#e5ddd0', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#087f78', flexShrink: 0 }}>
               <ShieldCheck size={20} />
             </div>
             <div>
@@ -324,7 +340,7 @@ export const DashboardPage: React.FC = () => {
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <div style={{ width: '38px', height: '38px', borderRadius: '8px', backgroundColor: '#e5ddd0', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#087f78' }}>
+            <div style={{ width: '38px', height: '38px', borderRadius: '8px', backgroundColor: '#e5ddd0', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#087f78', flexShrink: 0 }}>
               <HeartHandshake size={20} />
             </div>
             <div>
@@ -338,7 +354,7 @@ export const DashboardPage: React.FC = () => {
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <div style={{ width: '38px', height: '38px', borderRadius: '8px', backgroundColor: '#e5ddd0', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#087f78' }}>
+            <div style={{ width: '38px', height: '38px', borderRadius: '8px', backgroundColor: '#e5ddd0', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#087f78', flexShrink: 0 }}>
               <Users size={20} />
             </div>
             <div>
@@ -352,8 +368,8 @@ export const DashboardPage: React.FC = () => {
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <div style={{ width: '38px', height: '38px', borderRadius: '8px', backgroundColor: '#e5ddd0', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#087f78' }}>
-              <Sparkles size={20} />
+            <div style={{ width: '38px', height: '38px', borderRadius: '8px', backgroundColor: '#e5ddd0', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#087f78', flexShrink: 0 }}>
+              <Award size={20} />
             </div>
             <div>
               <div style={{ fontSize: '0.875rem', fontWeight: 700, color: '#0b1f2a' }}>
@@ -368,26 +384,268 @@ export const DashboardPage: React.FC = () => {
       </section>
 
       {/* =========================================================================
-          3. HOW CAN WE SERVE YOU TODAY? (4 Distinct Tinted Pathway Cards)
+          3. FIRST-TIME COMMUNITY ONBOARDING BANNER (Optional & Dismissible)
+          ========================================================================= */}
+      {showOnboarding && (
+        <section
+          style={{
+            backgroundColor: '#faf6ec',
+            borderBottom: '1px solid #fae8be',
+            paddingBlock: '1.25rem',
+            paddingInline: '1.25rem',
+          }}
+        >
+          <div
+            style={{
+              maxWidth: '1280px',
+              marginInline: 'auto',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '1rem',
+              flexWrap: 'wrap',
+            }}
+          >
+            <div>
+              <div style={{ fontSize: '0.95rem', fontWeight: 800, color: '#0b1f2a' }}>
+                {t('home.onboarding.title')} — {t('home.onboarding.subtitle')}
+              </div>
+              <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginTop: '0.4rem' }}>
+                <Link
+                  to="/requests"
+                  className="badge badge-neutral"
+                  style={{ textDecoration: 'none', padding: '0.3rem 0.65rem' }}
+                >
+                  {t('home.onboarding.opt_need_help')}
+                </Link>
+                <Link
+                  to="/volunteers"
+                  className="badge badge-neutral"
+                  style={{ textDecoration: 'none', padding: '0.3rem 0.65rem' }}
+                >
+                  {t('home.onboarding.opt_volunteer')}
+                </Link>
+                <Link
+                  to="/businesses"
+                  className="badge badge-neutral"
+                  style={{ textDecoration: 'none', padding: '0.3rem 0.65rem' }}
+                >
+                  {t('home.onboarding.opt_support')}
+                </Link>
+                <Link
+                  to="/knowledge"
+                  className="badge badge-neutral"
+                  style={{ textDecoration: 'none', padding: '0.3rem 0.65rem' }}
+                >
+                  {t('home.onboarding.opt_learn')}
+                </Link>
+                <Link
+                  to="/events"
+                  className="badge badge-neutral"
+                  style={{ textDecoration: 'none', padding: '0.3rem 0.65rem' }}
+                >
+                  {t('home.onboarding.opt_events')}
+                </Link>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleDismissOnboarding}
+              style={{
+                background: 'none',
+                border: '1px solid #dcd4c5',
+                borderRadius: '6px',
+                padding: '0.35rem 0.75rem',
+                fontSize: '0.785rem',
+                color: '#64748b',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.3rem',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              <span>{t('home.onboarding.dismiss')}</span>
+              <X size={13} />
+            </button>
+          </div>
+        </section>
+      )}
+
+      {/* =========================================================================
+          4. WHY WE HELP SECTION ("لماذا نساعد؟")
           ========================================================================= */}
       <section
         className="section-white"
         style={{
+          paddingBlock: '4rem 3.5rem',
+          paddingInline: '1.25rem',
+          borderBottom: '1px solid #f1ece1',
+        }}
+      >
+        <div style={{ maxWidth: '1280px', marginInline: 'auto' }}>
+          <div style={{ textAlign: 'center', maxWidth: '850px', marginInline: 'auto', marginBottom: '2.5rem' }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', color: '#087f78', fontSize: '0.8125rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '0.35rem' }}>
+              <Heart size={15} />
+              <span>{locale === 'ar' ? 'الغاية والمنطلق' : 'Purpose & Motivation'}</span>
+            </div>
+            <h2 style={{ fontSize: '2.1rem', fontWeight: 800, color: '#0b1f2a', margin: 0 }}>
+              {t('home.why_we_help.title')}
+            </h2>
+            <p style={{ color: '#475569', fontSize: '1.05rem', lineHeight: 1.75, marginTop: '0.65rem' }}>
+              {t('home.why_we_help.desc')}
+            </p>
+          </div>
+
+          {/* 5 Core Values Pill Chain */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+              gap: '1.25rem',
+            }}
+          >
+            {/* Value 1: Dignity */}
+            <div
+              style={{
+                backgroundColor: '#faf8f2',
+                border: '1px solid #e8e3d8',
+                borderRadius: '12px',
+                padding: '1.25rem',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.45rem',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#087f78' }}>
+                <HeartHandshake size={20} />
+                <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#0b1f2a', margin: 0 }}>
+                  {t('home.values.dignity')}
+                </h3>
+              </div>
+              <p style={{ fontSize: '0.8125rem', color: '#64748b', lineHeight: 1.55, margin: 0 }}>
+                {t('home.values.dignity_desc')}
+              </p>
+            </div>
+
+            {/* Value 2: Compassion */}
+            <div
+              style={{
+                backgroundColor: '#faf8f2',
+                border: '1px solid #e8e3d8',
+                borderRadius: '12px',
+                padding: '1.25rem',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.45rem',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#087f78' }}>
+                <Heart size={20} />
+                <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#0b1f2a', margin: 0 }}>
+                  {t('home.values.mercy')}
+                </h3>
+              </div>
+              <p style={{ fontSize: '0.8125rem', color: '#64748b', lineHeight: 1.55, margin: 0 }}>
+                {t('home.values.mercy_desc')}
+              </p>
+            </div>
+
+            {/* Value 3: Justice */}
+            <div
+              style={{
+                backgroundColor: '#faf8f2',
+                border: '1px solid #e8e3d8',
+                borderRadius: '12px',
+                padding: '1.25rem',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.45rem',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#087f78' }}>
+                <Scale size={20} />
+                <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#0b1f2a', margin: 0 }}>
+                  {t('home.values.justice')}
+                </h3>
+              </div>
+              <p style={{ fontSize: '0.8125rem', color: '#64748b', lineHeight: 1.55, margin: 0 }}>
+                {t('home.values.justice_desc')}
+              </p>
+            </div>
+
+            {/* Value 4: Service */}
+            <div
+              style={{
+                backgroundColor: '#faf8f2',
+                border: '1px solid #e8e3d8',
+                borderRadius: '12px',
+                padding: '1.25rem',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.45rem',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#087f78' }}>
+                <Utensils size={20} />
+                <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#0b1f2a', margin: 0 }}>
+                  {t('home.values.service')}
+                </h3>
+              </div>
+              <p style={{ fontSize: '0.8125rem', color: '#64748b', lineHeight: 1.55, margin: 0 }}>
+                {t('home.values.service_desc')}
+              </p>
+            </div>
+
+            {/* Value 5: Community */}
+            <div
+              style={{
+                backgroundColor: '#faf8f2',
+                border: '1px solid #e8e3d8',
+                borderRadius: '12px',
+                padding: '1.25rem',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.45rem',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#087f78' }}>
+                <Users size={20} />
+                <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#0b1f2a', margin: 0 }}>
+                  {t('home.values.community')}
+                </h3>
+              </div>
+              <p style={{ fontSize: '0.8125rem', color: '#64748b', lineHeight: 1.55, margin: 0 }}>
+                {t('home.values.community_desc')}
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* =========================================================================
+          5. DIRECT PATHWAYS: "كيف يمكننا خدمتك اليوم؟" (4 Tinted Cards)
+          ========================================================================= */}
+      <section
+        className="section-ivory"
+        style={{
           paddingBlock: '4rem',
-          paddingInline: '1.5rem',
+          paddingInline: '1.25rem',
+          borderBottom: '1px solid #e8e3d8',
         }}
       >
         <div style={{ maxWidth: '1280px', marginInline: 'auto' }}>
           <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
-            <h2 style={{ fontSize: '2rem', fontWeight: 800, color: '#0b1f2a', margin: 0 }}>
+            <h2 style={{ fontSize: '1.95rem', fontWeight: 800, color: '#0b1f2a', margin: 0 }}>
               {t('home.pathways.title')}
             </h2>
-            <p style={{ color: '#64748b', fontSize: '0.95rem', marginTop: '0.5rem' }}>
+            <p style={{ color: '#64748b', fontSize: '0.95rem', marginTop: '0.45rem' }}>
               {t('home.pathways.subtitle')}
             </p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.25rem' }}>
             {/* Pathway 1: Help (Soft Teal) */}
             <Link
               to="/requests"
@@ -395,18 +653,18 @@ export const DashboardPage: React.FC = () => {
                 backgroundColor: '#f0fbf9',
                 border: '1px solid #bceae6',
                 borderRadius: '12px',
-                padding: '1.75rem 1.5rem',
+                padding: '1.5rem',
                 textDecoration: 'none',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '0.85rem',
+                gap: '0.75rem',
                 transition: 'transform 0.15s ease, box-shadow 0.15s ease',
               }}
             >
               <div
                 style={{
-                  width: '46px',
-                  height: '46px',
+                  width: '44px',
+                  height: '44px',
                   borderRadius: '10px',
                   backgroundColor: '#087f78',
                   color: '#ffffff',
@@ -415,7 +673,7 @@ export const DashboardPage: React.FC = () => {
                   justifyContent: 'center',
                 }}
               >
-                <HeartHandshake size={24} />
+                <HeartHandshake size={22} />
               </div>
               <div>
                 <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#0b1f2a', marginBottom: '0.35rem' }}>
@@ -438,18 +696,18 @@ export const DashboardPage: React.FC = () => {
                 backgroundColor: '#fbf7ee',
                 border: '1px solid #fae8be',
                 borderRadius: '12px',
-                padding: '1.75rem 1.5rem',
+                padding: '1.5rem',
                 textDecoration: 'none',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '0.85rem',
+                gap: '0.75rem',
                 transition: 'transform 0.15s ease, box-shadow 0.15s ease',
               }}
             >
               <div
                 style={{
-                  width: '46px',
-                  height: '46px',
+                  width: '44px',
+                  height: '44px',
                   borderRadius: '10px',
                   backgroundColor: '#c6a24a',
                   color: '#ffffff',
@@ -458,7 +716,7 @@ export const DashboardPage: React.FC = () => {
                   justifyContent: 'center',
                 }}
               >
-                <Utensils size={24} />
+                <Utensils size={22} />
               </div>
               <div>
                 <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#0b1f2a', marginBottom: '0.35rem' }}>
@@ -481,18 +739,18 @@ export const DashboardPage: React.FC = () => {
                 backgroundColor: '#f0f9ff',
                 border: '1px solid #bae6fd',
                 borderRadius: '12px',
-                padding: '1.75rem 1.5rem',
+                padding: '1.5rem',
                 textDecoration: 'none',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '0.85rem',
+                gap: '0.75rem',
                 transition: 'transform 0.15s ease, box-shadow 0.15s ease',
               }}
             >
               <div
                 style={{
-                  width: '46px',
-                  height: '46px',
+                  width: '44px',
+                  height: '44px',
                   borderRadius: '10px',
                   backgroundColor: '#0284c7',
                   color: '#ffffff',
@@ -501,7 +759,7 @@ export const DashboardPage: React.FC = () => {
                   justifyContent: 'center',
                 }}
               >
-                <Users size={24} />
+                <Users size={22} />
               </div>
               <div>
                 <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#0b1f2a', marginBottom: '0.35rem' }}>
@@ -524,18 +782,18 @@ export const DashboardPage: React.FC = () => {
                 backgroundColor: '#fbeee9',
                 border: '1px solid #f6cfc1',
                 borderRadius: '12px',
-                padding: '1.75rem 1.5rem',
+                padding: '1.5rem',
                 textDecoration: 'none',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '0.85rem',
+                gap: '0.75rem',
                 transition: 'transform 0.15s ease, box-shadow 0.15s ease',
               }}
             >
               <div
                 style={{
-                  width: '46px',
-                  height: '46px',
+                  width: '44px',
+                  height: '44px',
                   borderRadius: '10px',
                   backgroundColor: '#b96e52',
                   color: '#ffffff',
@@ -544,7 +802,7 @@ export const DashboardPage: React.FC = () => {
                   justifyContent: 'center',
                 }}
               >
-                <Store size={24} />
+                <Store size={22} />
               </div>
               <div>
                 <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#0b1f2a', marginBottom: '0.35rem' }}>
@@ -564,15 +822,111 @@ export const DashboardPage: React.FC = () => {
       </section>
 
       {/* =========================================================================
-          4. COMMUNITY AROUND YOU ("ما يحدث حولك" - Interactive Filter Tabs)
+          6. HOW VALUES TURN INTO SERVICE (5-Step Visual Chain)
+          "كيف تتحول القيم إلى خدمة؟"
+          ========================================================================= */}
+      <section
+        className="section-teal-tint"
+        style={{
+          paddingBlock: '4.5rem',
+          paddingInline: '1.25rem',
+          borderBottom: '1px solid #d4ede9',
+        }}
+      >
+        <div style={{ maxWidth: '1280px', marginInline: 'auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+            <h2 style={{ fontSize: '2rem', fontWeight: 800, color: '#0b1f2a', margin: 0 }}>
+              {t('home.how_values_serve.title')}
+            </h2>
+            <p style={{ color: '#475569', fontSize: '0.95rem', marginTop: '0.5rem' }}>
+              {t('home.how_values_serve.desc')}
+            </p>
+          </div>
+
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+              gap: '1.25rem',
+            }}
+          >
+            {/* Step 1 */}
+            <div style={{ backgroundColor: '#ffffff', border: '1px solid #bceae6', borderRadius: '12px', padding: '1.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '0.65rem' }}>
+              <div style={{ width: '48px', height: '48px', borderRadius: '50%', backgroundColor: '#087f78', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '1.2rem' }}>
+                ١
+              </div>
+              <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0b1f2a', margin: 0 }}>
+                {t('home.how_values_serve.step1_title')}
+              </h3>
+              <p style={{ fontSize: '0.8125rem', color: '#64748b', lineHeight: 1.6, margin: 0 }}>
+                {t('home.how_values_serve.step1_desc')}
+              </p>
+            </div>
+
+            {/* Step 2 */}
+            <div style={{ backgroundColor: '#ffffff', border: '1px solid #bceae6', borderRadius: '12px', padding: '1.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '0.65rem' }}>
+              <div style={{ width: '48px', height: '48px', borderRadius: '50%', backgroundColor: '#0b1f2a', color: '#deb95f', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '1.2rem', border: '2px solid #deb95f' }}>
+                ٢
+              </div>
+              <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0b1f2a', margin: 0 }}>
+                {t('home.how_values_serve.step2_title')}
+              </h3>
+              <p style={{ fontSize: '0.8125rem', color: '#64748b', lineHeight: 1.6, margin: 0 }}>
+                {t('home.how_values_serve.step2_desc')}
+              </p>
+            </div>
+
+            {/* Step 3 */}
+            <div style={{ backgroundColor: '#ffffff', border: '1px solid #bceae6', borderRadius: '12px', padding: '1.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '0.65rem' }}>
+              <div style={{ width: '48px', height: '48px', borderRadius: '50%', backgroundColor: '#087f78', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '1.2rem' }}>
+                ٣
+              </div>
+              <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0b1f2a', margin: 0 }}>
+                {t('home.how_values_serve.step3_title')}
+              </h3>
+              <p style={{ fontSize: '0.8125rem', color: '#64748b', lineHeight: 1.6, margin: 0 }}>
+                {t('home.how_values_serve.step3_desc')}
+              </p>
+            </div>
+
+            {/* Step 4 */}
+            <div style={{ backgroundColor: '#ffffff', border: '1px solid #bceae6', borderRadius: '12px', padding: '1.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '0.65rem' }}>
+              <div style={{ width: '48px', height: '48px', borderRadius: '50%', backgroundColor: '#0b1f2a', color: '#deb95f', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '1.2rem', border: '2px solid #deb95f' }}>
+                ٤
+              </div>
+              <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0b1f2a', margin: 0 }}>
+                {t('home.how_values_serve.step4_title')}
+              </h3>
+              <p style={{ fontSize: '0.8125rem', color: '#64748b', lineHeight: 1.6, margin: 0 }}>
+                {t('home.how_values_serve.step4_desc')}
+              </p>
+            </div>
+
+            {/* Step 5 */}
+            <div style={{ backgroundColor: '#ffffff', border: '1px solid #bceae6', borderRadius: '12px', padding: '1.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '0.65rem' }}>
+              <div style={{ width: '48px', height: '48px', borderRadius: '50%', backgroundColor: '#deb95f', color: '#0b1f2a', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '1.2rem' }}>
+                ٥
+              </div>
+              <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0b1f2a', margin: 0 }}>
+                {t('home.how_values_serve.step5_title')}
+              </h3>
+              <p style={{ fontSize: '0.8125rem', color: '#64748b', lineHeight: 1.6, margin: 0 }}>
+                {t('home.how_values_serve.step5_desc')}
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* =========================================================================
+          7. COMMUNITY AROUND YOU ("ما يحدث حولك" - Interactive Filter Tabs)
           ========================================================================= */}
       <section
         className="section-ivory"
         style={{
-          borderTop: '1px solid #e8e3d8',
           borderBottom: '1px solid #e8e3d8',
           paddingBlock: '4rem',
-          paddingInline: '1.5rem',
+          paddingInline: '1.25rem',
         }}
       >
         <div style={{ maxWidth: '1280px', marginInline: 'auto' }}>
@@ -756,176 +1110,7 @@ export const DashboardPage: React.FC = () => {
       </section>
 
       {/* =========================================================================
-          5. HOW THE PLATFORM WORKS (5 Numbered Steps Flow)
-          ========================================================================= */}
-      <section
-        id="how-it-works"
-        className="section-white"
-        style={{
-          paddingBlock: '4.5rem',
-          paddingInline: '1.5rem',
-        }}
-      >
-        <div style={{ maxWidth: '1280px', marginInline: 'auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
-            <h2 style={{ fontSize: '2rem', fontWeight: 800, color: '#0b1f2a', margin: 0 }}>
-              {t('home.how_it_works.title')}
-            </h2>
-            <p style={{ color: '#64748b', fontSize: '0.95rem', marginTop: '0.5rem' }}>
-              {t('home.how_it_works.subtitle')}
-            </p>
-          </div>
-
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-              gap: '1.5rem',
-              position: 'relative',
-            }}
-          >
-            {/* Step 1 */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '0.75rem' }}>
-              <div
-                style={{
-                  width: '52px',
-                  height: '52px',
-                  borderRadius: '50%',
-                  backgroundColor: '#0b1f2a',
-                  color: '#deb95f',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontWeight: 800,
-                  fontSize: '1.25rem',
-                  border: '2px solid #deb95f',
-                  boxShadow: '0 4px 10px rgba(11, 31, 42, 0.15)',
-                }}
-              >
-                ١
-              </div>
-              <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0b1f2a', margin: 0 }}>
-                {t('home.how_it_works.step1_title')}
-              </h3>
-              <p style={{ fontSize: '0.8125rem', color: '#64748b', lineHeight: 1.6, margin: 0 }}>
-                {t('home.how_it_works.step1_desc')}
-              </p>
-            </div>
-
-            {/* Step 2 */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '0.75rem' }}>
-              <div
-                style={{
-                  width: '52px',
-                  height: '52px',
-                  borderRadius: '50%',
-                  backgroundColor: '#087f78',
-                  color: '#ffffff',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontWeight: 800,
-                  fontSize: '1.25rem',
-                  boxShadow: '0 4px 10px rgba(8, 127, 120, 0.2)',
-                }}
-              >
-                ٢
-              </div>
-              <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0b1f2a', margin: 0 }}>
-                {t('home.how_it_works.step2_title')}
-              </h3>
-              <p style={{ fontSize: '0.8125rem', color: '#64748b', lineHeight: 1.6, margin: 0 }}>
-                {t('home.how_it_works.step2_desc')}
-              </p>
-            </div>
-
-            {/* Step 3 */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '0.75rem' }}>
-              <div
-                style={{
-                  width: '52px',
-                  height: '52px',
-                  borderRadius: '50%',
-                  backgroundColor: '#0b1f2a',
-                  color: '#deb95f',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontWeight: 800,
-                  fontSize: '1.25rem',
-                  border: '2px solid #deb95f',
-                  boxShadow: '0 4px 10px rgba(11, 31, 42, 0.15)',
-                }}
-              >
-                ٣
-              </div>
-              <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0b1f2a', margin: 0 }}>
-                {t('home.how_it_works.step3_title')}
-              </h3>
-              <p style={{ fontSize: '0.8125rem', color: '#64748b', lineHeight: 1.6, margin: 0 }}>
-                {t('home.how_it_works.step3_desc')}
-              </p>
-            </div>
-
-            {/* Step 4 */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '0.75rem' }}>
-              <div
-                style={{
-                  width: '52px',
-                  height: '52px',
-                  borderRadius: '50%',
-                  backgroundColor: '#087f78',
-                  color: '#ffffff',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontWeight: 800,
-                  fontSize: '1.25rem',
-                  boxShadow: '0 4px 10px rgba(8, 127, 120, 0.2)',
-                }}
-              >
-                ٤
-              </div>
-              <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0b1f2a', margin: 0 }}>
-                {t('home.how_it_works.step4_title')}
-              </h3>
-              <p style={{ fontSize: '0.8125rem', color: '#64748b', lineHeight: 1.6, margin: 0 }}>
-                {t('home.how_it_works.step4_desc')}
-              </p>
-            </div>
-
-            {/* Step 5 */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '0.75rem' }}>
-              <div
-                style={{
-                  width: '52px',
-                  height: '52px',
-                  borderRadius: '50%',
-                  backgroundColor: '#deb95f',
-                  color: '#0b1f2a',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontWeight: 800,
-                  fontSize: '1.25rem',
-                  boxShadow: '0 4px 10px rgba(222, 185, 95, 0.3)',
-                }}
-              >
-                ٥
-              </div>
-              <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0b1f2a', margin: 0 }}>
-                {t('home.how_it_works.step5_title')}
-              </h3>
-              <p style={{ fontSize: '0.8125rem', color: '#64748b', lineHeight: 1.6, margin: 0 }}>
-                {t('home.how_it_works.step5_desc')}
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* =========================================================================
-          6. VALUES FROM KARBALA (Deep Navy Section `#0B1F2A` with Gold Accents)
+          8. VALUES FROM KARBALA (Deep Navy Section `#0B1F2A` with Gold Accents)
           "من قيم كربلاء إلى خدمة الإنسان"
           ========================================================================= */}
       <section
@@ -933,7 +1118,7 @@ export const DashboardPage: React.FC = () => {
         className="section-deep-navy"
         style={{
           paddingBlock: '5rem 4.5rem',
-          paddingInline: '1.5rem',
+          paddingInline: '1.25rem',
         }}
       >
         <div style={{ maxWidth: '1280px', marginInline: 'auto' }}>
@@ -987,7 +1172,7 @@ export const DashboardPage: React.FC = () => {
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', color: '#deb95f' }}>
                 <HeartHandshake size={22} />
                 <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#ffffff', margin: 0 }}>
-                  {t('home.values.dignity_title')}
+                  {t('home.values.dignity')}
                 </h3>
               </div>
               <p style={{ fontSize: '0.8125rem', color: '#94a3b8', lineHeight: 1.6, margin: 0 }}>
@@ -1010,7 +1195,7 @@ export const DashboardPage: React.FC = () => {
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', color: '#deb95f' }}>
                 <Heart size={22} />
                 <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#ffffff', margin: 0 }}>
-                  {t('home.values.mercy_title')}
+                  {t('home.values.mercy')}
                 </h3>
               </div>
               <p style={{ fontSize: '0.8125rem', color: '#94a3b8', lineHeight: 1.6, margin: 0 }}>
@@ -1033,7 +1218,7 @@ export const DashboardPage: React.FC = () => {
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', color: '#deb95f' }}>
                 <Scale size={22} />
                 <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#ffffff', margin: 0 }}>
-                  {t('home.values.justice_title')}
+                  {t('home.values.justice')}
                 </h3>
               </div>
               <p style={{ fontSize: '0.8125rem', color: '#94a3b8', lineHeight: 1.6, margin: 0 }}>
@@ -1056,7 +1241,7 @@ export const DashboardPage: React.FC = () => {
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', color: '#deb95f' }}>
                 <Utensils size={22} />
                 <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#ffffff', margin: 0 }}>
-                  {t('home.values.service_title')}
+                  {t('home.values.service')}
                 </h3>
               </div>
               <p style={{ fontSize: '0.8125rem', color: '#94a3b8', lineHeight: 1.6, margin: 0 }}>
@@ -1079,7 +1264,7 @@ export const DashboardPage: React.FC = () => {
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', color: '#deb95f' }}>
                 <Users size={22} />
                 <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#ffffff', margin: 0 }}>
-                  {t('home.values.community_title')}
+                  {t('home.values.community')}
                 </h3>
               </div>
               <p style={{ fontSize: '0.8125rem', color: '#94a3b8', lineHeight: 1.6, margin: 0 }}>
@@ -1100,9 +1285,9 @@ export const DashboardPage: React.FC = () => {
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', color: '#deb95f' }}>
-                <Sparkles size={22} />
+                <Award size={22} />
                 <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#ffffff', margin: 0 }}>
-                  {t('home.values.impact_title')}
+                  {t('home.values.impact')}
                 </h3>
               </div>
               <p style={{ fontSize: '0.8125rem', color: '#94a3b8', lineHeight: 1.6, margin: 0 }}>
@@ -1140,10 +1325,10 @@ export const DashboardPage: React.FC = () => {
                 <span>{locale === 'ar' ? 'الرسالة والرؤية' : 'The Inspiration'}</span>
               </div>
               <h3 style={{ fontSize: '1.85rem', fontWeight: 800, color: '#ffffff', margin: '0 0 1rem' }}>
-                {t('home.why_karbala.title')}
+                {t('home.values.why_karbala')}
               </h3>
               <p style={{ color: '#cbd5e1', fontSize: '0.95rem', lineHeight: 1.8, margin: 0 }}>
-                {t('home.why_karbala.desc')}
+                {t('home.values.why_karbala_desc')}
               </p>
               <div style={{ marginTop: '1.5rem' }}>
                 <Link
@@ -1159,7 +1344,7 @@ export const DashboardPage: React.FC = () => {
                     borderRadius: '8px',
                   }}
                 >
-                  <span>{t('home.why_karbala.cta')}</span>
+                  <span>{locale === 'ar' ? 'اكتشف المعرفة والقيم' : 'Explore Knowledge & Values'}</span>
                   <ArrowRight size={14} className="dir-flip" />
                 </Link>
               </div>
@@ -1190,14 +1375,14 @@ export const DashboardPage: React.FC = () => {
       </section>
 
       {/* =========================================================================
-          7. THE HUMAN ECOSYSTEM / GIVING PATHWAYS ("العطاء له أكثر من طريق")
+          9. THE HUMAN ECOSYSTEM / GIVING PATHWAYS ("العطاء له أكثر من طريق")
           ========================================================================= */}
       <section
         className="section-warm-earth"
         style={{
           borderBottom: '1px solid #e8e3d8',
           paddingBlock: '4.5rem',
-          paddingInline: '1.5rem',
+          paddingInline: '1.25rem',
         }}
       >
         <div style={{ maxWidth: '1280px', marginInline: 'auto' }}>
@@ -1223,10 +1408,10 @@ export const DashboardPage: React.FC = () => {
                 <HeartHandshake size={28} />
               </div>
               <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#0b1f2a', margin: 0 }}>
-                {t('home.ecosystem.box1_title')}
+                {locale === 'ar' ? 'الأفراد والأسر' : 'Individuals & Families'}
               </h3>
               <p style={{ fontSize: '0.8125rem', color: '#64748b', lineHeight: 1.6, margin: 0 }}>
-                {t('home.ecosystem.box1_desc')}
+                {locale === 'ar' ? 'طلب المساعدة الإنسانية والوجبات بكرامة وسرية تامة دون حرج.' : 'Seeking dignified and confidential relief with full respect.'}
               </p>
             </div>
 
@@ -1236,10 +1421,10 @@ export const DashboardPage: React.FC = () => {
                 <Building2 size={28} />
               </div>
               <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#0b1f2a', margin: 0 }}>
-                {t('home.ecosystem.box2_title')}
+                {locale === 'ar' ? 'الحسينيات والمنظمات' : 'Hussainiyas & NGOs'}
               </h3>
               <p style={{ fontSize: '0.8125rem', color: '#64748b', lineHeight: 1.6, margin: 0 }}>
-                {t('home.ecosystem.box2_desc')}
+                {locale === 'ar' ? 'مراكز العطاء الميداني المعتمدة التي تدير المطابخ والإغاثة المباشرة.' : 'Vetted community coordinators managing distributions and aid.'}
               </p>
             </div>
 
@@ -1249,10 +1434,10 @@ export const DashboardPage: React.FC = () => {
                 <Users size={28} />
               </div>
               <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#0b1f2a', margin: 0 }}>
-                {t('home.ecosystem.box3_title')}
+                {locale === 'ar' ? 'المتطوعون والمبادرون' : 'Volunteers'}
               </h3>
               <p style={{ fontSize: '0.8125rem', color: '#64748b', lineHeight: 1.6, margin: 0 }}>
-                {t('home.ecosystem.box3_desc')}
+                {locale === 'ar' ? 'سواعد الميدان الذين يقدمون وقتهم وخبراتهم في خدمة الناس.' : 'Ground responders giving their time, skills, and solidarity.'}
               </p>
             </div>
 
@@ -1262,10 +1447,10 @@ export const DashboardPage: React.FC = () => {
                 <Store size={28} />
               </div>
               <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#0b1f2a', margin: 0 }}>
-                {t('home.ecosystem.box4_title')}
+                {locale === 'ar' ? 'المطابخ والأعمال' : 'Kitchens & Businesses'}
               </h3>
               <p style={{ fontSize: '0.8125rem', color: '#64748b', lineHeight: 1.6, margin: 0 }}>
-                {t('home.ecosystem.box4_desc')}
+                {locale === 'ar' ? 'رعاية برامج الإطعام وتقديم فائض الطعام والخدمات اللوجستية.' : 'Sponsoring food programs and donating surplus meals.'}
               </p>
             </div>
 
@@ -1275,10 +1460,10 @@ export const DashboardPage: React.FC = () => {
                 <BookOpen size={28} />
               </div>
               <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#0b1f2a', margin: 0 }}>
-                {t('home.ecosystem.box5_title')}
+                {locale === 'ar' ? 'المعرفة والقيم' : 'Knowledge & Values'}
               </h3>
               <p style={{ fontSize: '0.8125rem', color: '#64748b', lineHeight: 1.6, margin: 0 }}>
-                {t('home.ecosystem.box5_desc')}
+                {locale === 'ar' ? 'محتوى توعوي وأخلاقي موثق يرسخ ثقافة العطاء والإيثار المجتمعي.' : 'Vetted cultural and ethical insights guiding continuous care.'}
               </p>
             </div>
           </div>
@@ -1286,14 +1471,15 @@ export const DashboardPage: React.FC = () => {
       </section>
 
       {/* =========================================================================
-          8. KNOWLEDGE & COMMUNITY LEARNING HIGHLIGHTS (White Section)
-          "المعرفة من كربلاء: تعرّف • تعلّم • شارك • اخدم"
+          10. LEARN TO SERVE / KNOWLEDGE & CULTURAL LEARNING
+          "نتعلم لنخدم: معرفة تقود إلى عمل، وعمل يصنع أثراً"
           ========================================================================= */}
       <section
-        className="section-white"
+        className="section-ivory"
         style={{
+          borderBottom: '1px solid #e8e3d8',
           paddingBlock: '4.5rem',
-          paddingInline: '1.5rem',
+          paddingInline: '1.25rem',
         }}
       >
         <div style={{ maxWidth: '1280px', marginInline: 'auto' }}>
@@ -1301,11 +1487,14 @@ export const DashboardPage: React.FC = () => {
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#c6a24a', fontSize: '0.8125rem', fontWeight: 700 }}>
                 <BookOpen size={16} />
-                <span>{locale === 'ar' ? 'المعرفة والقيم' : 'Knowledge & Insights'}</span>
+                <span>{t('home.learn_to_serve.title')}</span>
               </div>
               <h2 style={{ fontSize: '1.85rem', fontWeight: 800, color: '#0b1f2a', margin: '0.25rem 0 0' }}>
                 {t('home.knowledge.title')}
               </h2>
+              <p style={{ color: '#64748b', fontSize: '0.875rem', margin: '0.25rem 0 0' }}>
+                {t('home.learn_to_serve.desc')}
+              </p>
             </div>
             <Link to="/knowledge" style={{ color: '#087f78', fontSize: '0.875rem', fontWeight: 700, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
               <span>{t('home.knowledge.all')}</span>
@@ -1347,15 +1536,14 @@ export const DashboardPage: React.FC = () => {
       </section>
 
       {/* =========================================================================
-          9. VOLUNTEER & BUSINESS COLLABORATION SPOTLIGHT (Warm Ivory Background)
+          11. VOLUNTEER & BUSINESS COLLABORATION SPOTLIGHT (White Section)
           ========================================================================= */}
       <section
-        className="section-ivory"
+        className="section-white"
         style={{
-          borderTop: '1px solid #e8e3d8',
           borderBottom: '1px solid #e8e3d8',
           paddingBlock: '4rem',
-          paddingInline: '1.5rem',
+          paddingInline: '1.25rem',
         }}
       >
         <div style={{ maxWidth: '1280px', marginInline: 'auto' }}>
@@ -1370,6 +1558,7 @@ export const DashboardPage: React.FC = () => {
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '1rem',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
               }}
             >
               <div style={{ width: '44px', height: '44px', borderRadius: '10px', backgroundColor: '#f0fbf9', color: '#087f78', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -1380,7 +1569,7 @@ export const DashboardPage: React.FC = () => {
               </h3>
               <p style={{ fontSize: '0.875rem', color: '#475569', lineHeight: 1.7, margin: 0 }}>
                 {locale === 'ar'
-                  ? 'شارك بمهاراتك ووقتك في تنظيم الوجبات، وتوزيع المساعدات، والدعم الطبي والتنظيمي الميداني مع مؤسسات موثوقة.'
+                  ? 'شارك بمهاراتك ووقتك في تنظيم الوجبات، وتوزيع المساعدات، والدعم الميداني مع مؤسسات موثوقة تخدم الناس بكرامة.'
                   : 'Offer your skills, field coordination, and time with verified organizations serving community welfare.'}
               </p>
               <div style={{ marginTop: 'auto' }}>
@@ -1411,6 +1600,7 @@ export const DashboardPage: React.FC = () => {
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '1rem',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
               }}
             >
               <div style={{ width: '44px', height: '44px', borderRadius: '10px', backgroundColor: '#fbeee9', color: '#b96e52', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -1446,14 +1636,14 @@ export const DashboardPage: React.FC = () => {
       </section>
 
       {/* =========================================================================
-          10. REAL DATA IMPACT SUMMARY (Deep Navy Background `#0B1F2A`)
+          12. REAL DATA IMPACT SUMMARY (Deep Navy Background `#0B1F2A`)
           "معاً نصنع أثراً" - Real Aggregated MongoDB Metrics
           ========================================================================= */}
       <section
         className="section-deep-navy"
         style={{
           paddingBlock: '4.5rem',
-          paddingInline: '1.5rem',
+          paddingInline: '1.25rem',
         }}
       >
         <div style={{ maxWidth: '1280px', marginInline: 'auto' }}>
@@ -1543,23 +1733,23 @@ export const DashboardPage: React.FC = () => {
       </section>
 
       {/* =========================================================================
-          11. FINAL HIGH IMPACT CTA ("الخير يبدأ بخطوة")
+          13. FINAL HIGH IMPACT CTA ("الخير يبدأ بخطوة")
           ========================================================================= */}
       <section
         style={{
           background: 'linear-gradient(135deg, #0d4440 0%, #0b1f2a 100%)',
           color: '#ffffff',
           paddingBlock: '4.5rem',
-          paddingInline: '1.5rem',
+          paddingInline: '1.25rem',
           textAlign: 'center',
         }}
       >
         <div style={{ maxWidth: '800px', marginInline: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.25rem' }}>
           <h2 style={{ fontSize: 'clamp(2rem, 3.5vw, 2.75rem)', fontWeight: 800, color: '#ffffff', margin: 0 }}>
-            {t('home.final_cta.title')}
+            {t('home.cta.title')}
           </h2>
           <p style={{ fontSize: '1.05rem', color: '#cbd5e1', lineHeight: 1.7, maxWidth: '650px', margin: 0 }}>
-            {t('home.final_cta.desc')}
+            {t('home.cta.subtitle')}
           </p>
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', justifyContent: 'center', marginTop: '0.5rem' }}>
             <Link
@@ -1586,17 +1776,17 @@ export const DashboardPage: React.FC = () => {
               }}
             >
               <Users size={18} color="#087f78" />
-              <span>{t('home.final_cta.participate_btn')}</span>
+              <span>{t('home.cta.want_help')}</span>
             </Link>
           </div>
         </div>
       </section>
 
       {/* =========================================================================
-          12. PLATFORM ARCHITECTURAL NOTICE
+          14. PLATFORM ARCHITECTURAL NOTICE
           ========================================================================= */}
-      <section style={{ padding: '2rem 1.5rem', backgroundColor: '#faf8f2' }}>
-        <div className="container">
+      <section style={{ padding: '2rem 1.25rem', backgroundColor: '#faf8f2' }}>
+        <div style={{ maxWidth: '1280px', marginInline: 'auto' }}>
           <div className="authority-notice">
             <Info size={22} color="#9e7f33" style={{ flexShrink: 0, marginTop: '2px' }} />
             <div>

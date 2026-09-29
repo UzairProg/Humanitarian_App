@@ -392,7 +392,7 @@ html[dir='ltr'] h1, html[dir='ltr'] h2, html[dir='ltr'] h3 {
   display: none !important;
 }
 
-@media (max-width: 960px) {
+@media (max-width: 1120px) {
   .desktop-nav {
     display: none !important;
   }

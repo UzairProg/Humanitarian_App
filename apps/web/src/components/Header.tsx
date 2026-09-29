@@ -23,8 +23,10 @@ import {
   ClipboardList,
   ChevronDown,
   Home,
+  Award,
 } from 'lucide-react';
 import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
+import { BrandLogo } from './BrandLogo';
 
 interface SearchResultItem {
   id: string;
@@ -185,53 +187,39 @@ export const Header: React.FC = () => {
           position: 'sticky',
           top: 0,
           zIndex: 50,
+          width: '100%',
+          overflowX: 'clip',
         }}
       >
         <div
           style={{
-            maxWidth: '1360px',
+            maxWidth: '1280px',
+            width: '100%',
             marginInline: 'auto',
-            paddingInline: '1.25rem',
+            paddingInline: '1rem',
             paddingBlock: '0.6rem',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            gap: '1rem',
+            gap: '0.75rem',
+            boxSizing: 'border-box',
           }}
         >
-          {/* Brand Identity */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', flexShrink: 0 }}>
+          {/* Brand Identity: Custom Arabic Monogram Logo + Name */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexShrink: 0 }}>
             <Link
               to="/"
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '0.75rem',
+                gap: '0.65rem',
                 textDecoration: 'none',
                 color: '#0b1f2a',
               }}
             >
-              <div
-                style={{
-                  width: '38px',
-                  height: '38px',
-                  borderRadius: '9px',
-                  backgroundColor: '#0b1f2a',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#deb95f',
-                  fontWeight: 800,
-                  fontSize: '1.3rem',
-                  border: '1px solid #c6a24a',
-                  boxShadow: '0 2px 5px rgba(11, 31, 42, 0.15)',
-                  flexShrink: 0,
-                }}
-              >
-                ح
-              </div>
+              <BrandLogo size={38} />
               <div>
-                <div style={{ fontSize: '1.125rem', fontWeight: 800, color: '#0b1f2a', lineHeight: 1.15 }}>
+                <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0b1f2a', lineHeight: 1.15 }}>
                   {t('app.title')}
                 </div>
                 <div style={{ fontSize: '0.6875rem', color: '#64748b', fontWeight: 500, letterSpacing: '0.01em' }}>
@@ -297,11 +285,11 @@ export const Header: React.FC = () => {
                   cursor: 'pointer',
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: '0.3rem',
+                  gap: '0.25rem',
                 }}
               >
                 <span>{t('nav.participate')}</span>
-                <ChevronDown size={14} style={{ transform: showParticipateMenu ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s ease' }} />
+                <ChevronDown size={13} style={{ transform: showParticipateMenu ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s ease' }} />
               </button>
 
               {showParticipateMenu && (
@@ -348,12 +336,12 @@ export const Header: React.FC = () => {
                     cursor: 'pointer',
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: '0.3rem',
+                    gap: '0.25rem',
                   }}
                 >
                   <ShieldAlert size={14} color="#b45309" />
                   <span>{t('nav.admin')}</span>
-                  <ChevronDown size={14} style={{ transform: showAdminMenu ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s ease' }} />
+                  <ChevronDown size={13} style={{ transform: showAdminMenu ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s ease' }} />
                 </button>
 
                 {showAdminMenu && (
@@ -381,7 +369,7 @@ export const Header: React.FC = () => {
           </nav>
 
           {/* Right Section: Search, Language Switcher, Notifications, User */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem', flexShrink: 0 }}>
             {/* Global Search Bar */}
             <div style={{ position: 'relative' }} ref={searchRef}>
               <div
@@ -391,10 +379,10 @@ export const Header: React.FC = () => {
                   backgroundColor: '#faf8f2',
                   border: '1px solid #e5dfd2',
                   borderRadius: '20px',
-                  paddingInline: '0.75rem',
+                  paddingInline: '0.65rem',
                   paddingBlock: '0.35rem',
-                  gap: '0.4rem',
-                  width: '175px',
+                  gap: '0.35rem',
+                  width: '145px',
                   transition: 'width 0.2s ease, border-color 0.2s ease',
                 }}
               >
@@ -411,7 +399,7 @@ export const Header: React.FC = () => {
                     background: 'none',
                     border: 'none',
                     outline: 'none',
-                    fontSize: '0.8125rem',
+                    fontSize: '0.785rem',
                     color: '#0b1f2a',
                     width: '100%',
                   }}
@@ -425,7 +413,7 @@ export const Header: React.FC = () => {
                     position: 'absolute',
                     top: 'calc(100% + 8px)',
                     insetInlineEnd: 0,
-                    width: '380px',
+                    width: '360px',
                     maxHeight: '440px',
                     overflowY: 'auto',
                     backgroundColor: '#ffffff',
@@ -559,6 +547,7 @@ export const Header: React.FC = () => {
 
             {/* Language Switcher: In Arabic mode shows 'English', in English mode shows 'العربية' */}
             <button
+              type="button"
               onClick={() => setLocale(locale === 'ar' ? 'en' : 'ar')}
               style={{
                 display: 'flex',
@@ -573,6 +562,7 @@ export const Header: React.FC = () => {
                 cursor: 'pointer',
                 fontSize: '0.8125rem',
                 fontWeight: 600,
+                whiteSpace: 'nowrap',
               }}
               title={locale === 'ar' ? 'التحويل إلى الإنجليزية' : 'Switch to Arabic'}
             >
@@ -582,10 +572,11 @@ export const Header: React.FC = () => {
 
             {/* Authenticated user items: Notifications & Profile */}
             {isAuthenticated && user ? (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
                 {/* Notifications */}
                 <div style={{ position: 'relative' }} ref={notifRef}>
                   <button
+                    type="button"
                     onClick={() => setShowNotifications(!showNotifications)}
                     style={{
                       position: 'relative',
@@ -660,6 +651,7 @@ export const Header: React.FC = () => {
                         <span style={{ fontSize: '0.875rem', fontWeight: 600 }}>{t('notif.title')}</span>
                         {unreadCount > 0 && (
                           <button
+                            type="button"
                             onClick={handleMarkAllRead}
                             style={{
                               background: 'none',
@@ -730,15 +722,16 @@ export const Header: React.FC = () => {
                 {/* User Profile Menu */}
                 <div style={{ position: 'relative' }} ref={userMenuRef}>
                   <button
+                    type="button"
                     onClick={() => setShowUserMenu(!showUserMenu)}
                     style={{
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '0.5rem',
+                      gap: '0.4rem',
                       background: 'none',
                       border: 'none',
                       cursor: 'pointer',
-                      padding: '0.2rem 0.4rem',
+                      padding: '0.2rem 0.35rem',
                       borderRadius: '6px',
                     }}
                   >
@@ -759,7 +752,7 @@ export const Header: React.FC = () => {
                     >
                       {user.firstName ? user.firstName[0].toUpperCase() : 'U'}
                     </div>
-                    <ChevronDown size={14} color="#64748b" />
+                    <ChevronDown size={13} color="#64748b" />
                   </button>
 
                   {showUserMenu && (
@@ -823,6 +816,7 @@ export const Header: React.FC = () => {
                       )}
 
                       <button
+                        type="button"
                         onClick={() => {
                           setShowUserMenu(false);
                           logout();
@@ -853,9 +847,10 @@ export const Header: React.FC = () => {
                 className="btn btn-navy"
                 style={{
                   fontSize: '0.8125rem',
-                  paddingInline: '0.9rem',
+                  paddingInline: '0.85rem',
                   paddingBlock: '0.35rem',
                   borderRadius: '6px',
+                  whiteSpace: 'nowrap',
                 }}
               >
                 {t('auth.login')}
@@ -864,6 +859,7 @@ export const Header: React.FC = () => {
 
             {/* Mobile Menu Button */}
             <button
+              type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="mobile-nav-toggle"
               style={{
@@ -880,161 +876,132 @@ export const Header: React.FC = () => {
           </div>
         </div>
 
-        {/* Mobile Navigation Drawer */}
+        {/* Mobile Navigation Drawer - Categorized according to Section 15 */}
         {mobileMenuOpen && (
           <div
             style={{
               backgroundColor: '#ffffff',
               borderTop: '1px solid #e8e3d8',
-              padding: '1rem 1.5rem',
+              padding: '1.25rem 1.5rem',
               display: 'flex',
               flexDirection: 'column',
-              gap: '0.4rem',
+              gap: '1rem',
+              maxHeight: '80vh',
+              overflowY: 'auto',
             }}
           >
-            <Link
-              to="/"
-              onClick={() => setMobileMenuOpen(false)}
-              style={{
-                padding: '0.5rem 0',
-                fontSize: '0.9rem',
-                fontWeight: 600,
-                color: '#0b1f2a',
-                textDecoration: 'none',
-                borderBottom: '1px solid #f1f5f9',
-              }}
-            >
-              {t('nav.home')}
-            </Link>
-            <Link
-              to="/requests"
-              onClick={() => setMobileMenuOpen(false)}
-              style={{
-                padding: '0.5rem 0',
-                fontSize: '0.9rem',
-                fontWeight: 600,
-                color: '#0b1f2a',
-                textDecoration: 'none',
-                borderBottom: '1px solid #f1f5f9',
-              }}
-            >
-              {t('nav.help')}
-            </Link>
-            <Link
-              to="/food-programs"
-              onClick={() => setMobileMenuOpen(false)}
-              style={{
-                padding: '0.5rem 0',
-                fontSize: '0.9rem',
-                fontWeight: 600,
-                color: '#0b1f2a',
-                textDecoration: 'none',
-                borderBottom: '1px solid #f1f5f9',
-              }}
-            >
-              {t('nav.meals')}
-            </Link>
-            <Link
-              to="/organizations"
-              onClick={() => setMobileMenuOpen(false)}
-              style={{
-                padding: '0.5rem 0',
-                fontSize: '0.9rem',
-                fontWeight: 600,
-                color: '#0b1f2a',
-                textDecoration: 'none',
-                borderBottom: '1px solid #f1f5f9',
-              }}
-            >
-              {t('nav.organizations')}
-            </Link>
-            <Link
-              to="/knowledge"
-              onClick={() => setMobileMenuOpen(false)}
-              style={{
-                padding: '0.5rem 0',
-                fontSize: '0.9rem',
-                fontWeight: 600,
-                color: '#0b1f2a',
-                textDecoration: 'none',
-                borderBottom: '1px solid #f1f5f9',
-              }}
-            >
-              {t('nav.knowledge')}
-            </Link>
-            <Link
-              to="/volunteers"
-              onClick={() => setMobileMenuOpen(false)}
-              style={{
-                padding: '0.5rem 0',
-                fontSize: '0.9rem',
-                fontWeight: 600,
-                color: '#0b1f2a',
-                textDecoration: 'none',
-                borderBottom: '1px solid #f1f5f9',
-              }}
-            >
-              {t('nav.volunteers')}
-            </Link>
-            <Link
-              to="/events"
-              onClick={() => setMobileMenuOpen(false)}
-              style={{
-                padding: '0.5rem 0',
-                fontSize: '0.9rem',
-                fontWeight: 600,
-                color: '#0b1f2a',
-                textDecoration: 'none',
-                borderBottom: '1px solid #f1f5f9',
-              }}
-            >
-              {t('nav.events')}
-            </Link>
-            <Link
-              to="/businesses"
-              onClick={() => setMobileMenuOpen(false)}
-              style={{
-                padding: '0.5rem 0',
-                fontSize: '0.9rem',
-                fontWeight: 600,
-                color: '#0b1f2a',
-                textDecoration: 'none',
-                borderBottom: '1px solid #f1f5f9',
-              }}
-            >
-              {t('nav.businesses')}
-            </Link>
+            {/* Group 1: أحتاج إلى مساعدة (Help & Relief) */}
+            <div>
+              <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#087f78', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '0.4rem' }}>
+                {locale === 'ar' ? 'أحتاج إلى مساعدة' : 'Find Support'}
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                <Link
+                  to="/"
+                  onClick={() => setMobileMenuOpen(false)}
+                  style={{ padding: '0.4rem 0', fontSize: '0.875rem', fontWeight: 600, color: '#0b1f2a', textDecoration: 'none' }}
+                >
+                  {t('nav.home')}
+                </Link>
+                <Link
+                  to="/requests"
+                  onClick={() => setMobileMenuOpen(false)}
+                  style={{ padding: '0.4rem 0', fontSize: '0.875rem', fontWeight: 600, color: '#0b1f2a', textDecoration: 'none' }}
+                >
+                  {t('nav.help')}
+                </Link>
+                <Link
+                  to="/food-programs"
+                  onClick={() => setMobileMenuOpen(false)}
+                  style={{ padding: '0.4rem 0', fontSize: '0.875rem', fontWeight: 600, color: '#0b1f2a', textDecoration: 'none' }}
+                >
+                  {t('nav.meals')}
+                </Link>
+                <Link
+                  to="/organizations"
+                  onClick={() => setMobileMenuOpen(false)}
+                  style={{ padding: '0.4rem 0', fontSize: '0.875rem', fontWeight: 600, color: '#0b1f2a', textDecoration: 'none' }}
+                >
+                  {t('nav.organizations')}
+                </Link>
+              </div>
+            </div>
+
+            {/* Group 2: أريد أن أشارك (Participation) */}
+            <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '0.75rem' }}>
+              <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#0b1f2a', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '0.4rem' }}>
+                {locale === 'ar' ? 'أريد أن أشارك' : 'Participation'}
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                <Link
+                  to="/volunteers"
+                  onClick={() => setMobileMenuOpen(false)}
+                  style={{ padding: '0.4rem 0', fontSize: '0.875rem', fontWeight: 600, color: '#0b1f2a', textDecoration: 'none' }}
+                >
+                  {t('nav.volunteers')}
+                </Link>
+                <Link
+                  to="/events"
+                  onClick={() => setMobileMenuOpen(false)}
+                  style={{ padding: '0.4rem 0', fontSize: '0.875rem', fontWeight: 600, color: '#0b1f2a', textDecoration: 'none' }}
+                >
+                  {t('nav.events')}
+                </Link>
+                <Link
+                  to="/businesses"
+                  onClick={() => setMobileMenuOpen(false)}
+                  style={{ padding: '0.4rem 0', fontSize: '0.875rem', fontWeight: 600, color: '#0b1f2a', textDecoration: 'none' }}
+                >
+                  {t('nav.businesses')}
+                </Link>
+              </div>
+            </div>
+
+            {/* Group 3: أريد أن أتعلم (Learning & Culture) */}
+            <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '0.75rem' }}>
+              <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#c6a24a', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '0.4rem' }}>
+                {locale === 'ar' ? 'أريد أن أتعلم' : 'Knowledge & Values'}
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                <Link
+                  to="/knowledge"
+                  onClick={() => setMobileMenuOpen(false)}
+                  style={{ padding: '0.4rem 0', fontSize: '0.875rem', fontWeight: 600, color: '#0b1f2a', textDecoration: 'none' }}
+                >
+                  {t('nav.knowledge')}
+                </Link>
+                <a
+                  href="#values"
+                  onClick={() => setMobileMenuOpen(false)}
+                  style={{ padding: '0.4rem 0', fontSize: '0.875rem', fontWeight: 600, color: '#0b1f2a', textDecoration: 'none' }}
+                >
+                  {locale === 'ar' ? 'قيم كربلاء والخدمة' : 'Values of Karbala'}
+                </a>
+              </div>
+            </div>
 
             {isModeratorOrAdmin && (
-              <>
-                <Link
-                  to="/moderation"
-                  onClick={() => setMobileMenuOpen(false)}
-                  style={{
-                    padding: '0.5rem 0',
-                    fontSize: '0.9rem',
-                    fontWeight: 600,
-                    color: '#087f78',
-                    textDecoration: 'none',
-                    borderBottom: '1px solid #f1f5f9',
-                  }}
-                >
-                  {t('nav.moderation')}
-                </Link>
-                <Link
-                  to="/audit"
-                  onClick={() => setMobileMenuOpen(false)}
-                  style={{
-                    padding: '0.5rem 0',
-                    fontSize: '0.9rem',
-                    fontWeight: 600,
-                    color: '#087f78',
-                    textDecoration: 'none',
-                  }}
-                >
-                  {t('nav.audit')}
-                </Link>
-              </>
+              <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '0.75rem' }}>
+                <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#b45309', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '0.4rem' }}>
+                  {t('nav.admin')}
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                  <Link
+                    to="/moderation"
+                    onClick={() => setMobileMenuOpen(false)}
+                    style={{ padding: '0.4rem 0', fontSize: '0.875rem', fontWeight: 600, color: '#087f78', textDecoration: 'none' }}
+                  >
+                    {t('nav.moderation')}
+                  </Link>
+                  <Link
+                    to="/audit"
+                    onClick={() => setMobileMenuOpen(false)}
+                    style={{ padding: '0.4rem 0', fontSize: '0.875rem', fontWeight: 600, color: '#087f78', textDecoration: 'none' }}
+                  >
+                    {t('nav.audit')}
+                  </Link>
+                </div>
+              </div>
             )}
           </div>
         )}

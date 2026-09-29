@@ -70,6 +70,51 @@ const translations: Record<SupportedLocale, Record<string, string>> = {
     'home.trust.volunteers': 'فرص تطوع هادفة',
     'home.trust.impact': 'أثر موثق وشفاف',
 
+    // Hero Badge & Navigation
+    'nav.more': 'المزيد',
+    'home.badge.hospitality': 'ضيافة تتكرر دائماً',
+    'home.badge.spirit': 'خدمة بروح كربلاء طوال العام',
+
+    // Why We Help
+    'home.why_we_help.title': 'لماذا نساعد؟',
+    'home.why_we_help.desc':
+      'لأن الخدمة ليست موسماً، ولأن كرامة الإنسان ومساعدة الآخرين يمكن أن تصبح جزءاً من مجتمعنا كل يوم.',
+
+    // How Values Turn Into Service (5-Step Visual Chain)
+    'home.how_values_serve.title': 'كيف تتحول القيم إلى خدمة؟',
+    'home.how_values_serve.desc':
+      'مسار عملي متصل يربط بين المنطلقات الأخلاقية والخدمة الإنسانية الميدانية.',
+    'home.how_values_serve.step1_title': '١. نكتشف الاحتياج',
+    'home.how_values_serve.step1_desc':
+      'استقبال طلبات المساعدة الإنسانية والغذائية والمعيشية بخصوصية وسرية تامة.',
+    'home.how_values_serve.step2_title': '٢. نربط المجتمع',
+    'home.how_values_serve.step2_desc':
+      'تنسيق مباشر بين الحسينيات والمؤسسات المعتمدة والمتطوعين والداعمين.',
+    'home.how_values_serve.step3_title': '٣. نقدّم الخدمة',
+    'home.how_values_serve.step3_desc':
+      'توفير الوجبات الساخنة وتوزيع الإغاثة والرعاية الميدانية بكرامة واحترام.',
+    'home.how_values_serve.step4_title': '٤. نشارك المعرفة',
+    'home.how_values_serve.step4_desc':
+      'نشر ثقافة الإيثار وأخلاق الخدمة من خلال مساهمات موثقة من أهل الاختصاص.',
+    'home.how_values_serve.step5_title': '٥. نقيس الأثر',
+    'home.how_values_serve.step5_desc':
+      'توثيق الأثر الإنساني ومتابعته بشفافية لضمان استدامة التكافل المجتمعي.',
+
+    // Learn to Serve
+    'home.learn_to_serve.title': 'نتعلم لنخدم',
+    'home.learn_to_serve.desc':
+      'معرفة تقود إلى عمل، وعمل يصنع أثراً في خدمة الإنسان.',
+
+    // Onboarding
+    'home.onboarding.title': 'مرحباً بك في منصة الحسينية',
+    'home.onboarding.subtitle': 'كيف ترغب في المشاركة معنا اليوم؟',
+    'home.onboarding.opt_need_help': 'أحتاج إلى مساعدة',
+    'home.onboarding.opt_volunteer': 'أريد التطوع بالوقت',
+    'home.onboarding.opt_support': 'أريد دعم المجتمع',
+    'home.onboarding.opt_learn': 'أريد التعلم والمعرفة',
+    'home.onboarding.opt_events': 'استكشاف الفعاليات',
+    'home.onboarding.dismiss': 'تخطي والاستمرار',
+
     // Pathways
     'home.pathways.title': 'كيف يمكننا خدمتك اليوم؟',
     'home.pathways.subtitle': 'اختر المسار المناسب لاكتشاف الخدمات الموثوقة أو المشاركة الفعالة في خدمة المجتمع.',
@@ -330,6 +375,51 @@ const translations: Record<SupportedLocale, Record<string, string>> = {
     'home.trust.services': 'Community Services',
     'home.trust.volunteers': 'Volunteer Missions',
     'home.trust.impact': 'Measurable Impact',
+
+    // Hero Badge & Navigation
+    'nav.more': 'More',
+    'home.badge.hospitality': 'Enduring Hospitality',
+    'home.badge.spirit': 'Serving with Karbala spirit year-round',
+
+    // Why We Help
+    'home.why_we_help.title': 'Why We Help',
+    'home.why_we_help.desc':
+      'Because service is not seasonal, and upholding human dignity through mutual care belongs in our daily community life.',
+
+    // How Values Turn Into Service (5-Step Visual Chain)
+    'home.how_values_serve.title': 'How Values Turn Into Service',
+    'home.how_values_serve.desc':
+      'A connected practical journey that links moral principles to field humanitarian delivery.',
+    'home.how_values_serve.step1_title': '1. Discover Need',
+    'home.how_values_serve.step1_desc':
+      'Receive humanitarian, nutrition, and living support requests with total privacy.',
+    'home.how_values_serve.step2_title': '2. Connect Community',
+    'home.how_values_serve.step2_desc':
+      'Direct coordination between verified organizations, volunteers, and supporters.',
+    'home.how_values_serve.step3_title': '3. Deliver Service',
+    'home.how_values_serve.step3_desc':
+      'Distribute warm meals, family relief, and logistical aid with complete dignity.',
+    'home.how_values_serve.step4_title': '4. Share Knowledge',
+    'home.how_values_serve.step4_desc':
+      'Cultivate altruism and service ethics through vetted scholarly contributions.',
+    'home.how_values_serve.step5_title': '5. Measure Impact',
+    'home.how_values_serve.step5_desc':
+      'Transparently verify community outcomes to guarantee ongoing trust and care.',
+
+    // Learn to Serve
+    'home.learn_to_serve.title': 'Learn to Serve',
+    'home.learn_to_serve.desc':
+      'Knowledge that leads to action, and action that creates lasting human impact.',
+
+    // Onboarding
+    'home.onboarding.title': 'Welcome to Al-Husseiniya',
+    'home.onboarding.subtitle': 'How would you like to participate today?',
+    'home.onboarding.opt_need_help': 'I need assistance',
+    'home.onboarding.opt_volunteer': 'I want to volunteer',
+    'home.onboarding.opt_support': 'I want to support',
+    'home.onboarding.opt_learn': 'I want to learn',
+    'home.onboarding.opt_events': 'Explore gatherings',
+    'home.onboarding.dismiss': 'Skip and continue',
 
     // Pathways
     'home.pathways.title': 'How can we serve you today?',
