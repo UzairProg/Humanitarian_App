@@ -1,16 +1,9 @@
-import {
-  Injectable,
-  NotFoundException,
-  ForbiddenException,
-} from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
 import { RoleType, JwtPayload } from '@al-husseiniya/types';
-import { User, UserDocument } from '../../database/schemas/user.schema';
-import { Role, RoleDocument } from '../../database/schemas/role.schema';
-import { AuthorizationService } from '../../common/authorization/authorization.service';
+import { UserModel, UserDocument } from '../../models/user.model';
+import { authorizationService } from '../../services/authorization.service';
+import { AppError } from '../../middleware/error.middleware';
 
-export interface UpdateProfileDto {
+export interface UpdateProfileInput {
   firstName?: string;
   lastName?: string;
   locale?: string;
@@ -20,87 +13,88 @@ export interface UpdateProfileDto {
   status?: any;
 }
 
-export interface AssignRoleDto {
-  role: RoleType;
-}
-
-@Injectable()
 export class UsersService {
-  constructor(
-    @InjectModel(User.name)
-    private userModel: Model<UserDocument>,
-    @InjectModel(Role.name)
-    private roleModel: Model<RoleDocument>,
-    private authzService: AuthorizationService,
-  ) {}
-
-  async getById(id: string): Promise<User> {
-    const user = await this.userModel.findById(id).exec();
+  async getById(id: string): Promise<UserDocument> {
+    const user = await UserModel.findById(id).exec();
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new AppError('User not found', 404, 'NOT_FOUND');
     }
-    return user.toJSON();
+    return user;
   }
 
   async updateProfile(
     userId: string,
-    dto: UpdateProfileDto,
+    input: UpdateProfileInput,
     currentUser: JwtPayload,
-  ): Promise<User> {
-    if (userId !== currentUser.sub && !this.isAdmin(currentUser)) {
-      throw new ForbiddenException('Access denied: You cannot edit another user profile');
+  ): Promise<UserDocument> {
+    const isAdmin = authorizationService.isSuperAdminOrAdmin(currentUser);
+    if (userId !== currentUser.sub && !isAdmin) {
+      throw new AppError(
+        'Access denied: You cannot edit another user profile',
+        403,
+        'FORBIDDEN',
+      );
     }
 
-    if (dto.roles !== undefined || dto.status !== undefined) {
-      throw new ForbiddenException('Forbidden: Roles and account status cannot be updated via profile endpoints');
+    if (input.roles !== undefined || input.status !== undefined) {
+      throw new AppError(
+        'Forbidden: Roles and account status cannot be updated via profile endpoints',
+        403,
+        'FORBIDDEN',
+      );
     }
 
-    const user = await this.userModel.findById(userId).exec();
+    const user = await UserModel.findById(userId).exec();
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new AppError('User not found', 404, 'NOT_FOUND');
     }
 
-    if (dto.firstName) user.firstName = dto.firstName;
-    if (dto.lastName) user.lastName = dto.lastName;
-    if (dto.locale) user.locale = dto.locale;
-    if (dto.timezone) user.timezone = dto.timezone;
-    if (dto.phone !== undefined) user.phone = dto.phone;
+    if (input.firstName) user.firstName = input.firstName.trim();
+    if (input.lastName) user.lastName = input.lastName.trim();
+    if (input.locale) user.locale = input.locale;
+    if (input.timezone) user.timezone = input.timezone;
+    if (input.phone !== undefined) user.phone = input.phone;
 
     const saved = await user.save();
-    return saved.toJSON();
+    return saved;
   }
 
   async assignRole(
     targetUserId: string,
     roleType: RoleType,
     actor: JwtPayload,
-  ): Promise<void> {
-    this.authzService.assertCanAssignRoles(actor);
+  ): Promise<UserDocument> {
+    authorizationService.assertCanAssignRoles(actor);
 
     if (roleType === RoleType.SUPER_ADMIN && !actor.roles.includes(RoleType.SUPER_ADMIN)) {
-      throw new ForbiddenException('Only Super Administrators can assign the SUPER_ADMIN role');
+      throw new AppError(
+        'Only Super Administrators can assign the SUPER_ADMIN role',
+        403,
+        'FORBIDDEN',
+      );
     }
 
-    const targetUser = await this.userModel.findById(targetUserId).exec();
+    const targetUser = await UserModel.findById(targetUserId).exec();
     if (!targetUser) {
-      throw new NotFoundException('Target user not found');
+      throw new AppError('Target user not found', 404, 'NOT_FOUND');
     }
 
     if (!targetUser.roles.includes(roleType)) {
       targetUser.roles.push(roleType);
       await targetUser.save();
     }
+
+    return targetUser;
   }
 
-  async listUsers(page = 1, limit = 20): Promise<{ items: User[]; total: number }> {
+  async listUsers(page = 1, limit = 20): Promise<{ items: any[]; total: number }> {
     const [users, total] = await Promise.all([
-      this.userModel
-        .find()
+      UserModel.find()
         .skip((page - 1) * limit)
         .limit(limit)
         .sort({ createdAt: -1 })
         .exec(),
-      this.userModel.countDocuments().exec(),
+      UserModel.countDocuments().exec(),
     ]);
 
     return {
@@ -108,11 +102,6 @@ export class UsersService {
       total,
     };
   }
-
-  private isAdmin(user: JwtPayload): boolean {
-    return (
-      user.roles?.includes(RoleType.ADMIN) ||
-      user.roles?.includes(RoleType.SUPER_ADMIN)
-    );
-  }
 }
+
+export const usersService = new UsersService();

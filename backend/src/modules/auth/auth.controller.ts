@@ -1,64 +1,95 @@
-import {
-  Controller,
-  Post,
-  Body,
-  Get,
-  Req,
-  HttpCode,
-  HttpStatus,
-  UseGuards,
-} from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse as SwaggerResponse } from '@nestjs/swagger';
-import { AuthService } from './auth.service';
-import { RegisterDto, LoginDto, RefreshTokenDto } from './dto/auth.dto';
-import { Public } from '../../common/decorators/public.decorator';
-import { CurrentUser } from '../../common/decorators/current-user.decorator';
-import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
-import { ExtendedRequest } from '../../common/middleware/request-id.middleware';
-import { JwtPayload } from '@al-husseiniya/types';
+import { Request, Response, NextFunction } from 'express';
+import { authService } from './auth.service';
+import { AppError } from '../../middleware/error.middleware';
 
-@ApiTags('Authentication')
-@Controller('api/v1/auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  async register(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { email, password, firstName, lastName, phone, locale, timezone } = req.body;
 
-  @Public()
-  @Post('register')
-  @ApiOperation({ summary: 'Register a new individual user account' })
-  async register(@Body() dto: RegisterDto, @Req() req: ExtendedRequest) {
-    const ip = req.ip || (req.headers['x-forwarded-for'] as string);
-    return this.authService.register(dto, req.requestId, ip);
+      if (!email || !password || !firstName || !lastName) {
+        throw new AppError('Email, password, firstName, and lastName are required', 400);
+      }
+      if (typeof password !== 'string' || password.length < 8) {
+        throw new AppError('Password must be at least 8 characters long', 400);
+      }
+
+      const session = await authService.register(
+        { email, password, firstName, lastName, phone, locale, timezone },
+        req.requestId,
+        req.ip,
+      );
+
+      res.status(201).json({
+        success: true,
+        data: session,
+        timestamp: new Date().toISOString(),
+      });
+    } catch (err) {
+      next(err);
+    }
   }
 
-  @Public()
-  @Post('login')
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Authenticate user and return JWT tokens' })
-  async login(@Body() dto: LoginDto, @Req() req: ExtendedRequest) {
-    const ip = req.ip || (req.headers['x-forwarded-for'] as string);
-    return this.authService.login(dto, req.requestId, ip);
+  async login(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { email, password } = req.body;
+      if (!email || !password) {
+        throw new AppError('Email and password are required', 400);
+      }
+
+      const session = await authService.login({ email, password }, req.requestId, req.ip);
+
+      res.status(200).json({
+        success: true,
+        data: session,
+        timestamp: new Date().toISOString(),
+      });
+    } catch (err) {
+      next(err);
+    }
   }
 
-  @Public()
-  @Post('refresh')
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Refresh expired access token with valid refresh token' })
-  async refresh(@Body() dto: RefreshTokenDto) {
-    return this.authService.refreshTokens(dto);
+  async refresh(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { refreshToken } = req.body;
+      if (!refreshToken) {
+        throw new AppError('Refresh token is required', 400);
+      }
+
+      const tokens = await authService.refreshTokens(refreshToken);
+
+      res.status(200).json({
+        success: true,
+        data: tokens,
+        timestamp: new Date().toISOString(),
+      });
+    } catch (err) {
+      next(err);
+    }
   }
 
-  @Post('logout')
-  @HttpCode(HttpStatus.OK)
-  @UseGuards(JwtAuthGuard)
-  @ApiOperation({ summary: 'Logout and invalidate session' })
-  async logout(@CurrentUser() user: JwtPayload) {
-    return { success: true, message: 'Logged out successfully' };
-  }
+  async me(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      if (!req.user) {
+        throw new AppError('Not authenticated', 401, 'UNAUTHORIZED');
+      }
 
-  @Get('me')
-  @UseGuards(JwtAuthGuard)
-  @ApiOperation({ summary: 'Get currently authenticated user identity and permissions' })
-  async getProfile(@CurrentUser() user: JwtPayload) {
-    return user;
+      const user = await authService.getCurrentUser(req.user.sub);
+
+      res.status(200).json({
+        success: true,
+        data: {
+          user: user.toJSON(),
+          roles: req.user.roles,
+          permissions: req.user.permissions,
+          orgId: req.user.orgId,
+        },
+        timestamp: new Date().toISOString(),
+      });
+    } catch (err) {
+      next(err);
+    }
   }
 }
+
+export const authController = new AuthController();

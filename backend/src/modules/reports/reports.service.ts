@@ -1,16 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import {
-  ReportStatus,
-  ReportTargetType,
-  JwtPayload,
-  AuditAction,
-} from '@al-husseiniya/types';
-import { Report, ReportDocument } from '../../database/schemas/report.schema';
-import { AuditService } from '../../infrastructure/audit/audit.service';
+import { ReportStatus, ReportTargetType, JwtPayload } from '@al-husseiniya/types';
+import { ReportModel, ReportDocument } from '../../models/report.model';
+import { auditService } from '../../services/audit.service';
+import { AppError } from '../../middleware/error.middleware';
 
-export interface SubmitReportDto {
+export interface CreateReportInput {
   targetType: ReportTargetType;
   targetId: string;
   reason: string;
@@ -18,53 +11,44 @@ export interface SubmitReportDto {
   evidenceUrl?: string;
 }
 
-export interface ResolveReportDto {
-  status: ReportStatus.RESOLVED | ReportStatus.DISMISSED;
-  resolution: string;
-}
-
-@Injectable()
 export class ReportsService {
-  constructor(
-    @InjectModel(Report.name)
-    private reportModel: Model<ReportDocument>,
-    private auditService: AuditService,
-  ) {}
+  async create(input: CreateReportInput, reporterId: string): Promise<ReportDocument> {
+    if (!input.targetType || !input.targetId || !input.reason || !input.description) {
+      throw new AppError('targetType, targetId, reason, and description are required', 400);
+    }
 
-  async submitReport(
-    dto: SubmitReportDto,
-    reporter: JwtPayload,
-  ): Promise<Report> {
-    const report = await this.reportModel.create({
-      reporterId: reporter.sub,
-      targetType: dto.targetType,
-      targetId: dto.targetId,
-      reason: dto.reason,
-      description: dto.description,
-      evidenceUrl: dto.evidenceUrl || null,
+    const report = await ReportModel.create({
+      reporterId,
+      targetType: input.targetType,
+      targetId: input.targetId,
+      reason: input.reason.trim(),
+      description: input.description.trim(),
+      evidenceUrl: input.evidenceUrl || null,
       status: ReportStatus.SUBMITTED,
     });
 
-    await this.auditService.record({
-      actorId: reporter.sub,
-      action: AuditAction.CREATE,
+    await auditService.record({
+      actorId: reporterId,
+      action: 'REPORT_CREATE',
       targetType: 'REPORT',
       targetId: report.id,
-      metadata: { targetType: dto.targetType, reason: dto.reason },
+      metadata: { reason: report.reason },
     });
 
-    return report.toJSON();
+    return report;
   }
 
-  async list(page = 1, limit = 20): Promise<{ items: Report[]; total: number }> {
+  async list(page = 1, limit = 20, status?: ReportStatus): Promise<{ items: any[]; total: number }> {
+    const filter: any = {};
+    if (status) filter.status = status;
+
     const [items, total] = await Promise.all([
-      this.reportModel
-        .find()
+      ReportModel.find(filter)
         .skip((page - 1) * limit)
         .limit(limit)
         .sort({ createdAt: -1 })
         .exec(),
-      this.reportModel.countDocuments().exec(),
+      ReportModel.countDocuments(filter).exec(),
     ]);
 
     return {
@@ -73,30 +57,31 @@ export class ReportsService {
     };
   }
 
-  async resolveReport(
+  async resolve(
     id: string,
-    dto: ResolveReportDto,
-    moderator: JwtPayload,
-  ): Promise<Report> {
-    const report = await this.reportModel.findById(id).exec();
+    resolution: string,
+    reviewerId: string,
+  ): Promise<ReportDocument> {
+    const report = await ReportModel.findById(id).exec();
     if (!report) {
-      throw new NotFoundException('Report not found');
+      throw new AppError('Report not found', 404, 'NOT_FOUND');
     }
 
-    report.status = dto.status;
-    report.resolution = dto.resolution;
-    report.assignedReviewerId = moderator.sub;
-
+    report.status = ReportStatus.RESOLVED;
+    report.resolution = resolution;
+    report.assignedReviewerId = reviewerId;
     const saved = await report.save();
 
-    await this.auditService.record({
-      actorId: moderator.sub,
-      action: AuditAction.STATUS_CHANGE,
+    await auditService.record({
+      actorId: reviewerId,
+      action: 'REPORT_RESOLVE',
       targetType: 'REPORT',
       targetId: report.id,
-      metadata: { newStatus: dto.status, resolution: dto.resolution },
+      metadata: { resolution },
     });
 
-    return saved.toJSON();
+    return saved;
   }
 }
+
+export const reportsService = new ReportsService();

@@ -1,14 +1,5 @@
-import {
-  Injectable,
-  ConflictException,
-  UnauthorizedException,
-  ForbiddenException,
-} from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { JwtService } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
-import * as bcrypt from 'bcryptjs';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 import {
   RoleType,
   UserStatus,
@@ -19,49 +10,48 @@ import {
   AuditAction,
 } from '@al-husseiniya/types';
 import { ROLE_PERMISSIONS_MAP, SECURITY_CONFIG } from '@al-husseiniya/config';
-import { User, UserDocument } from '../../database/schemas/user.schema';
-import { Role, RoleDocument } from '../../database/schemas/role.schema';
-import { OrganizationMember, OrganizationMemberDocument } from '../../database/schemas/organization-member.schema';
-import { RegisterDto, LoginDto, RefreshTokenDto } from './dto/auth.dto';
-import { AuditService } from '../../infrastructure/audit/audit.service';
+import { UserModel, UserDocument } from '../../models/user.model';
+import { OrganizationMemberModel } from '../../models/organization-member.model';
+import { auditService } from '../../services/audit.service';
+import { env } from '../../config/env';
+import { AppError } from '../../middleware/error.middleware';
 
-@Injectable()
+export interface RegisterInput {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  phone?: string;
+  locale?: string;
+  timezone?: string;
+}
+
+export interface LoginInput {
+  email: string;
+  password: string;
+}
+
 export class AuthService {
-  constructor(
-    @InjectModel(User.name)
-    private userModel: Model<UserDocument>,
-    @InjectModel(Role.name)
-    private roleModel: Model<RoleDocument>,
-    @InjectModel(OrganizationMember.name)
-    private orgMemberModel: Model<OrganizationMemberDocument>,
-    private jwtService: JwtService,
-    private configService: ConfigService,
-    private auditService: AuditService,
-  ) {}
-
   async register(
-    dto: RegisterDto,
+    input: RegisterInput,
     requestId?: string,
     ipAddress?: string,
   ): Promise<AuthSession> {
-    const existing = await this.userModel.findOne({
-      email: dto.email.toLowerCase(),
-    });
+    const existing = await UserModel.findOne({ email: input.email.toLowerCase() });
     if (existing) {
-      throw new ConflictException('An account with this email already exists');
+      throw new AppError('An account with this email already exists', 409, 'CONFLICT');
     }
 
-    const passwordHash = await bcrypt.hash(
-      dto.password,
-      SECURITY_CONFIG.bcryptSaltRounds,
-    );
+    const passwordHash = await bcrypt.hash(input.password, SECURITY_CONFIG.bcryptSaltRounds);
 
-    const savedUser = await this.userModel.create({
-      email: dto.email.toLowerCase(),
+    const savedUser = await UserModel.create({
+      email: input.email.toLowerCase(),
       passwordHash,
-      firstName: dto.firstName,
-      lastName: dto.lastName,
-      phone: dto.phone || null,
+      firstName: input.firstName,
+      lastName: input.lastName,
+      phone: input.phone || null,
+      locale: input.locale || 'en',
+      timezone: input.timezone || 'UTC',
       status: UserStatus.ACTIVE,
       emailVerified: false,
       phoneVerified: false,
@@ -70,9 +60,9 @@ export class AuthService {
 
     const roles = [RoleType.INDIVIDUAL];
     const permissions = this.aggregatePermissions(roles);
-    const tokens = await this.generateTokens(savedUser.id, savedUser.email, roles, permissions);
+    const tokens = this.generateTokens(savedUser.id, savedUser.email, roles, permissions);
 
-    await this.auditService.record({
+    await auditService.record({
       actorId: savedUser.id,
       action: AuditAction.CREATE,
       targetType: 'USER',
@@ -91,35 +81,38 @@ export class AuthService {
   }
 
   async login(
-    dto: LoginDto,
+    input: LoginInput,
     requestId?: string,
     ipAddress?: string,
   ): Promise<AuthSession> {
-    const user = await this.userModel
-      .findOne({ email: dto.email.toLowerCase() })
+    const user = await UserModel.findOne({ email: input.email.toLowerCase() })
       .select('+passwordHash')
       .exec();
 
     if (!user) {
-      throw new UnauthorizedException('Invalid email or password');
+      throw new AppError('Invalid email or password', 401, 'UNAUTHORIZED');
     }
 
     if (user.status === UserStatus.SUSPENDED) {
-      throw new ForbiddenException('This account has been suspended. Please contact administration');
+      throw new AppError(
+        'This account has been suspended. Please contact administration.',
+        403,
+        'FORBIDDEN',
+      );
     }
 
-    const isMatch = await bcrypt.compare(dto.password, user.passwordHash);
+    const isMatch = await bcrypt.compare(input.password, user.passwordHash);
     if (!isMatch) {
-      throw new UnauthorizedException('Invalid email or password');
+      throw new AppError('Invalid email or password', 401, 'UNAUTHORIZED');
     }
 
     const roles: RoleType[] = user.roles?.length ? user.roles : [RoleType.INDIVIDUAL];
     const permissions = this.aggregatePermissions(roles);
 
-    const membership = await this.orgMemberModel.findOne({ userId: user.id }).exec();
+    const membership = await OrganizationMemberModel.findOne({ userId: user.id }).exec();
     const orgId = membership?.organizationId || null;
 
-    const tokens = await this.generateTokens(
+    const tokens = this.generateTokens(
       user.id,
       user.email,
       roles,
@@ -127,7 +120,7 @@ export class AuthService {
       orgId,
     );
 
-    await this.auditService.record({
+    await auditService.record({
       actorId: user.id,
       action: AuditAction.LOGIN,
       targetType: 'USER',
@@ -145,19 +138,13 @@ export class AuthService {
     };
   }
 
-  async refreshTokens(dto: RefreshTokenDto): Promise<AuthTokens> {
+  async refreshTokens(refreshToken: string): Promise<AuthTokens> {
     try {
-      const refreshSecret = this.configService.get<string>(
-        'JWT_REFRESH_SECRET',
-        'al_husseiniya_dev_jwt_refresh_secret_change_in_production_min32chars',
-      );
-      const payload: JwtPayload = this.jwtService.verify(dto.refreshToken, {
-        secret: refreshSecret,
-      });
+      const payload = jwt.verify(refreshToken, env.JWT_REFRESH_SECRET) as JwtPayload;
+      const user = await UserModel.findById(payload.sub).exec();
 
-      const user = await this.userModel.findById(payload.sub).exec();
       if (!user || user.status === UserStatus.SUSPENDED) {
-        throw new UnauthorizedException('User account inactive or invalid');
+        throw new AppError('User account inactive or invalid', 401, 'UNAUTHORIZED');
       }
 
       return this.generateTokens(
@@ -168,17 +155,17 @@ export class AuthService {
         payload.orgId,
       );
     } catch {
-      throw new UnauthorizedException('Invalid or expired refresh token');
+      throw new AppError('Invalid or expired refresh token', 401, 'UNAUTHORIZED');
     }
   }
 
-  async generateTokens(
+  generateTokens(
     userId: string,
     email: string,
     roles: RoleType[],
     permissions: PermissionKey[],
     orgId?: string | null,
-  ): Promise<AuthTokens> {
+  ): AuthTokens {
     const payload: JwtPayload = {
       sub: userId,
       email,
@@ -187,31 +174,26 @@ export class AuthService {
       orgId,
     };
 
-    const accessSecret = this.configService.get<string>(
-      'JWT_ACCESS_SECRET',
-      'al_husseiniya_dev_jwt_access_secret_change_in_production_min32chars',
-    );
-    const refreshSecret = this.configService.get<string>(
-      'JWT_REFRESH_SECRET',
-      'al_husseiniya_dev_jwt_refresh_secret_change_in_production_min32chars',
-    );
-
-    const [accessToken, refreshToken] = await Promise.all([
-      this.jwtService.signAsync(payload, {
-        secret: accessSecret,
-        expiresIn: '15m',
-      }),
-      this.jwtService.signAsync(payload, {
-        secret: refreshSecret,
-        expiresIn: '7d',
-      }),
-    ]);
+    const accessToken = jwt.sign(payload, env.JWT_ACCESS_SECRET, {
+      expiresIn: env.JWT_ACCESS_EXPIRES_IN as any,
+    });
+    const refreshToken = jwt.sign(payload, env.JWT_REFRESH_SECRET, {
+      expiresIn: env.JWT_REFRESH_EXPIRES_IN as any,
+    });
 
     return {
       accessToken,
       refreshToken,
       expiresIn: SECURITY_CONFIG.accessTokenExpiresInSeconds,
     };
+  }
+
+  async getCurrentUser(userId: string): Promise<UserDocument> {
+    const user = await UserModel.findById(userId).exec();
+    if (!user) {
+      throw new AppError('User not found', 404, 'NOT_FOUND');
+    }
+    return user;
   }
 
   private aggregatePermissions(roles: RoleType[]): PermissionKey[] {
@@ -223,3 +205,5 @@ export class AuthService {
     return Array.from(set);
   }
 }
+
+export const authService = new AuthService();

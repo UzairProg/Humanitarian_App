@@ -37,9 +37,10 @@
     "humanitarian",
     "community",
     "modular-monolith",
-    "nestjs",
+    "mongodb",
+    "express",
     "react",
-    "flutter"
+    "nodejs"
   ],
   "author": "Al-Husseiniya Engineering Team",
   "license": "UNLICENSED"

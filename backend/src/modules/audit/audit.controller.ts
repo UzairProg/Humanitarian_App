@@ -1,29 +1,36 @@
-import { Controller, Get, Query, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
-import { AuditService } from '../../infrastructure/audit/audit.service';
-import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
-import { PermissionsGuard } from '../../common/guards/permissions.guard';
-import { RequirePermissions } from '../../common/decorators/permissions.decorator';
-import { PermissionKey } from '@al-husseiniya/types';
+import { Request, Response, NextFunction } from 'express';
+import { auditService } from '../../services/audit.service';
+import { AppError } from '../../middleware/error.middleware';
 
-@ApiTags('Audit & Compliance')
-@Controller('api/v1/audit')
-@UseGuards(JwtAuthGuard, PermissionsGuard)
 export class AuditController {
-  constructor(private readonly auditService: AuditService) {}
+  async list(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const page = parseInt(req.query.page as string, 10) || 1;
+      const limit = Math.min(parseInt(req.query.limit as string, 10) || 50, 100);
+      const targetType = req.query.targetType as string;
+      const actorId = req.query.actorId as string;
 
-  @Get()
-  @RequirePermissions(PermissionKey.AUDIT_VIEW)
-  @ApiOperation({ summary: 'Retrieve system audit logs (Authorized Auditors & Admins only)' })
-  async getLogs(
-    @Query('page') page = '1',
-    @Query('limit') limit = '50',
-  ) {
-    const pageNum = parseInt(page, 10);
-    const limitNum = parseInt(limit, 10);
-    const offset = (pageNum - 1) * limitNum;
+      const filters: any = {};
+      if (targetType) filters.targetType = targetType;
+      if (actorId) filters.actorId = actorId;
 
-    const [items, total] = await this.auditService.getRecentLogs(limitNum, offset);
-    return { items, total };
+      const result = await auditService.list(page, limit, filters);
+
+      res.status(200).json({
+        success: true,
+        data: result.items,
+        meta: {
+          page,
+          limit,
+          total: result.total,
+          totalPages: Math.ceil(result.total / limit) || 1,
+        },
+        timestamp: new Date().toISOString(),
+      });
+    } catch (err) {
+      next(err);
+    }
   }
 }
+
+export const auditController = new AuditController();

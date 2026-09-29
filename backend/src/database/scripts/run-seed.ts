@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { getMongoUri, stopMemoryServer } from '../database.module';
+import { getMongoUri, disconnectDatabase } from '../../config/database';
 import { runDevSeed } from '../seeds/dev.seed';
 
 async function main() {
@@ -9,8 +9,7 @@ async function main() {
     await mongoose.connect(uri);
     console.log(`[SeedRunner] Connected to MongoDB at: ${uri}`);
     await runDevSeed(mongoose.connection);
-    await mongoose.disconnect();
-    await stopMemoryServer();
+    await disconnectDatabase();
     console.log('[SeedRunner] Seed completed successfully.');
     process.exit(0);
   } catch (error) {

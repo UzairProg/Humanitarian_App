@@ -93,11 +93,16 @@ export enum VerificationStatus {
 export enum RequestStatus {
   DRAFT = 'DRAFT',
   SUBMITTED = 'SUBMITTED',
+  UNDER_REVIEW = 'UNDER_REVIEW',
   IN_REVIEW = 'IN_REVIEW',
   MATCHED = 'MATCHED',
+  ACCEPTED = 'ACCEPTED',
   IN_PROGRESS = 'IN_PROGRESS',
+  COMPLETED = 'COMPLETED',
   FULFILLED = 'FULFILLED',
+  REJECTED = 'REJECTED',
   CANCELLED = 'CANCELLED',
+  ESCALATED = 'ESCALATED',
   CLOSED = 'CLOSED',
 }
 
@@ -110,9 +115,15 @@ export enum RequestPriority {
 
 export enum ProgramStatus {
   DRAFT = 'DRAFT',
+  PENDING_REVIEW = 'PENDING_REVIEW',
+  PUBLISHED = 'PUBLISHED',
   SCHEDULED = 'SCHEDULED',
   ACTIVE = 'ACTIVE',
+  OPEN = 'OPEN',
+  LIMITED = 'LIMITED',
+  FULL = 'FULL',
   COMPLETED = 'COMPLETED',
+  CLOSED = 'CLOSED',
   CANCELLED = 'CANCELLED',
 }
 
@@ -195,6 +206,7 @@ export interface IUser {
   emailVerified: boolean;
   phoneVerified: boolean;
   avatarUrl?: string | null;
+  roles: RoleType[];
   createdAt: Date;
   updatedAt: Date;
   deletedAt?: Date | null;

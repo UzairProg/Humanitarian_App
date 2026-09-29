@@ -1,46 +1,73 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Event, EventDocument } from '../../database/schemas/event.schema';
+import { EventModel, EventDocument } from '../../models/event.model';
+import { auditService } from '../../services/audit.service';
+import { AppError } from '../../middleware/error.middleware';
 
-export interface CreateEventDto {
+export interface CreateEventInput {
   organizationId?: string;
   title: string;
   description: string;
   location: string;
-  startAt: string;
-  endAt: string;
+  startAt: string | Date;
+  endAt: string | Date;
   category: string;
   mediaUrl?: string;
+  status?: string;
 }
 
-@Injectable()
 export class EventsService {
-  constructor(
-    @InjectModel(Event.name)
-    private eventModel: Model<EventDocument>,
-  ) {}
+  async create(input: CreateEventInput, organizerId: string): Promise<EventDocument> {
+    if (!input.title || !input.description || !input.location || !input.startAt || !input.endAt) {
+      throw new AppError('Title, description, location, startAt, and endAt are required', 400);
+    }
 
-  async create(dto: CreateEventDto, organizerId: string): Promise<Event> {
-    const event = await this.eventModel.create({
-      ...dto,
+    const event = await EventModel.create({
+      ...input,
       organizerId,
-      startAt: new Date(dto.startAt),
-      endAt: new Date(dto.endAt),
-      status: 'PUBLISHED',
+      startAt: new Date(input.startAt),
+      endAt: new Date(input.endAt),
+      status: input.status || 'PUBLISHED',
     });
-    return event.toJSON();
+
+    await auditService.record({
+      actorId: organizerId,
+      action: 'EVENT_CREATE',
+      targetType: 'EVENT',
+      targetId: event.id,
+      metadata: { title: event.title },
+    });
+
+    return event;
   }
 
-  async list(page = 1, limit = 20): Promise<{ items: Event[]; total: number }> {
+  async list(
+    options: {
+      page?: number;
+      limit?: number;
+      organizationId?: string;
+      search?: string;
+    } = {},
+  ): Promise<{ items: any[]; total: number }> {
+    const page = options.page || 1;
+    const limit = options.limit || 20;
+
+    const filter: any = { status: 'PUBLISHED' };
+    if (options.organizationId) {
+      filter.organizationId = options.organizationId;
+    }
+    if (options.search) {
+      filter.$or = [
+        { title: { $regex: options.search, $options: 'i' } },
+        { description: { $regex: options.search, $options: 'i' } },
+      ];
+    }
+
     const [items, total] = await Promise.all([
-      this.eventModel
-        .find()
+      EventModel.find(filter)
         .skip((page - 1) * limit)
         .limit(limit)
         .sort({ startAt: 1 })
         .exec(),
-      this.eventModel.countDocuments().exec(),
+      EventModel.countDocuments(filter).exec(),
     ]);
 
     return {
@@ -49,11 +76,13 @@ export class EventsService {
     };
   }
 
-  async getById(id: string): Promise<Event> {
-    const event = await this.eventModel.findById(id).exec();
+  async getById(id: string): Promise<EventDocument> {
+    const event = await EventModel.findById(id).exec();
     if (!event) {
-      throw new NotFoundException('Event not found');
+      throw new AppError('Event not found', 404, 'NOT_FOUND');
     }
-    return event.toJSON();
+    return event;
   }
 }
+
+export const eventsService = new EventsService();

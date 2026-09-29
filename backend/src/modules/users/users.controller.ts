@@ -1,86 +1,80 @@
-import {
-  Controller,
-  Get,
-  Put,
-  Post,
-  Body,
-  Param,
-  Query,
-  UseGuards,
-  ForbiddenException,
-} from '@nestjs/common';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
-import { UsersService, UpdateProfileDto, AssignRoleDto } from './users.service';
-import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
-import { RolesGuard } from '../../common/guards/roles.guard';
-import { Roles } from '../../common/decorators/roles.decorator';
-import { CurrentUser } from '../../common/decorators/current-user.decorator';
-import { JwtPayload, RoleType } from '@al-husseiniya/types';
+import { Request, Response, NextFunction } from 'express';
+import { usersService } from './users.service';
+import { AppError } from '../../middleware/error.middleware';
 
-@ApiTags('Users')
-@Controller('api/v1/users')
-@UseGuards(JwtAuthGuard, RolesGuard)
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
-
-  @Get('me')
-  @ApiOperation({ summary: 'Get current user profile' })
-  async getMyProfile(@CurrentUser() user: JwtPayload) {
-    return this.usersService.getById(user.sub);
-  }
-
-  @Put('me')
-  @ApiOperation({ summary: 'Update current user profile' })
-  async updateMyProfile(
-    @CurrentUser() user: JwtPayload,
-    @Body() dto: UpdateProfileDto,
-  ) {
-    return this.usersService.updateProfile(user.sub, dto, user);
-  }
-
-  @Get(':id')
-  @ApiOperation({ summary: 'Get user profile by ID (Owner or Admin)' })
-  async getById(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
-    const isOwner = user.sub === id;
-    const isAdmin =
-      user.roles.includes(RoleType.ADMIN) ||
-      user.roles.includes(RoleType.SUPER_ADMIN);
-
-    if (!isOwner && !isAdmin) {
-      throw new ForbiddenException('Access denied: You can only view your own profile');
+  async getById(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const user = await usersService.getById(req.params.id);
+      res.status(200).json({
+        success: true,
+        data: user.toJSON(),
+        timestamp: new Date().toISOString(),
+      });
+    } catch (err) {
+      next(err);
     }
-    return this.usersService.getById(id);
   }
 
-  @Put(':id')
-  @ApiOperation({ summary: 'Update user profile by ID' })
-  async updateProfile(
-    @Param('id') id: string,
-    @Body() dto: UpdateProfileDto,
-    @CurrentUser() user: JwtPayload,
-  ) {
-    return this.usersService.updateProfile(id, dto, user);
+  async updateProfile(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      if (!req.user) {
+        throw new AppError('Authentication required', 401, 'UNAUTHORIZED');
+      }
+
+      const updated = await usersService.updateProfile(req.params.id, req.body, req.user);
+      res.status(200).json({
+        success: true,
+        data: updated.toJSON(),
+        timestamp: new Date().toISOString(),
+      });
+    } catch (err) {
+      next(err);
+    }
   }
 
-  @Post(':id/roles')
-  @Roles(RoleType.ADMIN, RoleType.SUPER_ADMIN)
-  @ApiOperation({ summary: 'Assign a role to user (Admins only)' })
-  async assignRole(
-    @Param('id') id: string,
-    @Body() dto: AssignRoleDto,
-    @CurrentUser() user: JwtPayload,
-  ) {
-    await this.usersService.assignRole(id, dto.role, user);
-    return { success: true, message: `Role ${dto.role} assigned successfully` };
+  async assignRole(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      if (!req.user) {
+        throw new AppError('Authentication required', 401, 'UNAUTHORIZED');
+      }
+      const { role } = req.body;
+      if (!role) {
+        throw new AppError('Role is required', 400);
+      }
+
+      const updated = await usersService.assignRole(req.params.id, role, req.user);
+      res.status(200).json({
+        success: true,
+        data: updated.toJSON(),
+        timestamp: new Date().toISOString(),
+      });
+    } catch (err) {
+      next(err);
+    }
   }
 
-  @Get()
-  @Roles(RoleType.ADMIN, RoleType.SUPER_ADMIN)
-  @ApiOperation({ summary: 'List all users with pagination (Admins only)' })
-  async listUsers(
-    @Query('page') page = '1',
-    @Query('limit') limit = '20',
-  ) {
-    return this.usersService.listUsers(parseInt(page, 10), parseInt(limit, 10));
+  async list(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const page = parseInt(req.query.page as string, 10) || 1;
+      const limit = Math.min(parseInt(req.query.limit as string, 10) || 20, 100);
+
+      const result = await usersService.listUsers(page, limit);
+      res.status(200).json({
+        success: true,
+        data: result.items,
+        meta: {
+          page,
+          limit,
+          total: result.total,
+          totalPages: Math.ceil(result.total / limit) || 1,
+        },
+        timestamp: new Date().toISOString(),
+      });
+    } catch (err) {
+      next(err);
+    }
   }
 }
+
+export const usersController = new UsersController();
