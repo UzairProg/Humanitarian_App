@@ -57,7 +57,7 @@ interface HighlightArticle {
 
 export const DashboardPage: React.FC = () => {
   const { user, isAuthenticated } = useAuth();
-  const { t, isRtl } = useLocalization();
+  const { t, locale, isRtl } = useLocalization();
 
   const [impact, setImpact] = useState<ImpactSummaryData | null>(null);
   const [activePrograms, setActivePrograms] = useState<HighlightProgram[]>([]);
@@ -73,7 +73,7 @@ export const DashboardPage: React.FC = () => {
           ApiClient.request<ImpactSummaryData>('/impact/summary'),
           ApiClient.request<HighlightProgram[]>('/food-programs'),
           ApiClient.request<HighlightEvent[]>('/events'),
-          ApiClient.request<HighlightArticle[]>('/knowledge?lang=en'),
+          ApiClient.request<HighlightArticle[]>(`/knowledge?lang=${locale}`),
         ]);
 
         if (impactRes.success && impactRes.data) setImpact(impactRes.data);
@@ -87,19 +87,20 @@ export const DashboardPage: React.FC = () => {
       }
     };
     loadHomeData();
-  }, []);
+  }, [locale]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '3rem', paddingBottom: '4rem' }}>
       {/* 1. HERO SECTION */}
       <section
         style={{
-          background: 'linear-gradient(180deg, #ffffff 0%, #f8f5ee 100%)',
+          background: 'linear-gradient(180deg, #ffffff 0%, #faf8f2 100%)',
           borderBottom: '1px solid #e8e3d8',
-          padding: '4.5rem 1.5rem 4rem',
+          paddingBlock: '4.5rem 4rem',
+          paddingInline: '1.5rem',
         }}
       >
-        <div style={{ maxWidth: '1000px', margin: '0 auto', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.25rem' }}>
+        <div style={{ maxWidth: '1000px', marginInline: 'auto', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.25rem' }}>
           {/* Trust Banner Tag */}
           <div
             style={{
@@ -109,41 +110,39 @@ export const DashboardPage: React.FC = () => {
               backgroundColor: '#fbf5e6',
               border: '1px solid #fae8be',
               color: '#85530f',
-              padding: '0.35rem 0.85rem',
+              paddingInline: '0.85rem',
+              paddingBlock: '0.35rem',
               borderRadius: '9999px',
-              fontSize: '0.78125rem',
-              fontWeight: 600,
-              letterSpacing: '0.04em',
+              fontSize: '0.8125rem',
+              fontWeight: 700,
             }}
           >
             <Sparkles size={14} color="#c6a24a" />
-            <span>AL-HUSSEINIYA COMMUNITY ECOSYSTEM • YEAR-ROUND DIGNITY & RELIEF</span>
+            <span>{t('home.eyebrow')}</span>
           </div>
 
           <h1
             style={{
-              fontSize: 'clamp(2.2rem, 5vw, 3.4rem)',
+              fontSize: 'clamp(2.1rem, 5vw, 3.3rem)',
               fontWeight: 800,
-              lineHeight: 1.15,
+              lineHeight: 1.2,
               color: '#0b1f2a',
-              letterSpacing: '-0.03em',
               maxWidth: '850px',
             }}
           >
-            Help is closer than you think.
+            {t('home.hero.title')}
           </h1>
 
           <p
             style={{
               fontSize: 'clamp(1rem, 2vw, 1.2rem)',
               color: '#475569',
-              lineHeight: 1.6,
-              maxWidth: '720px',
-              margin: '0 auto',
+              lineHeight: 1.7,
+              maxWidth: '740px',
+              marginInline: 'auto',
             }}
           >
-            Find fresh community meals, submit confidential requests for family relief, volunteer with
-            verified responders, and join community gatherings inspired by the enduring values of Karbala.
+            {t('home.hero.desc')}
           </p>
 
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', justifyContent: 'center', marginTop: '0.75rem' }}>
@@ -151,7 +150,8 @@ export const DashboardPage: React.FC = () => {
               to="/requests"
               className="btn btn-primary"
               style={{
-                padding: '0.75rem 1.75rem',
+                paddingInline: '1.75rem',
+                paddingBlock: '0.75rem',
                 fontSize: '1rem',
                 borderRadius: '8px',
                 display: 'flex',
@@ -160,14 +160,15 @@ export const DashboardPage: React.FC = () => {
               }}
             >
               <HeartHandshake size={18} />
-              <span>Find Help</span>
+              <span>{t('home.cta.need_help')}</span>
             </Link>
 
             <Link
               to="/volunteers"
               className="btn btn-secondary"
               style={{
-                padding: '0.75rem 1.75rem',
+                paddingInline: '1.75rem',
+                paddingBlock: '0.75rem',
                 fontSize: '1rem',
                 borderRadius: '8px',
                 display: 'flex',
@@ -176,14 +177,15 @@ export const DashboardPage: React.FC = () => {
               }}
             >
               <Users size={18} color="#087f78" />
-              <span>Offer Help</span>
+              <span>{t('home.cta.want_help')}</span>
             </Link>
 
             <Link
               to="/food-programs"
               className="btn btn-navy"
               style={{
-                padding: '0.75rem 1.75rem',
+                paddingInline: '1.75rem',
+                paddingBlock: '0.75rem',
                 fontSize: '1rem',
                 borderRadius: '8px',
                 display: 'flex',
@@ -192,7 +194,7 @@ export const DashboardPage: React.FC = () => {
               }}
             >
               <Utensils size={18} color="#deb95f" />
-              <span>Explore Meals</span>
+              <span>{t('home.cta.explore_meals')}</span>
             </Link>
           </div>
         </div>
@@ -201,14 +203,14 @@ export const DashboardPage: React.FC = () => {
       {/* 2. QUICK ACTION PATHWAYS */}
       <section className="container">
         <div style={{ textAlign: 'center', marginBottom: '1.75rem' }}>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#0b1f2a' }}>How can we serve you today?</h2>
-          <p style={{ color: '#64748b', fontSize: '0.875rem', marginTop: '0.25rem' }}>
-            Choose a pathway to discover verified services, participate, or connect with community organizers.
+          <h2 style={{ fontSize: '1.65rem', fontWeight: 800, color: '#0b1f2a' }}>{t('home.pathways.title')}</h2>
+          <p style={{ color: '#64748b', fontSize: '0.9rem', marginTop: '0.25rem' }}>
+            {t('home.pathways.subtitle')}
           </p>
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.25rem' }}>
-          {/* Card 1 */}
+          {/* Card 1: Help */}
           <Link
             to="/requests"
             className="card"
@@ -235,19 +237,19 @@ export const DashboardPage: React.FC = () => {
               <HeartHandshake size={22} />
             </div>
             <div>
-              <h3 style={{ fontSize: '1.1rem', fontWeight: 600, color: '#0b1f2a', marginBottom: '0.25rem' }}>
-                Request Help
+              <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#0b1f2a', marginBottom: '0.25rem' }}>
+                {t('home.pathway.help.title')}
               </h3>
-              <p style={{ fontSize: '0.8125rem', color: '#64748b', lineHeight: 1.5, margin: 0 }}>
-                Confidential family relief, emergency food, medical supplies, and living assistance.
+              <p style={{ fontSize: '0.8125rem', color: '#64748b', lineHeight: 1.55, margin: 0 }}>
+                {t('home.pathway.help.desc')}
               </p>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', color: '#087f78', fontSize: '0.8125rem', fontWeight: 600, marginTop: 'auto' }}>
-              <span>Submit request</span> <ArrowRight size={14} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', color: '#087f78', fontSize: '0.8125rem', fontWeight: 700, marginTop: 'auto' }}>
+              <span>{t('home.cta.need_help')}</span> <ArrowRight size={14} className="dir-flip" />
             </div>
           </Link>
 
-          {/* Card 2 */}
+          {/* Card 2: Meals */}
           <Link
             to="/food-programs"
             className="card"
@@ -274,19 +276,19 @@ export const DashboardPage: React.FC = () => {
               <Utensils size={22} />
             </div>
             <div>
-              <h3 style={{ fontSize: '1.1rem', fontWeight: 600, color: '#0b1f2a', marginBottom: '0.25rem' }}>
-                Community Meals
+              <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#0b1f2a', marginBottom: '0.25rem' }}>
+                {t('home.pathway.meals.title')}
               </h3>
-              <p style={{ fontSize: '0.8125rem', color: '#64748b', lineHeight: 1.5, margin: 0 }}>
-                Hot, freshly cooked meals distributed free of charge with complete dignity.
+              <p style={{ fontSize: '0.8125rem', color: '#64748b', lineHeight: 1.55, margin: 0 }}>
+                {t('home.pathway.meals.desc')}
               </p>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', color: '#087f78', fontSize: '0.8125rem', fontWeight: 600, marginTop: 'auto' }}>
-              <span>View kitchens</span> <ArrowRight size={14} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', color: '#087f78', fontSize: '0.8125rem', fontWeight: 700, marginTop: 'auto' }}>
+              <span>{t('home.cta.explore_meals')}</span> <ArrowRight size={14} className="dir-flip" />
             </div>
           </Link>
 
-          {/* Card 3 */}
+          {/* Card 3: Volunteers */}
           <Link
             to="/volunteers"
             className="card"
@@ -313,19 +315,19 @@ export const DashboardPage: React.FC = () => {
               <Users size={22} />
             </div>
             <div>
-              <h3 style={{ fontSize: '1.1rem', fontWeight: 600, color: '#0b1f2a', marginBottom: '0.25rem' }}>
-                Volunteer Circle
+              <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#0b1f2a', marginBottom: '0.25rem' }}>
+                {t('home.pathway.volunteer.title')}
               </h3>
-              <p style={{ fontSize: '0.8125rem', color: '#64748b', lineHeight: 1.5, margin: 0 }}>
-                Contribute your time, logistics support, teaching, or field assistance.
+              <p style={{ fontSize: '0.8125rem', color: '#64748b', lineHeight: 1.55, margin: 0 }}>
+                {t('home.pathway.volunteer.desc')}
               </p>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', color: '#087f78', fontSize: '0.8125rem', fontWeight: 600, marginTop: 'auto' }}>
-              <span>Join initiatives</span> <ArrowRight size={14} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', color: '#087f78', fontSize: '0.8125rem', fontWeight: 700, marginTop: 'auto' }}>
+              <span>{t('home.cta.want_help')}</span> <ArrowRight size={14} className="dir-flip" />
             </div>
           </Link>
 
-          {/* Card 4 */}
+          {/* Card 4: Businesses */}
           <Link
             to="/businesses"
             className="card"
@@ -352,19 +354,19 @@ export const DashboardPage: React.FC = () => {
               <Store size={22} />
             </div>
             <div>
-              <h3 style={{ fontSize: '1.1rem', fontWeight: 600, color: '#0b1f2a', marginBottom: '0.25rem' }}>
-                Business Partners
+              <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#0b1f2a', marginBottom: '0.25rem' }}>
+                {t('home.pathway.business.title')}
               </h3>
-              <p style={{ fontSize: '0.8125rem', color: '#64748b', lineHeight: 1.5, margin: 0 }}>
-                Local grocers, merchants, and caterers pledging surplus food and logistics.
+              <p style={{ fontSize: '0.8125rem', color: '#64748b', lineHeight: 1.55, margin: 0 }}>
+                {t('home.pathway.business.desc')}
               </p>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', color: '#087f78', fontSize: '0.8125rem', fontWeight: 600, marginTop: 'auto' }}>
-              <span>Partner with us</span> <ArrowRight size={14} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', color: '#087f78', fontSize: '0.8125rem', fontWeight: 700, marginTop: 'auto' }}>
+              <span>{t('nav.businesses')}</span> <ArrowRight size={14} className="dir-flip" />
             </div>
           </Link>
 
-          {/* Card 5 */}
+          {/* Card 5: Organizations */}
           <Link
             to="/organizations"
             className="card"
@@ -391,15 +393,15 @@ export const DashboardPage: React.FC = () => {
               <Building2 size={22} />
             </div>
             <div>
-              <h3 style={{ fontSize: '1.1rem', fontWeight: 600, color: '#0b1f2a', marginBottom: '0.25rem' }}>
-                Organizations
+              <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#0b1f2a', marginBottom: '0.25rem' }}>
+                {t('home.pathway.organizations.title')}
               </h3>
-              <p style={{ fontSize: '0.8125rem', color: '#64748b', lineHeight: 1.5, margin: 0 }}>
-                Discover verified Hussainiyas, charitable foundations, and community centers.
+              <p style={{ fontSize: '0.8125rem', color: '#64748b', lineHeight: 1.55, margin: 0 }}>
+                {t('home.pathway.organizations.desc')}
               </p>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', color: '#087f78', fontSize: '0.8125rem', fontWeight: 600, marginTop: 'auto' }}>
-              <span>Explore directory</span> <ArrowRight size={14} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', color: '#087f78', fontSize: '0.8125rem', fontWeight: 700, marginTop: 'auto' }}>
+              <span>{t('nav.organizations')}</span> <ArrowRight size={14} className="dir-flip" />
             </div>
           </Link>
         </div>
@@ -409,37 +411,40 @@ export const DashboardPage: React.FC = () => {
       <section className="container">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '1.25rem' }}>
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#087f78', fontSize: '0.8125rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-              <Utensils size={14} /> Fresh Distributions
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#087f78', fontSize: '0.8125rem', fontWeight: 700, textTransform: 'uppercase' }}>
+              <Utensils size={14} /> {locale === 'ar' ? 'الإطعام المجتمعي' : 'Community Meals'}
             </div>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#0b1f2a', margin: '0.2rem 0 0' }}>
-              Community Meals & Hot Food
+            <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#0b1f2a', margin: '0.2rem 0 0' }}>
+              {t('home.meals.title')}
             </h2>
           </div>
-          <Link to="/food-programs" style={{ color: '#087f78', fontSize: '0.875rem', fontWeight: 600, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-            View all programs <ChevronRight size={16} />
+          <Link to="/food-programs" style={{ color: '#087f78', fontSize: '0.875rem', fontWeight: 700, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+            <span>{locale === 'ar' ? 'عرض كل المطابخ' : 'View all kitchens'}</span>
+            <ChevronRight size={16} className="dir-flip" />
           </Link>
         </div>
 
         {activePrograms.length === 0 ? (
           <div className="card" style={{ textAlign: 'center', padding: '2.5rem' }}>
-            <p style={{ color: '#64748b', margin: 0 }}>No active food distributions listed right now. Check back soon.</p>
+            <p style={{ color: '#64748b', margin: 0 }}>
+              {locale === 'ar' ? 'لا توجد وجبات معلنة في هذا الوقت. تابعنا قريباً.' : 'No active food distributions listed right now.'}
+            </p>
           </div>
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.25rem' }}>
             {activePrograms.map((p) => (
               <div key={p.id} className="card" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', borderRadius: '12px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span className="badge badge-success">Available Today</span>
-                  <span style={{ fontSize: '0.75rem', color: '#087f78', fontWeight: 600 }}>
-                    {p.remainingCapacity} meals remaining
+                  <span className="badge badge-success">{t('status.open')}</span>
+                  <span style={{ fontSize: '0.75rem', color: '#087f78', fontWeight: 700 }}>
+                    {p.remainingCapacity} {t('home.meals.remaining')}
                   </span>
                 </div>
-                <h3 style={{ fontSize: '1.15rem', fontWeight: 600, color: '#0b1f2a' }}>{p.title}</h3>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem', fontSize: '0.8125rem', color: '#64748b' }}>
+                <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: '#0b1f2a' }}>{p.title}</h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', fontSize: '0.8125rem', color: '#64748b' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                     <Clock size={13} color="#087f78" />
-                    <span>Serving: {p.startTime} - {p.endTime}</span>
+                    <span>{t('food.serving_time')}: {p.startTime} - {p.endTime}</span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                     <MapPin size={13} color="#087f78" />
@@ -447,8 +452,9 @@ export const DashboardPage: React.FC = () => {
                   </div>
                 </div>
                 <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '0.75rem', marginTop: 'auto' }}>
-                  <Link to="/food-programs" style={{ color: '#087f78', fontSize: '0.8125rem', fontWeight: 600, textDecoration: 'none' }}>
-                    Get Details & Directions &rarr;
+                  <Link to="/food-programs" style={{ color: '#087f78', fontSize: '0.8125rem', fontWeight: 700, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                    <span>{t('home.meals.details')}</span>
+                    <ArrowRight size={13} className="dir-flip" />
                   </Link>
                 </div>
               </div>
@@ -463,18 +469,19 @@ export const DashboardPage: React.FC = () => {
           {/* Upcoming Events Column */}
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-              <h2 style={{ fontSize: '1.35rem', fontWeight: 700, color: '#0b1f2a', margin: 0 }}>
-                Mobilization & Events
+              <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#0b1f2a', margin: 0 }}>
+                {t('home.events.title')}
               </h2>
-              <Link to="/events" style={{ color: '#087f78', fontSize: '0.8125rem', fontWeight: 600, textDecoration: 'none' }}>
-                All Events &rarr;
+              <Link to="/events" style={{ color: '#087f78', fontSize: '0.8125rem', fontWeight: 700, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.2rem' }}>
+                <span>{t('home.events.all')}</span>
+                <ChevronRight size={14} className="dir-flip" />
               </Link>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
               {upcomingEvents.length === 0 ? (
                 <div className="card" style={{ padding: '2rem', textAlign: 'center', color: '#64748b' }}>
-                  No upcoming gatherings currently scheduled.
+                  {locale === 'ar' ? 'لا توجد فعاليات مجدولة حالياً.' : 'No upcoming gatherings currently scheduled.'}
                 </div>
               ) : (
                 upcomingEvents.map((evt) => (
@@ -482,10 +489,10 @@ export const DashboardPage: React.FC = () => {
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <span className="badge badge-info">{evt.category}</span>
                       <span style={{ fontSize: '0.75rem', color: '#64748b' }}>
-                        {new Date(evt.startAt).toLocaleDateString()}
+                        {new Date(evt.startAt).toLocaleDateString(locale === 'ar' ? 'ar-EG' : undefined)}
                       </span>
                     </div>
-                    <h4 style={{ fontSize: '1rem', fontWeight: 600, color: '#0b1f2a', margin: '0.2rem 0' }}>
+                    <h4 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#0b1f2a', margin: '0.2rem 0' }}>
                       {evt.title}
                     </h4>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.75rem', color: '#64748b' }}>
@@ -500,18 +507,19 @@ export const DashboardPage: React.FC = () => {
           {/* Knowledge & Reflections Column */}
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-              <h2 style={{ fontSize: '1.35rem', fontWeight: 700, color: '#0b1f2a', margin: 0 }}>
-                Ethical & Cultural Insights
+              <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#0b1f2a', margin: 0 }}>
+                {t('home.knowledge.title')}
               </h2>
-              <Link to="/knowledge" style={{ color: '#087f78', fontSize: '0.8125rem', fontWeight: 600, textDecoration: 'none' }}>
-                Library &rarr;
+              <Link to="/knowledge" style={{ color: '#087f78', fontSize: '0.8125rem', fontWeight: 700, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.2rem' }}>
+                <span>{t('home.knowledge.all')}</span>
+                <ChevronRight size={14} className="dir-flip" />
               </Link>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
               {featuredArticles.length === 0 ? (
                 <div className="card" style={{ padding: '2rem', textAlign: 'center', color: '#64748b' }}>
-                  Articles will appear here as verified contributors publish.
+                  {locale === 'ar' ? 'المقالات ستظهر هنا فور نشرها من قبل المساهمين المعتمدين.' : 'Articles will appear here as verified contributors publish.'}
                 </div>
               ) : (
                 featuredArticles.map((art) => (
@@ -519,18 +527,19 @@ export const DashboardPage: React.FC = () => {
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <span className="badge badge-gold">{art.category}</span>
                       <span style={{ fontSize: '0.75rem', color: '#64748b' }}>
-                        {art.language.toUpperCase()}
+                        {art.language === 'ar' ? 'العربية' : 'English'}
                       </span>
                     </div>
-                    <h4 style={{ fontSize: '1.05rem', fontWeight: 600, color: '#0b1f2a', margin: '0.2rem 0' }}>
+                    <h4 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#0b1f2a', margin: '0.2rem 0' }}>
                       {art.title}
                     </h4>
-                    <p style={{ fontSize: '0.8125rem', color: '#475569', lineHeight: 1.5, margin: 0 }}>
+                    <p style={{ fontSize: '0.8125rem', color: '#475569', lineHeight: 1.6, margin: 0 }}>
                       {art.summary}
                     </p>
                     <div style={{ marginTop: '0.4rem' }}>
-                      <Link to="/knowledge" style={{ color: '#087f78', fontSize: '0.8125rem', fontWeight: 600, textDecoration: 'none' }}>
-                        Read full article &rarr;
+                      <Link to="/knowledge" style={{ color: '#087f78', fontSize: '0.8125rem', fontWeight: 700, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                        <span>{t('knowledge.read_btn')}</span>
+                        <ArrowRight size={13} className="dir-flip" />
                       </Link>
                     </div>
                   </div>
@@ -546,100 +555,87 @@ export const DashboardPage: React.FC = () => {
         style={{
           backgroundColor: '#0b1f2a',
           color: '#ffffff',
-          padding: '4rem 1.5rem',
+          paddingBlock: '4rem',
+          paddingInline: '1.5rem',
           borderTop: '1px solid #e8e3d8',
           borderBottom: '1px solid #e8e3d8',
         }}
       >
         <div className="container" style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
-          <div style={{ maxWidth: '700px' }}>
+          <div style={{ maxWidth: '750px' }}>
             <span style={{ color: '#deb95f', fontSize: '0.8125rem', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
-              Living Impact
+              {t('home.impact.eyebrow')}
             </span>
-            <h2 style={{ fontSize: '2rem', fontWeight: 800, color: '#ffffff', letterSpacing: '-0.02em', marginTop: '0.35rem' }}>
-              Together, our community is creating tangible change.
+            <h2 style={{ fontSize: '2.1rem', fontWeight: 800, color: '#ffffff', marginTop: '0.35rem' }}>
+              {t('home.impact.title')}
             </h2>
-            <p style={{ color: '#94a3b8', fontSize: '0.95rem', lineHeight: 1.6, marginTop: '0.5rem' }}>
-              Every meal, emergency relief kit, and volunteer hour represents real families supported with dignity,
-              transparency, and unwavering compassion.
+            <p style={{ color: '#94a3b8', fontSize: '0.95rem', lineHeight: 1.7, marginTop: '0.5rem' }}>
+              {t('home.impact.desc')}
             </p>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem' }}>
             <div style={{ backgroundColor: 'rgba(255,255,255,0.05)', padding: '1.5rem', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.1)' }}>
-              <div style={{ fontSize: '2.25rem', fontWeight: 800, color: '#deb95f', lineHeight: 1 }}>
-                {(impact?.totalMealsDistributed ?? 1250).toLocaleString()}
+              <div style={{ fontSize: '2.3rem', fontWeight: 800, color: '#deb95f', lineHeight: 1 }}>
+                {(impact?.totalMealsDistributed ?? 1250).toLocaleString(locale === 'ar' ? 'ar-EG' : undefined)}
               </div>
-              <div style={{ fontSize: '0.875rem', fontWeight: 600, color: '#ffffff', marginTop: '0.5rem' }}>
-                Hot Meals Distributed
+              <div style={{ fontSize: '0.875rem', fontWeight: 700, color: '#ffffff', marginTop: '0.5rem' }}>
+                {t('home.impact.meals')}
               </div>
               <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '0.2rem' }}>
-                Served directly to individuals and families
+                {locale === 'ar' ? 'وجبات غذائية ساخنة وُزعت للأفراد والأسر' : 'Served directly to individuals and families'}
               </div>
             </div>
 
             <div style={{ backgroundColor: 'rgba(255,255,255,0.05)', padding: '1.5rem', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.1)' }}>
-              <div style={{ fontSize: '2.25rem', fontWeight: 800, color: '#38bdf8', lineHeight: 1 }}>
-                {(impact?.totalRequestsFulfilled ?? 85).toLocaleString()}
+              <div style={{ fontSize: '2.3rem', fontWeight: 800, color: '#38bdf8', lineHeight: 1 }}>
+                {(impact?.totalRequestsFulfilled ?? 85).toLocaleString(locale === 'ar' ? 'ar-EG' : undefined)}
               </div>
-              <div style={{ fontSize: '0.875rem', fontWeight: 600, color: '#ffffff', marginTop: '0.5rem' }}>
-                Relief Requests Fulfilled
+              <div style={{ fontSize: '0.875rem', fontWeight: 700, color: '#ffffff', marginTop: '0.5rem' }}>
+                {t('home.impact.requests')}
               </div>
               <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '0.2rem' }}>
-                Medical, grocery, and living support delivered
+                {locale === 'ar' ? 'مساعدات إنسانية ومعيشية تم إيصالها' : 'Medical and living support fulfilled'}
               </div>
             </div>
 
             <div style={{ backgroundColor: 'rgba(255,255,255,0.05)', padding: '1.5rem', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.1)' }}>
-              <div style={{ fontSize: '2.25rem', fontWeight: 800, color: '#4ade80', lineHeight: 1 }}>
-                {(impact?.verifiedOrganizationsCount ?? 12).toLocaleString()}
+              <div style={{ fontSize: '2.3rem', fontWeight: 800, color: '#4ade80', lineHeight: 1 }}>
+                {(impact?.verifiedOrganizationsCount ?? 12).toLocaleString(locale === 'ar' ? 'ar-EG' : undefined)}
               </div>
-              <div style={{ fontSize: '0.875rem', fontWeight: 600, color: '#ffffff', marginTop: '0.5rem' }}>
-                Verified Hussainiyas & NGOs
+              <div style={{ fontSize: '0.875rem', fontWeight: 700, color: '#ffffff', marginTop: '0.5rem' }}>
+                {t('home.impact.orgs')}
               </div>
               <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '0.2rem' }}>
-                Vetted community coordinators on platform
+                {locale === 'ar' ? 'حسينيات وجمعيات معتمدة تقدم خدماتها' : 'Vetted community coordinators on platform'}
               </div>
             </div>
 
             <div style={{ backgroundColor: 'rgba(255,255,255,0.05)', padding: '1.5rem', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.1)' }}>
-              <div style={{ fontSize: '2.25rem', fontWeight: 800, color: '#fb923c', lineHeight: 1 }}>
-                {(impact?.activeVolunteersCount ?? 45).toLocaleString()}
+              <div style={{ fontSize: '2.3rem', fontWeight: 800, color: '#fb923c', lineHeight: 1 }}>
+                {(impact?.activeVolunteersCount ?? 45).toLocaleString(locale === 'ar' ? 'ar-EG' : undefined)}
               </div>
-              <div style={{ fontSize: '0.875rem', fontWeight: 600, color: '#ffffff', marginTop: '0.5rem' }}>
-                Mobilized Volunteers
+              <div style={{ fontSize: '0.875rem', fontWeight: 700, color: '#ffffff', marginTop: '0.5rem' }}>
+                {t('home.impact.volunteers')}
               </div>
               <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '0.2rem' }}>
-                Ready to respond across all active sectors
+                {locale === 'ar' ? 'متطوعون مستعدون للاستجابة والخدمة' : 'Ready to respond across all active sectors'}
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 6. PLATFORM ARCHITECTURAL & RELIGIOUS AUTHORITY NOTICE */}
+      {/* 6. PLATFORM ARCHITECTURAL & AUTHORITY NOTICE */}
       <section className="container">
-        <div
-          style={{
-            backgroundColor: '#fbf5e6',
-            border: '1px solid #fae8be',
-            borderRadius: '12px',
-            padding: '1.25rem 1.5rem',
-            display: 'flex',
-            alignItems: 'flex-start',
-            gap: '1rem',
-          }}
-        >
+        <div className="authority-notice">
           <Info size={22} color="#9e7f33" style={{ flexShrink: 0, marginTop: '2px' }} />
           <div>
             <h4 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#85530f', margin: '0 0 0.25rem' }}>
-              Platform Purpose & Scope
+              {t('home.scope.title')}
             </h4>
-            <p style={{ fontSize: '0.8125rem', color: '#78350f', lineHeight: 1.55, margin: 0 }}>
-              Al-Husseiniya is dedicated strictly to technical, administrative, and logistical coordination among
-              humanitarian entities and community members. The platform does not independently issue religious rulings
-              (fatwas) or arbitrate doctrinal matters. Verified scholarly contributors publish articles under their own
-              institutional affiliations.
+            <p style={{ fontSize: '0.8125rem', color: '#78350f', lineHeight: 1.6, margin: 0 }}>
+              {t('home.scope.desc')}
             </p>
           </div>
         </div>

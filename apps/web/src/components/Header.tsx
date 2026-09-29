@@ -8,7 +8,6 @@ import {
   User as UserIcon,
   LogOut,
   Bell,
-  Check,
   Clock,
   Search,
   Menu,
@@ -46,7 +45,7 @@ interface SearchResults {
 
 export const Header: React.FC = () => {
   const { user, isAuthenticated, logout, hasRole } = useAuth();
-  const { locale, setLocale, t } = useLocalization();
+  const { locale, setLocale, t, isRtl } = useLocalization();
   const navigate = useNavigate();
 
   // Search state
@@ -156,13 +155,13 @@ export const Header: React.FC = () => {
   };
 
   const navLinks = [
-    { to: '/requests', label: 'Find Help' },
-    { to: '/food-programs', label: 'Community Meals' },
-    { to: '/organizations', label: 'Organizations' },
-    { to: '/events', label: 'Events' },
-    { to: '/knowledge', label: 'Knowledge' },
-    { to: '/volunteers', label: 'Volunteers' },
-    { to: '/businesses', label: 'Businesses' },
+    { to: '/requests', label: t('nav.help') },
+    { to: '/food-programs', label: t('nav.meals') },
+    { to: '/organizations', label: t('nav.organizations') },
+    { to: '/events', label: t('nav.events') },
+    { to: '/knowledge', label: t('nav.knowledge') },
+    { to: '/volunteers', label: t('nav.volunteers') },
+    { to: '/businesses', label: t('nav.businesses') },
   ];
 
   return (
@@ -179,15 +178,16 @@ export const Header: React.FC = () => {
       <div
         style={{
           maxWidth: '1360px',
-          margin: '0 auto',
-          padding: '0.65rem 1.5rem',
+          marginInline: 'auto',
+          paddingInline: '1.5rem',
+          paddingBlock: '0.65rem',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
           gap: '1rem',
         }}
       >
-        {/* Left: Brand Identity */}
+        {/* Brand Identity */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexShrink: 0 }}>
           <Link
             to="/"
@@ -209,7 +209,7 @@ export const Header: React.FC = () => {
                 alignItems: 'center',
                 justifyContent: 'center',
                 color: '#deb95f',
-                fontWeight: '700',
+                fontWeight: 700,
                 fontSize: '1.25rem',
                 border: '1px solid #c6a24a',
                 boxShadow: '0 2px 5px rgba(11, 31, 42, 0.15)',
@@ -218,11 +218,11 @@ export const Header: React.FC = () => {
               ح
             </div>
             <div>
-              <div style={{ fontSize: '1.125rem', fontWeight: 800, letterSpacing: '-0.02em', color: '#0b1f2a', lineHeight: 1.15 }}>
+              <div style={{ fontSize: '1.15rem', fontWeight: 800, color: '#0b1f2a', lineHeight: 1.15 }}>
                 {t('app.title')}
               </div>
-              <div style={{ fontSize: '0.6875rem', color: '#64748b', fontWeight: 500, letterSpacing: '0.02em' }}>
-                Humanitarian & Community Platform
+              <div style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: 500 }}>
+                {t('app.tagline')}
               </div>
             </div>
           </Link>
@@ -246,7 +246,7 @@ export const Header: React.FC = () => {
                 padding: '0.45rem 0.75rem',
                 borderRadius: '6px',
                 fontSize: '0.85rem',
-                fontWeight: isActive ? 600 : 500,
+                fontWeight: isActive ? 700 : 500,
                 color: isActive ? '#087f78' : '#334155',
                 backgroundColor: isActive ? '#f0fbf9' : 'transparent',
                 textDecoration: 'none',
@@ -258,7 +258,7 @@ export const Header: React.FC = () => {
           ))}
         </nav>
 
-        {/* Right Section: Search, Language, Notifications, User */}
+        {/* Right Section: Search, Language Switcher, Notifications, User */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           {/* Global Search Bar */}
           <div style={{ position: 'relative' }} ref={searchRef}>
@@ -266,12 +266,13 @@ export const Header: React.FC = () => {
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                backgroundColor: '#f8f5ee',
-                border: '1px solid #e5e0d3',
+                backgroundColor: '#faf8f2',
+                border: '1px solid #e5dfd2',
                 borderRadius: '20px',
-                padding: '0.35rem 0.75rem',
+                paddingInline: '0.75rem',
+                paddingBlock: '0.35rem',
                 gap: '0.4rem',
-                width: '180px',
+                width: '185px',
                 transition: 'width 0.2s ease, border-color 0.2s ease',
               }}
             >
@@ -283,7 +284,7 @@ export const Header: React.FC = () => {
                   if (searchResults) setShowSearchDropdown(true);
                 }}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search platform..."
+                placeholder={t('search.placeholder')}
                 style={{
                   background: 'none',
                   border: 'none',
@@ -301,7 +302,7 @@ export const Header: React.FC = () => {
                 style={{
                   position: 'absolute',
                   top: 'calc(100% + 8px)',
-                  right: 0,
+                  insetInlineEnd: 0,
                   width: '380px',
                   maxHeight: '440px',
                   overflowY: 'auto',
@@ -313,15 +314,15 @@ export const Header: React.FC = () => {
                   zIndex: 110,
                 }}
               >
-                <div style={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', marginBottom: '0.5rem', textTransform: 'uppercase' }}>
-                  Search Results for "{searchQuery}"
+                <div style={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', marginBottom: '0.5rem' }}>
+                  {t('search.results_for')} "{searchQuery}"
                 </div>
 
                 {/* Events */}
                 {searchResults.events && searchResults.events.length > 0 && (
                   <div style={{ marginBottom: '0.75rem' }}>
                     <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#087f78', display: 'flex', alignItems: 'center', gap: '0.3rem', marginBottom: '0.25rem' }}>
-                      <Calendar size={13} /> Events ({searchResults.events.length})
+                      <Calendar size={13} /> {t('nav.events')} ({searchResults.events.length})
                     </div>
                     {searchResults.events.map((evt) => (
                       <div
@@ -338,7 +339,7 @@ export const Header: React.FC = () => {
                         }}
                       >
                         <strong>{evt.title}</strong>
-                        {evt.category && <span style={{ fontSize: '0.7rem', color: '#64748b', marginLeft: '0.5rem' }}>{evt.category}</span>}
+                        {evt.category && <span style={{ fontSize: '0.7rem', color: '#64748b', marginInlineStart: '0.5rem' }}>{evt.category}</span>}
                       </div>
                     ))}
                   </div>
@@ -348,7 +349,7 @@ export const Header: React.FC = () => {
                 {searchResults.knowledge && searchResults.knowledge.length > 0 && (
                   <div style={{ marginBottom: '0.75rem' }}>
                     <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#087f78', display: 'flex', alignItems: 'center', gap: '0.3rem', marginBottom: '0.25rem' }}>
-                      <BookOpen size={13} /> Knowledge Library ({searchResults.knowledge.length})
+                      <BookOpen size={13} /> {t('nav.knowledge')} ({searchResults.knowledge.length})
                     </div>
                     {searchResults.knowledge.map((k) => (
                       <div
@@ -374,7 +375,7 @@ export const Header: React.FC = () => {
                 {searchResults.opportunities && searchResults.opportunities.length > 0 && (
                   <div style={{ marginBottom: '0.75rem' }}>
                     <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#087f78', display: 'flex', alignItems: 'center', gap: '0.3rem', marginBottom: '0.25rem' }}>
-                      <Users size={13} /> Volunteer Needs ({searchResults.opportunities.length})
+                      <Users size={13} /> {t('nav.volunteers')} ({searchResults.opportunities.length})
                     </div>
                     {searchResults.opportunities.map((opp) => (
                       <div
@@ -400,7 +401,7 @@ export const Header: React.FC = () => {
                 {searchResults.businesses && searchResults.businesses.length > 0 && (
                   <div style={{ marginBottom: '0.5rem' }}>
                     <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#087f78', display: 'flex', alignItems: 'center', gap: '0.3rem', marginBottom: '0.25rem' }}>
-                      <Store size={13} /> Supporting Merchants ({searchResults.businesses.length})
+                      <Store size={13} /> {t('nav.businesses')} ({searchResults.businesses.length})
                     </div>
                     {searchResults.businesses.map((b) => (
                       <div
@@ -427,33 +428,34 @@ export const Header: React.FC = () => {
                   !searchResults.opportunities?.length &&
                   !searchResults.businesses?.length && (
                     <div style={{ textAlign: 'center', padding: '1rem', color: '#64748b', fontSize: '0.8125rem' }}>
-                      No matching services or content found.
+                      {t('search.no_results')}
                     </div>
                   )}
               </div>
             )}
           </div>
 
-          {/* Language Switcher */}
+          {/* Language Switcher: In Arabic mode shows 'English', in English mode shows 'العربية' */}
           <button
-            onClick={() => setLocale(locale === 'en' ? 'ar' : 'en')}
+            onClick={() => setLocale(locale === 'ar' ? 'en' : 'ar')}
             style={{
               display: 'flex',
               alignItems: 'center',
               gap: '0.35rem',
-              backgroundColor: '#f8f5ee',
-              border: '1px solid #e5e0d3',
+              backgroundColor: '#faf8f2',
+              border: '1px solid #e5dfd2',
               color: '#0b1f2a',
-              padding: '0.35rem 0.65rem',
+              paddingInline: '0.65rem',
+              paddingBlock: '0.35rem',
               borderRadius: '6px',
               cursor: 'pointer',
               fontSize: '0.8125rem',
-              fontWeight: 500,
+              fontWeight: 600,
             }}
-            title="Switch language / تغيير اللغة"
+            title={locale === 'ar' ? 'التحويل إلى الإنجليزية' : 'Switch to Arabic'}
           >
             <Globe size={14} color="#087f78" />
-            <span>{locale === 'en' ? 'العربية' : 'English'}</span>
+            <span>{locale === 'ar' ? 'English' : 'العربية'}</span>
           </button>
 
           {/* Authenticated user items: Notifications & Profile */}
@@ -465,8 +467,8 @@ export const Header: React.FC = () => {
                   onClick={() => setShowNotifications(!showNotifications)}
                   style={{
                     position: 'relative',
-                    backgroundColor: '#f8f5ee',
-                    border: '1px solid #e5e0d3',
+                    backgroundColor: '#faf8f2',
+                    border: '1px solid #e5dfd2',
                     color: '#0b1f2a',
                     padding: '0.45rem',
                     borderRadius: '6px',
@@ -475,7 +477,7 @@ export const Header: React.FC = () => {
                     alignItems: 'center',
                     justifyContent: 'center',
                   }}
-                  aria-label="Notifications"
+                  aria-label={t('notif.title')}
                 >
                   <Bell size={16} />
                   {unreadCount > 0 && (
@@ -483,7 +485,7 @@ export const Header: React.FC = () => {
                       style={{
                         position: 'absolute',
                         top: '-4px',
-                        right: '-4px',
+                        insetInlineEnd: '-4px',
                         backgroundColor: '#ef4444',
                         color: '#ffffff',
                         borderRadius: '9999px',
@@ -509,7 +511,7 @@ export const Header: React.FC = () => {
                     style={{
                       position: 'absolute',
                       top: 'calc(100% + 8px)',
-                      right: 0,
+                      insetInlineEnd: 0,
                       width: '320px',
                       maxHeight: '400px',
                       backgroundColor: '#ffffff',
@@ -533,7 +535,7 @@ export const Header: React.FC = () => {
                         backgroundColor: '#f8fafc',
                       }}
                     >
-                      <span style={{ fontSize: '0.875rem', fontWeight: 600 }}>Notifications</span>
+                      <span style={{ fontSize: '0.875rem', fontWeight: 600 }}>{t('notif.title')}</span>
                       {unreadCount > 0 && (
                         <button
                           onClick={handleMarkAllRead}
@@ -546,7 +548,7 @@ export const Header: React.FC = () => {
                             fontWeight: 600,
                           }}
                         >
-                          Mark all read
+                          {t('notif.mark_all_read')}
                         </button>
                       )}
                     </div>
@@ -554,7 +556,7 @@ export const Header: React.FC = () => {
                     <div style={{ overflowY: 'auto', maxHeight: '320px' }}>
                       {notifications.length === 0 ? (
                         <div style={{ padding: '2rem 1rem', textAlign: 'center', color: '#64748b', fontSize: '0.8125rem' }}>
-                          No notifications yet
+                          {t('notif.empty')}
                         </div>
                       ) : (
                         notifications.map((n) => (
@@ -593,7 +595,7 @@ export const Header: React.FC = () => {
                             </p>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.7rem', color: '#94a3b8' }}>
                               <Clock size={11} />
-                              <span>{new Date(n.createdAt).toLocaleDateString()}</span>
+                              <span>{new Date(n.createdAt).toLocaleDateString(locale === 'ar' ? 'ar-EG' : undefined)}</span>
                             </div>
                           </div>
                         ))
@@ -642,7 +644,7 @@ export const Header: React.FC = () => {
                     style={{
                       position: 'absolute',
                       top: 'calc(100% + 8px)',
-                      right: 0,
+                      insetInlineEnd: 0,
                       width: '220px',
                       backgroundColor: '#ffffff',
                       borderRadius: '8px',
@@ -676,7 +678,7 @@ export const Header: React.FC = () => {
                             gap: '0.5rem',
                           }}
                         >
-                          <ShieldAlert size={14} color="#087f78" /> Moderation Center
+                          <ShieldAlert size={14} color="#087f78" /> {t('nav.moderation')}
                         </Link>
                         <Link
                           to="/audit"
@@ -691,7 +693,7 @@ export const Header: React.FC = () => {
                             gap: '0.5rem',
                           }}
                         >
-                          <ClipboardList size={14} color="#087f78" /> Audit Logs
+                          <ClipboardList size={14} color="#087f78" /> {t('nav.audit')}
                         </Link>
                         <div style={{ borderTop: '1px solid #f1f5f9', margin: '0.25rem 0' }} />
                       </>
@@ -708,7 +710,7 @@ export const Header: React.FC = () => {
                         color: '#ef4444',
                         background: 'none',
                         border: 'none',
-                        textAlign: 'left',
+                        textAlign: isRtl ? 'right' : 'left',
                         cursor: 'pointer',
                         display: 'flex',
                         alignItems: 'center',
@@ -716,7 +718,7 @@ export const Header: React.FC = () => {
                         width: '100%',
                       }}
                     >
-                      <LogOut size={14} /> Sign Out
+                      <LogOut size={14} /> {t('auth.logout')}
                     </button>
                   </div>
                 )}
@@ -728,11 +730,12 @@ export const Header: React.FC = () => {
               className="btn btn-navy"
               style={{
                 fontSize: '0.8125rem',
-                padding: '0.4rem 0.9rem',
+                paddingInline: '1rem',
+                paddingBlock: '0.4rem',
                 borderRadius: '6px',
               }}
             >
-              Sign In
+              {t('auth.login')}
             </Link>
           )}
 
@@ -795,7 +798,7 @@ export const Header: React.FC = () => {
                   textDecoration: 'none',
                 }}
               >
-                Moderation Center
+                {t('nav.moderation')}
               </Link>
               <Link
                 to="/audit"
@@ -808,7 +811,7 @@ export const Header: React.FC = () => {
                   textDecoration: 'none',
                 }}
               >
-                Audit Logs
+                {t('nav.audit')}
               </Link>
             </>
           )}

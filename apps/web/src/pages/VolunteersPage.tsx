@@ -282,11 +282,11 @@ export const VolunteersPage: React.FC = () => {
       {/* Header bar */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
-          <h2 style={{ fontSize: '1.75rem', fontWeight: 700, color: '#0b1b2b', letterSpacing: '-0.02em' }}>
-            Volunteer Service Ecosystem
+          <h2 style={{ fontSize: '1.75rem', fontWeight: 700, color: '#0b1f2a', letterSpacing: '-0.02em', margin: 0 }}>
+            {t('volunteers.title')}
           </h2>
           <p style={{ color: '#64748b', fontSize: '0.9rem', marginTop: '0.25rem' }}>
-            Serve neighbors with dignity: packaging rations, providing logistics, emergency aid, and educational support.
+            {t('volunteers.subtitle')}
           </p>
         </div>
 
@@ -312,14 +312,14 @@ export const VolunteersPage: React.FC = () => {
             padding: '0.65rem 1rem',
             background: 'none',
             border: 'none',
-            borderBottom: activeTab === 'opportunities' ? '2px solid #1b6b63' : '2px solid transparent',
-            color: activeTab === 'opportunities' ? '#1b6b63' : '#64748b',
+            borderBottom: activeTab === 'opportunities' ? '2px solid #087f78' : '2px solid transparent',
+            color: activeTab === 'opportunities' ? '#087f78' : '#64748b',
             fontWeight: activeTab === 'opportunities' ? 600 : 500,
             cursor: 'pointer',
             fontSize: '0.9rem',
           }}
         >
-          Open Opportunities
+          {t('volunteers.opportunities_tab')} ({opportunities.length})
         </button>
 
         {isAuthenticated && (
@@ -330,8 +330,8 @@ export const VolunteersPage: React.FC = () => {
                 padding: '0.65rem 1rem',
                 background: 'none',
                 border: 'none',
-                borderBottom: activeTab === 'my-applications' ? '2px solid #1b6b63' : '2px solid transparent',
-                color: activeTab === 'my-applications' ? '#1b6b63' : '#64748b',
+                borderBottom: activeTab === 'my-applications' ? '2px solid #087f78' : '2px solid transparent',
+                color: activeTab === 'my-applications' ? '#087f78' : '#64748b',
                 fontWeight: activeTab === 'my-applications' ? 600 : 500,
                 cursor: 'pointer',
                 fontSize: '0.9rem',
@@ -340,7 +340,7 @@ export const VolunteersPage: React.FC = () => {
                 gap: '0.4rem',
               }}
             >
-              <span>My Applications</span>
+              <span>{t('volunteers.my_apps_tab')}</span>
               {myApplications.length > 0 && (
                 <span className="badge badge-neutral" style={{ fontSize: '0.7rem' }}>
                   {myApplications.length}
@@ -354,14 +354,14 @@ export const VolunteersPage: React.FC = () => {
                 padding: '0.65rem 1rem',
                 background: 'none',
                 border: 'none',
-                borderBottom: activeTab === 'profile' ? '2px solid #1b6b63' : '2px solid transparent',
-                color: activeTab === 'profile' ? '#1b6b63' : '#64748b',
+                borderBottom: activeTab === 'profile' ? '2px solid #087f78' : '2px solid transparent',
+                color: activeTab === 'profile' ? '#087f78' : '#64748b',
                 fontWeight: activeTab === 'profile' ? 600 : 500,
                 cursor: 'pointer',
                 fontSize: '0.9rem',
               }}
             >
-              My Volunteer Profile
+              {t('volunteers.profile_btn')}
             </button>
           </>
         )}
@@ -460,7 +460,7 @@ export const VolunteersPage: React.FC = () => {
                         className="btn btn-teal"
                         style={{ flex: 1, padding: '0.5rem', fontSize: '0.85rem' }}
                       >
-                        Apply to Serve
+                        {t('volunteers.apply_btn')}
                       </button>
                     )}
 

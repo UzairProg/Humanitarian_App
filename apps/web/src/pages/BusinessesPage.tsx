@@ -163,11 +163,11 @@ export const BusinessesPage: React.FC = () => {
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
-          <h2 style={{ fontSize: '1.75rem', fontWeight: 700, color: '#0b1b2b', letterSpacing: '-0.02em' }}>
-            Community Businesses & Ethical Partners
+          <h2 style={{ fontSize: '1.75rem', fontWeight: 700, color: '#0b1f2a', letterSpacing: '-0.02em', margin: 0 }}>
+            {t('businesses.title')}
           </h2>
           <p style={{ color: '#64748b', fontSize: '0.9rem', marginTop: '0.25rem' }}>
-            Halal merchants, wholesale grocers, and ethical businesses offering meal pledges, logistics, and surplus food support.
+            {t('businesses.subtitle')}
           </p>
         </div>
 
@@ -178,7 +178,7 @@ export const BusinessesPage: React.FC = () => {
             style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem' }}
           >
             <PlusCircle size={16} />
-            <span>Register Business</span>
+            <span>{t('businesses.register_btn')}</span>
           </button>
         )}
       </div>

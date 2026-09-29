@@ -6,7 +6,7 @@ import { Shield, Lock, Mail, AlertCircle, HeartHandshake, Sparkles, CheckCircle2
 
 export const LoginPage: React.FC = () => {
   const { login } = useAuth();
-  const { t } = useLocalization();
+  const { t, isRtl } = useLocalization();
   const navigate = useNavigate();
 
   const [email, setEmail] = useState('admin@alhusseiniya.org');
@@ -85,35 +85,37 @@ export const LoginPage: React.FC = () => {
                 justifyContent: 'center',
                 marginBottom: '1.5rem',
                 border: '1px solid #c6a24a',
+                fontFamily: "'Amiri', serif",
               }}
             >
               ح
             </div>
 
             <span style={{ color: '#deb95f', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-              Al-Husseiniya Platform
+              {t('app.title')}
             </span>
             <h2 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#ffffff', letterSpacing: '-0.02em', margin: '0.4rem 0 0.75rem' }}>
-              Humanitarian coordination with complete dignity.
+              {isRtl ? 'التنسيق الإنساني بكرامة واحترام كامل.' : 'Humanitarian coordination with complete dignity.'}
             </h2>
             <p style={{ color: '#94a3b8', fontSize: '0.875rem', lineHeight: 1.6, margin: 0 }}>
-              Access your account to coordinate verified community food programs, volunteer missions,
-              emergency aid requests, and educational publications.
+              {isRtl
+                ? 'سجل دخولك لتنسيق برامج الإطعام المجتمعي المعتمدة، وفرص التطوع، وطلبات الإغاثة، ومقالات المعرفة المستلهمة من قيم كربلاء.'
+                : 'Access your account to coordinate verified community food programs, volunteer missions, emergency aid requests, and educational publications.'}
             </p>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', fontSize: '0.8125rem', color: '#cbd5e1' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <CheckCircle2 size={16} color="#deb95f" />
-              <span>Strictly verified organizations & coordinators</span>
+              <span>{isRtl ? 'منظمات ومنسقون معتمدون وموثقون' : 'Strictly verified organizations & coordinators'}</span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <CheckCircle2 size={16} color="#deb95f" />
-              <span>Confidentiality guaranteed on relief requests</span>
+              <span>{isRtl ? 'سرية تامة ومضمونة لكافة طلبات الدعم' : 'Confidentiality guaranteed on relief requests'}</span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <CheckCircle2 size={16} color="#deb95f" />
-              <span>Year-round community service inspired by Karbala</span>
+              <span>{isRtl ? 'خدمة إنسانية طوال العام مستلهمة من كربلاء' : 'Year-round community service inspired by Karbala'}</span>
             </div>
           </div>
         </div>
@@ -122,10 +124,10 @@ export const LoginPage: React.FC = () => {
         <div style={{ padding: '3rem 2.5rem', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
           <div style={{ marginBottom: '1.75rem' }}>
             <h3 style={{ fontSize: '1.4rem', fontWeight: 700, color: '#0b1f2a', margin: '0 0 0.25rem' }}>
-              Sign in to your account
+              {t('auth.welcome_back')}
             </h3>
             <p style={{ color: '#64748b', fontSize: '0.8125rem', margin: 0 }}>
-              Enter your credentials to access the community portal.
+              {t('auth.portal_desc')}
             </p>
           </div>
 
@@ -152,16 +154,23 @@ export const LoginPage: React.FC = () => {
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
             <div>
               <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 600, color: '#334155', marginBottom: '0.4rem' }}>
-                Email Address
+                {t('field.email')}
               </label>
               <div style={{ position: 'relative' }}>
-                <Mail size={16} color="#94a3b8" style={{ position: 'absolute', top: '11px', left: '10px' }} />
+                <Mail size={16} color="#94a3b8" style={{ position: 'absolute', top: '11px', [isRtl ? 'right' : 'left']: '10px' }} />
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@alhusseiniya.org"
-                  style={{ width: '100%', padding: '0.6rem 0.6rem 0.6rem 2.25rem', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.875rem' }}
+                  style={{
+                    width: '100%',
+                    padding: '0.6rem 0.6rem',
+                    paddingInlineStart: '2.25rem',
+                    borderRadius: '6px',
+                    border: '1px solid #cbd5e1',
+                    fontSize: '0.875rem',
+                  }}
                   required
                 />
               </div>
@@ -169,29 +178,36 @@ export const LoginPage: React.FC = () => {
 
             <div>
               <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 600, color: '#334155', marginBottom: '0.4rem' }}>
-                Password
+                {t('field.password')}
               </label>
               <div style={{ position: 'relative' }}>
-                <Lock size={16} color="#94a3b8" style={{ position: 'absolute', top: '11px', left: '10px' }} />
+                <Lock size={16} color="#94a3b8" style={{ position: 'absolute', top: '11px', [isRtl ? 'right' : 'left']: '10px' }} />
                 <input
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  style={{ width: '100%', padding: '0.6rem 0.6rem 0.6rem 2.25rem', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.875rem' }}
+                  style={{
+                    width: '100%',
+                    padding: '0.6rem 0.6rem',
+                    paddingInlineStart: '2.25rem',
+                    borderRadius: '6px',
+                    border: '1px solid #cbd5e1',
+                    fontSize: '0.875rem',
+                  }}
                   required
                 />
               </div>
             </div>
 
             <button type="submit" disabled={loading} className="btn btn-primary" style={{ width: '100%', padding: '0.7rem', marginTop: '0.25rem' }}>
-              <span>{loading ? 'Authenticating...' : 'Sign In'}</span>
+              <span>{loading ? t('common.loading') : t('auth.login')}</span>
             </button>
           </form>
 
           {/* Quick Fill Personas */}
           <div style={{ marginTop: '2rem', borderTop: '1px solid #f1f5f9', paddingTop: '1.25rem' }}>
             <p style={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', marginBottom: '0.6rem', letterSpacing: '0.04em' }}>
-              Quick Persona Switch (Demo)
+              {isRtl ? 'التبديل السريع بين الحسابات التجريبية' : 'Quick Persona Switch (Demo)'}
             </p>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.4rem' }}>
               <button
@@ -200,7 +216,7 @@ export const LoginPage: React.FC = () => {
                 className="btn btn-secondary"
                 style={{ fontSize: '0.75rem', padding: '0.35rem 0.5rem' }}
               >
-                Administrator
+                {isRtl ? 'مدير المنصة (Admin)' : 'Administrator'}
               </button>
               <button
                 type="button"
@@ -208,7 +224,7 @@ export const LoginPage: React.FC = () => {
                 className="btn btn-secondary"
                 style={{ fontSize: '0.75rem', padding: '0.35rem 0.5rem' }}
               >
-                Org Admin
+                {isRtl ? 'مسؤول حسينية (Org)' : 'Org Admin'}
               </button>
               <button
                 type="button"
@@ -216,7 +232,7 @@ export const LoginPage: React.FC = () => {
                 className="btn btn-secondary"
                 style={{ fontSize: '0.75rem', padding: '0.35rem 0.5rem' }}
               >
-                Moderator
+                {isRtl ? 'مشرف أمان (Mod)' : 'Moderator'}
               </button>
               <button
                 type="button"
@@ -224,7 +240,7 @@ export const LoginPage: React.FC = () => {
                 className="btn btn-secondary"
                 style={{ fontSize: '0.75rem', padding: '0.35rem 0.5rem' }}
               >
-                Community User
+                {isRtl ? 'مستخدم مجتمعي (User)' : 'Community User'}
               </button>
             </div>
           </div>

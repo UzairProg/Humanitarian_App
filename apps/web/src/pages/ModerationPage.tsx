@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ApiClient from '../services/api';
 import { Report, ReportStatus } from '@al-husseiniya/types';
+import { useLocalization } from '../context/LocalizationContext';
 import {
   ShieldAlert,
   CheckCircle,
@@ -16,6 +17,7 @@ import {
 } from 'lucide-react';
 
 export const ModerationPage: React.FC = () => {
+  const { t, isRtl } = useLocalization();
   const [reports, setReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'pending' | 'resolved'>('pending');
@@ -103,13 +105,13 @@ export const ModerationPage: React.FC = () => {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
-            <ShieldAlert size={24} color="#1b6b63" />
-            <h2 style={{ fontSize: '1.75rem', fontWeight: 700, color: '#0b1b2b', letterSpacing: '-0.02em', margin: 0 }}>
-              Trust, Safety & Moderation
+            <ShieldAlert size={24} color="#087f78" />
+            <h2 style={{ fontSize: '1.75rem', fontWeight: 700, color: '#0b1f2a', letterSpacing: '-0.02em', margin: 0 }}>
+              {t('moderation.title')}
             </h2>
           </div>
           <p style={{ color: '#64748b', fontSize: '0.875rem' }}>
-            Inspect community complaints, disputed registrations, inappropriate content, and enforce platform safeguards.
+            {t('moderation.subtitle')}
           </p>
         </div>
       </div>
@@ -124,12 +126,12 @@ export const ModerationPage: React.FC = () => {
             fontSize: '0.875rem',
             background: 'none',
             border: 'none',
-            borderBottom: activeTab === 'pending' ? '3px solid #1b6b63' : '3px solid transparent',
-            color: activeTab === 'pending' ? '#1b6b63' : '#64748b',
+            borderBottom: activeTab === 'pending' ? '3px solid #087f78' : '3px solid transparent',
+            color: activeTab === 'pending' ? '#087f78' : '#64748b',
             cursor: 'pointer',
           }}
         >
-          Pending Review Queue
+          {t('moderation.pending_tab')}
         </button>
         <button
           onClick={() => setActiveTab('resolved')}
@@ -139,12 +141,12 @@ export const ModerationPage: React.FC = () => {
             fontSize: '0.875rem',
             background: 'none',
             border: 'none',
-            borderBottom: activeTab === 'resolved' ? '3px solid #1b6b63' : '3px solid transparent',
-            color: activeTab === 'resolved' ? '#1b6b63' : '#64748b',
+            borderBottom: activeTab === 'resolved' ? '3px solid #087f78' : '3px solid transparent',
+            color: activeTab === 'resolved' ? '#087f78' : '#64748b',
             cursor: 'pointer',
           }}
         >
-          Resolved Archive
+          {t('moderation.resolved_tab')}
         </button>
       </div>
 

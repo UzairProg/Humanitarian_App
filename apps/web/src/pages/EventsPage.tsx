@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import ApiClient from '../services/api';
 import { Event, EventRegistration, RoleType } from '@al-husseiniya/types';
 import { useAuth } from '../context/AuthContext';
+import { useLocalization } from '../context/LocalizationContext';
 import {
   Calendar,
   MapPin,
@@ -22,6 +23,7 @@ interface ExtendedEventRegistration extends EventRegistration {
 
 export const EventsPage: React.FC = () => {
   const { user, isAuthenticated } = useAuth();
+  const { t, isRtl } = useLocalization();
 
   const [activeTab, setActiveTab] = useState<'all' | 'my-events'>('all');
   const [events, setEvents] = useState<Event[]>([]);
@@ -183,11 +185,11 @@ export const EventsPage: React.FC = () => {
       {/* Top Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
-          <h2 style={{ fontSize: '1.75rem', fontWeight: 700, color: '#0b1b2b', letterSpacing: '-0.02em' }}>
-            Community Events & Mobilization
+          <h2 style={{ fontSize: '1.75rem', fontWeight: 700, color: '#0b1f2a', letterSpacing: '-0.02em', margin: 0 }}>
+            {t('events.title')}
           </h2>
           <p style={{ color: '#64748b', fontSize: '0.875rem', marginTop: '0.25rem' }}>
-            Volunteer orientations, educational workshops, logistics meetings, and communal gatherings.
+            {t('events.subtitle')}
           </p>
         </div>
 
@@ -199,7 +201,7 @@ export const EventsPage: React.FC = () => {
               style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem' }}
             >
               <Plus size={16} />
-              <span>Schedule Event</span>
+              <span>{t('events.schedule_btn')}</span>
             </button>
           )}
         </div>
@@ -215,12 +217,12 @@ export const EventsPage: React.FC = () => {
             fontSize: '0.875rem',
             background: 'none',
             border: 'none',
-            borderBottom: activeTab === 'all' ? '3px solid #1b6b63' : '3px solid transparent',
-            color: activeTab === 'all' ? '#1b6b63' : '#64748b',
+            borderBottom: activeTab === 'all' ? '3px solid #087f78' : '3px solid transparent',
+            color: activeTab === 'all' ? '#087f78' : '#64748b',
             cursor: 'pointer',
           }}
         >
-          Upcoming Events ({events.length})
+          {t('events.upcoming_tab')} ({events.length})
         </button>
 
         {isAuthenticated && (
@@ -232,12 +234,12 @@ export const EventsPage: React.FC = () => {
               fontSize: '0.875rem',
               background: 'none',
               border: 'none',
-              borderBottom: activeTab === 'my-events' ? '3px solid #1b6b63' : '3px solid transparent',
-              color: activeTab === 'my-events' ? '#1b6b63' : '#64748b',
+              borderBottom: activeTab === 'my-events' ? '3px solid #087f78' : '3px solid transparent',
+              color: activeTab === 'my-events' ? '#087f78' : '#64748b',
               cursor: 'pointer',
             }}
           >
-            My Registrations ({myRegistrations.filter((r) => r.status === 'CONFIRMED').length})
+            {t('events.my_registrations')} ({myRegistrations.filter((r) => r.status === 'CONFIRMED').length})
           </button>
         )}
       </div>
@@ -260,7 +262,7 @@ export const EventsPage: React.FC = () => {
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#64748b', fontSize: '0.875rem' }}>
               <Filter size={15} />
-              <span>Filter:</span>
+              <span>{t('common.filter')}</span>
             </div>
 
             <select
@@ -274,13 +276,12 @@ export const EventsPage: React.FC = () => {
                 backgroundColor: '#ffffff',
               }}
             >
-              <option value="">All Categories</option>
-              <option value="COMMUNITY_GATHERING">Community Gathering</option>
-              <option value="ORIENTATION">Orientation</option>
-              <option value="WORKSHOP">Workshop</option>
-              <option value="COMMEMORATION">Commemoration</option>
-              <option value="LOGISTICS">Logistics</option>
-              <option value="HUMANITARIAN_DISTRIBUTION">Humanitarian Distribution</option>
+              <option value="">{t('events.cat_all')}</option>
+              <option value="COMMUNITY_GATHERING">{t('events.cat_gathering')}</option>
+              <option value="ORIENTATION">{t('events.cat_orientation')}</option>
+              <option value="WORKSHOP">{t('events.cat_workshop')}</option>
+              <option value="LOGISTICS">{t('events.cat_logistics')}</option>
+              <option value="HUMANITARIAN_DISTRIBUTION">{t('home.pathway.meals.title')}</option>
             </select>
 
             <select
@@ -294,10 +295,10 @@ export const EventsPage: React.FC = () => {
                 backgroundColor: '#ffffff',
               }}
             >
-              <option value="">All Formats</option>
-              <option value="ON_SITE">On-Site</option>
-              <option value="ONLINE">Online</option>
-              <option value="HYBRID">Hybrid</option>
+              <option value="">{t('events.format_all')}</option>
+              <option value="ON_SITE">{t('events.format_onsite')}</option>
+              <option value="ONLINE">{t('events.format_online')}</option>
+              <option value="HYBRID">{t('events.format_hybrid')}</option>
             </select>
 
             {(categoryFilter || formatFilter) && (
@@ -315,7 +316,7 @@ export const EventsPage: React.FC = () => {
                   textDecoration: 'underline',
                 }}
               >
-                Clear Filters
+                {t('common.cancel')}
               </button>
             )}
           </div>
@@ -323,11 +324,11 @@ export const EventsPage: React.FC = () => {
           {/* Events Grid */}
           {loading ? (
             <div className="card" style={{ textAlign: 'center', padding: '3rem' }}>
-              <p style={{ color: '#64748b' }}>Loading community events...</p>
+              <p style={{ color: '#64748b' }}>{t('common.loading')}</p>
             </div>
           ) : events.length === 0 ? (
             <div className="card" style={{ textAlign: 'center', padding: '3rem' }}>
-              <p style={{ color: '#64748b' }}>No upcoming events matching your criteria.</p>
+              <p style={{ color: '#64748b' }}>{t('events.no_events')}</p>
             </div>
           ) : (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '1.5rem' }}>
@@ -435,16 +436,16 @@ export const EventsPage: React.FC = () => {
                         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: '#64748b' }}>
                           <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
                             <Users size={12} />
-                            {regCount} / {capacity} Registered
+                            {regCount} / {capacity}
                           </span>
-                          <span>{isFull ? 'Event Full' : `${capacity - regCount} spots left`}</span>
+                          <span>{isFull ? t('status.full') : `${capacity - regCount} ${t('events.spots_left')}`}</span>
                         </div>
                         <div style={{ width: '100%', height: '6px', backgroundColor: '#e2e8f0', borderRadius: '3px', overflow: 'hidden' }}>
                           <div
                             style={{
                               width: `${percentFull}%`,
                               height: '100%',
-                              backgroundColor: isFull ? '#ef4444' : percentFull > 80 ? '#f59e0b' : '#1b6b63',
+                              backgroundColor: isFull ? '#ef4444' : percentFull > 80 ? '#f59e0b' : '#087f78',
                               transition: 'width 0.3s ease',
                             }}
                           />
@@ -457,7 +458,7 @@ export const EventsPage: React.FC = () => {
                       {registered ? (
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                           <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: '#16a34a', fontSize: '0.8125rem', fontWeight: 600 }}>
-                            <CheckCircle size={16} /> Confirmed Registered
+                            <CheckCircle size={16} /> {t('events.registered_badge')}
                           </span>
                           <button
                             onClick={() => handleCancelRegistration(evt.id)}
@@ -470,7 +471,7 @@ export const EventsPage: React.FC = () => {
                               textDecoration: 'underline',
                             }}
                           >
-                            Cancel
+                            {t('events.cancel_reg')}
                           </button>
                         </div>
                       ) : (
@@ -488,9 +489,14 @@ export const EventsPage: React.FC = () => {
                             width: '100%',
                             opacity: isFull ? 0.6 : 1,
                             cursor: isFull ? 'not-allowed' : 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '0.4rem',
                           }}
                         >
-                          {isFull ? 'Registration Full' : 'Register Now'}
+                          <span>{isFull ? t('status.full') : t('events.register_btn')}</span>
+                          {!isFull && <span className="dir-flip">&rarr;</span>}
                         </button>
                       )}
                     </div>

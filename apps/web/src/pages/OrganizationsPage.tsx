@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useLocalization } from '../context/LocalizationContext';
 import ApiClient from '../services/api';
 import { Organization, VerificationStatus, PermissionKey, FoodProgram, Event } from '@al-husseiniya/types';
 import {
@@ -37,6 +38,7 @@ interface OrgDetailModalData {
 
 export const OrganizationsPage: React.FC = () => {
   const { hasPermission, isAuthenticated } = useAuth();
+  const { t, isRtl } = useLocalization();
   const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedOrg, setSelectedOrg] = useState<OrgDetailModalData | null>(null);
@@ -169,11 +171,11 @@ export const OrganizationsPage: React.FC = () => {
       {/* Top Banner */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
-          <h2 style={{ fontSize: '1.75rem', fontWeight: 700, color: '#0b1b2b', letterSpacing: '-0.02em', margin: 0 }}>
-            Organizations Serving the Community
+          <h2 style={{ fontSize: '1.75rem', fontWeight: 700, color: '#0b1f2a', letterSpacing: '-0.02em', margin: 0 }}>
+            {t('orgs.title')}
           </h2>
           <p style={{ color: '#64748b', fontSize: '0.875rem', marginTop: '0.25rem' }}>
-            Verified Hussainiyas, relief funds, and civil society partners mobilizing humanitarian aid.
+            {t('orgs.subtitle')}
           </p>
         </div>
 
@@ -184,7 +186,7 @@ export const OrganizationsPage: React.FC = () => {
             style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.55rem 1.25rem' }}
           >
             <Plus size={16} />
-            <span>Register Organization</span>
+            <span>{t('orgs.register_btn')}</span>
           </button>
         )}
       </div>
@@ -206,7 +208,7 @@ export const OrganizationsPage: React.FC = () => {
           <Search size={16} color="#94a3b8" />
           <input
             type="text"
-            placeholder="Search organizations by name or city..."
+            placeholder={t('orgs.search_placeholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             style={{ width: '100%', padding: '0.4rem 0.6rem', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.8125rem' }}
@@ -220,22 +222,22 @@ export const OrganizationsPage: React.FC = () => {
             onChange={(e) => setFilterVerifiedOnly(e.target.checked)}
             style={{ width: '16px', height: '16px' }}
           />
-          <span>Show Verified Partners Only</span>
+          <span>{t('orgs.filter_verified')}</span>
         </label>
 
-        <span style={{ marginLeft: 'auto', fontSize: '0.8125rem', color: '#64748b' }}>
-          Showing {filteredOrgs.length} of {organizations.length} organizations
+        <span style={{ marginInlineStart: 'auto', fontSize: '0.8125rem', color: '#64748b' }}>
+          {filteredOrgs.length} / {organizations.length}
         </span>
       </div>
 
       {/* Organizations Grid */}
       {loading ? (
         <div className="card" style={{ textAlign: 'center', padding: '3rem' }}>
-          <p style={{ color: '#64748b' }}>Loading community organizations...</p>
+          <p style={{ color: '#64748b' }}>{t('common.loading')}</p>
         </div>
       ) : filteredOrgs.length === 0 ? (
         <div className="card" style={{ textAlign: 'center', padding: '3rem' }}>
-          <p style={{ color: '#64748b' }}>No organizations found matching your criteria.</p>
+          <p style={{ color: '#64748b' }}>{t('orgs.no_orgs')}</p>
         </div>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '1.5rem' }}>
@@ -285,10 +287,10 @@ export const OrganizationsPage: React.FC = () => {
 
                     {isVerified ? (
                       <span className="verified-pill" title="Verified by Al-Husseiniya administrative team">
-                        <ShieldCheck size={13} /> Verified
+                        <ShieldCheck size={13} /> {t('status.verified')}
                       </span>
                     ) : (
-                      <span className="badge badge-warning">Pending</span>
+                      <span className="badge badge-warning">{t('status.pending')}</span>
                     )}
                   </div>
 
@@ -314,9 +316,10 @@ export const OrganizationsPage: React.FC = () => {
                   <button
                     onClick={() => handleViewDetails(org)}
                     className="btn btn-secondary"
-                    style={{ fontSize: '0.8125rem', padding: '0.4rem 0.85rem' }}
+                    style={{ fontSize: '0.8125rem', padding: '0.4rem 0.85rem', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
                   >
-                    View Programs & Impact &rarr;
+                    <span>{t('orgs.details_btn')}</span>
+                    <span className="dir-flip">&rarr;</span>
                   </button>
 
                   {canVerify && !isVerified && (
@@ -325,7 +328,7 @@ export const OrganizationsPage: React.FC = () => {
                       className="btn btn-primary"
                       style={{ fontSize: '0.75rem', padding: '0.35rem 0.65rem' }}
                     >
-                      Verify Org
+                      {t('orgs.verify_btn')}
                     </button>
                   )}
                 </div>
@@ -410,26 +413,26 @@ export const OrganizationsPage: React.FC = () => {
                 }}
               >
                 <div style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#0b1f2a', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                  Community Outcomes & Verified Impact
+                  {t('orgs.impact_title')}
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem' }}>
                   <div>
                     <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#087f78' }}>
                       {selectedOrg.impact.mealsDistributed.toLocaleString()}
                     </div>
-                    <div style={{ fontSize: '0.75rem', color: '#64748b' }}>Meals Distributed</div>
+                    <div style={{ fontSize: '0.75rem', color: '#64748b' }}>{t('home.impact.meals')}</div>
                   </div>
                   <div>
                     <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#0369a1' }}>
                       {selectedOrg.impact.requestsFulfilled.toLocaleString()}
                     </div>
-                    <div style={{ fontSize: '0.75rem', color: '#64748b' }}>Requests Supported</div>
+                    <div style={{ fontSize: '0.75rem', color: '#64748b' }}>{t('home.impact.requests')}</div>
                   </div>
                   <div>
                     <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#85530f' }}>
                       {selectedOrg.impact.activeProgramsCount}
                     </div>
-                    <div style={{ fontSize: '0.75rem', color: '#64748b' }}>Active Programs</div>
+                    <div style={{ fontSize: '0.75rem', color: '#64748b' }}>{t('orgs.active_programs_title')}</div>
                   </div>
                 </div>
               </div>
@@ -439,7 +442,7 @@ export const OrganizationsPage: React.FC = () => {
             {selectedOrg.organization.activeFoodPrograms && selectedOrg.organization.activeFoodPrograms.length > 0 && (
               <div>
                 <h4 style={{ fontSize: '0.95rem', fontWeight: 600, color: '#0b1f2a', marginBottom: '0.5rem' }}>
-                  Active Food Programs ({selectedOrg.organization.activeFoodPrograms.length})
+                  {t('orgs.active_programs_title')} ({selectedOrg.organization.activeFoodPrograms.length})
                 </h4>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                   {selectedOrg.organization.activeFoodPrograms.map((p) => (

@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import ApiClient from '../services/api';
 import { AuditLog } from '@al-husseiniya/types';
+import { useLocalization } from '../context/LocalizationContext';
 import { ClipboardList, Shield, Filter, Search, CheckCircle } from 'lucide-react';
 
 export const AuditPage: React.FC = () => {
+  const { t, isRtl } = useLocalization();
   const [logs, setLogs] = useState<AuditLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [targetTypeFilter, setTargetTypeFilter] = useState('ALL');
@@ -32,11 +34,11 @@ export const AuditPage: React.FC = () => {
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
             <ClipboardList size={22} color="#087f78" />
             <h2 style={{ fontSize: '1.75rem', fontWeight: 700, color: '#0b1f2a', letterSpacing: '-0.02em', margin: 0 }}>
-              System Audit & Compliance Logs
+              {t('audit.title')}
             </h2>
           </div>
           <p style={{ color: '#64748b', fontSize: '0.875rem' }}>
-            Immutable operational journal recording administrative decisions, verifications, and permission updates.
+            {t('audit.subtitle')}
           </p>
         </div>
       </div>
@@ -55,7 +57,7 @@ export const AuditPage: React.FC = () => {
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#64748b', fontSize: '0.8125rem' }}>
           <Filter size={15} />
-          <span>Entity Filter:</span>
+          <span>{t('audit.entity_filter')}</span>
         </div>
 
         <select
@@ -72,14 +74,14 @@ export const AuditPage: React.FC = () => {
           <option value="REPORT">Report / Moderation</option>
         </select>
 
-        <span style={{ marginLeft: 'auto', fontSize: '0.8125rem', color: '#64748b' }}>
-          Total Audit Records: {filteredLogs.length}
+        <span style={{ marginInlineStart: 'auto', fontSize: '0.8125rem', color: '#64748b' }}>
+          {t('audit.total_records')} {filteredLogs.length}
         </span>
       </div>
 
       {loading ? (
         <div className="card" style={{ textAlign: 'center', padding: '3rem' }}>
-          <p style={{ color: '#64748b' }}>Loading audit records...</p>
+          <p style={{ color: '#64748b' }}>{t('common.loading')}</p>
         </div>
       ) : filteredLogs.length === 0 ? (
         <div className="card" style={{ textAlign: 'center', padding: '3rem' }}>
@@ -89,13 +91,13 @@ export const AuditPage: React.FC = () => {
         <div className="card" style={{ overflowX: 'auto', padding: 0, borderRadius: '10px' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8125rem' }}>
             <thead>
-              <tr style={{ backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0', textAlign: 'left', color: '#64748b' }}>
-                <th style={{ padding: '0.75rem 1rem' }}>Action Code</th>
-                <th style={{ padding: '0.75rem 1rem' }}>Entity Type</th>
-                <th style={{ padding: '0.75rem 1rem' }}>Entity ID</th>
-                <th style={{ padding: '0.75rem 1rem' }}>Actor</th>
-                <th style={{ padding: '0.75rem 1rem' }}>IP Address</th>
-                <th style={{ padding: '0.75rem 1rem' }}>Recorded Time</th>
+              <tr style={{ backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0', textAlign: isRtl ? 'right' : 'left', color: '#64748b' }}>
+                <th style={{ padding: '0.75rem 1rem' }}>{t('audit.action_code')}</th>
+                <th style={{ padding: '0.75rem 1rem' }}>{t('audit.entity_type')}</th>
+                <th style={{ padding: '0.75rem 1rem' }}>{t('audit.entity_id')}</th>
+                <th style={{ padding: '0.75rem 1rem' }}>{t('audit.actor')}</th>
+                <th style={{ padding: '0.75rem 1rem' }}>{t('audit.ip')}</th>
+                <th style={{ padding: '0.75rem 1rem' }}>{t('audit.time')}</th>
               </tr>
             </thead>
             <tbody>

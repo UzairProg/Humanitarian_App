@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useLocalization } from '../context/LocalizationContext';
 import ApiClient from '../services/api';
 import { FoodProgram, RoleType, Organization } from '@al-husseiniya/types';
 import {
@@ -20,6 +21,7 @@ import {
 
 export const FoodProgramsPage: React.FC = () => {
   const { user } = useAuth();
+  const { t, locale, isRtl } = useLocalization();
   const [programs, setPrograms] = useState<FoodProgram[]>([]);
   const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [loading, setLoading] = useState(true);
@@ -90,10 +92,14 @@ export const FoodProgramsPage: React.FC = () => {
     });
 
     if (res.success) {
-      setSuccessMsg('Meal kit successfully reserved! Please show your confirmation code upon pickup.');
+      setSuccessMsg(
+        locale === 'ar'
+          ? 'تم حجز وجبتك بنجاح! يرجى إبراز رمز التأكيد عند نقطة التوزيع.'
+          : 'Meal kit successfully reserved! Please show confirmation upon pickup.'
+      );
       loadData();
     } else {
-      setErrorMsg(res.error?.message || 'Failed to complete reservation');
+      setErrorMsg(res.error?.message || (locale === 'ar' ? 'تعذر إتمام الحجز حالياً' : 'Failed to complete reservation'));
     }
   };
 
@@ -124,7 +130,7 @@ export const FoodProgramsPage: React.FC = () => {
       setInstructions('');
       loadData();
     } else {
-      setCreateFormError(res.error?.message || 'Failed to create food program');
+      setCreateFormError(res.error?.message || (locale === 'ar' ? 'فشل جدول توزيع الوجبات' : 'Failed to create food program'));
     }
   };
 
@@ -141,14 +147,15 @@ export const FoodProgramsPage: React.FC = () => {
   });
 
   return (
-    <div style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
+    <div style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '2rem', maxWidth: '1240px', marginInline: 'auto' }}>
       {/* Editorial Header Banner */}
       <div
         style={{
           background: 'linear-gradient(135deg, #0b1f2a 0%, #123744 100%)',
           color: '#ffffff',
           borderRadius: '16px',
-          padding: '2.5rem 2rem',
+          paddingBlock: '2.5rem',
+          paddingInline: '2rem',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
@@ -157,23 +164,22 @@ export const FoodProgramsPage: React.FC = () => {
           boxShadow: '0 4px 15px rgba(11, 31, 42, 0.1)',
         }}
       >
-        <div style={{ maxWidth: '640px' }}>
-          <span style={{ color: '#deb95f', fontSize: '0.8125rem', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
-            NUTRITION & NOURISHMENT
+        <div style={{ maxWidth: '680px' }}>
+          <span style={{ color: '#deb95f', fontSize: '0.8125rem', fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+            {t('food.hero.eyebrow')}
           </span>
-          <h1 style={{ fontSize: 'clamp(1.75rem, 3vw, 2.4rem)', fontWeight: 800, color: '#ffffff', letterSpacing: '-0.02em', margin: '0.35rem 0 0.5rem' }}>
-            Food should never be out of reach.
+          <h1 style={{ fontSize: 'clamp(1.8rem, 3.2vw, 2.5rem)', fontWeight: 800, color: '#ffffff', margin: '0.35rem 0 0.5rem' }}>
+            {t('food.hero.title')}
           </h1>
           <p style={{ color: '#cbd5e1', fontSize: '0.95rem', lineHeight: 1.6, margin: 0 }}>
-            Fresh, hot meals prepared daily by verified community kitchens, religious centers, and generous volunteers.
-            Served openly to anyone in need with total dignity and warmth.
+            {t('food.hero.desc')}
           </p>
         </div>
 
         {isStaffOrAdmin && (
-          <button onClick={() => setShowCreateModal(true)} className="btn btn-primary" style={{ padding: '0.65rem 1.4rem' }}>
+          <button onClick={() => setShowCreateModal(true)} className="btn btn-primary" style={{ paddingInline: '1.4rem', paddingBlock: '0.65rem' }}>
             <Plus size={16} />
-            <span>Schedule Meal Distribution</span>
+            <span>{t('food.schedule_btn')}</span>
           </button>
         )}
       </div>
@@ -196,7 +202,8 @@ export const FoodProgramsPage: React.FC = () => {
       <div
         style={{
           backgroundColor: '#ffffff',
-          padding: '0.85rem 1rem',
+          paddingInline: '1rem',
+          paddingBlock: '0.85rem',
           borderRadius: '10px',
           border: '1px solid #e2e8f0',
           display: 'flex',
@@ -209,47 +216,48 @@ export const FoodProgramsPage: React.FC = () => {
           <Search size={16} color="#94a3b8" />
           <input
             type="text"
-            placeholder="Search kitchens by name or neighborhood..."
+            placeholder={locale === 'ar' ? 'ابحث عن المطابخ والمراكز بالاسم أو الحي...' : 'Search kitchens by name or neighborhood...'}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            style={{ width: '100%', padding: '0.4rem 0.6rem', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.8125rem' }}
+            style={{ width: '100%', paddingInline: '0.6rem', paddingBlock: '0.4rem', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.8125rem' }}
           />
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <label style={{ fontSize: '0.8125rem', color: '#475569' }}>Availability:</label>
+          <label style={{ fontSize: '0.8125rem', color: '#475569' }}>{t('common.status')}</label>
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            style={{ padding: '0.4rem 0.6rem', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.8125rem' }}
+            style={{ paddingInline: '0.6rem', paddingBlock: '0.4rem', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.8125rem' }}
           >
-            <option value="ALL">All Statuses</option>
-            <option value="OPEN">Open (Meals Available)</option>
-            <option value="LIMITED">Limited Spots</option>
-            <option value="FULL">Fully Reserved</option>
-            <option value="CLOSED">Completed</option>
+            <option value="ALL">{t('common.all')}</option>
+            <option value="OPEN">{t('status.open')}</option>
+            <option value="LIMITED">{t('status.limited')}</option>
+            <option value="FULL">{t('status.full')}</option>
+            <option value="CLOSED">{t('status.closed')}</option>
           </select>
         </div>
 
-        <span style={{ marginLeft: 'auto', fontSize: '0.8125rem', color: '#64748b' }}>
-          Showing {filteredPrograms.length} of {programs.length} programs
+        <span style={{ marginInlineStart: 'auto', fontSize: '0.8125rem', color: '#64748b' }}>
+          {filteredPrograms.length} / {programs.length}
         </span>
       </div>
 
       {/* Programs Grid */}
       {loading ? (
         <div className="card" style={{ textAlign: 'center', padding: '3rem' }}>
-          <p style={{ color: '#64748b' }}>Loading scheduled community meals...</p>
+          <p style={{ color: '#64748b' }}>{t('common.loading')}</p>
         </div>
       ) : filteredPrograms.length === 0 ? (
         <div className="card" style={{ textAlign: 'center', padding: '3rem' }}>
-          <p style={{ color: '#64748b' }}>No community meals match your search criteria.</p>
+          <p style={{ color: '#64748b' }}>
+            {locale === 'ar' ? 'لا توجد وجبات معلنة تطابق خيارات البحث الحالية.' : 'No community meals match your search criteria.'}
+          </p>
         </div>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '1.5rem' }}>
           {filteredPrograms.map((p) => {
             const isFull = p.remainingCapacity <= 0;
-            const percentRemaining = Math.round((p.remainingCapacity / p.capacity) * 100);
 
             return (
               <div
@@ -266,18 +274,18 @@ export const FoodProgramsPage: React.FC = () => {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span className={`badge ${isFull ? 'badge-error' : p.remainingCapacity < 20 ? 'badge-warning' : 'badge-success'}`}>
-                      {isFull ? 'FULLY RESERVED' : p.status}
+                      {isFull ? t('status.full') : t('status.open')}
                     </span>
                     <span style={{ fontSize: '0.75rem', fontWeight: 700, color: isFull ? '#ef4444' : '#087f78' }}>
-                      {p.remainingCapacity} / {p.capacity} Available
+                      {p.remainingCapacity} / {p.capacity} {t('home.meals.remaining')}
                     </span>
                   </div>
 
                   <div>
-                    <h3 style={{ fontSize: '1.2rem', fontWeight: 600, color: '#0b1f2a', marginBottom: '0.35rem' }}>
+                    <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#0b1f2a', marginBottom: '0.35rem' }}>
                       {p.title}
                     </h3>
-                    <p style={{ fontSize: '0.875rem', color: '#475569', lineHeight: 1.5, margin: 0 }}>
+                    <p style={{ fontSize: '0.875rem', color: '#475569', lineHeight: 1.6, margin: 0 }}>
                       {p.description}
                     </p>
                   </div>
@@ -297,11 +305,11 @@ export const FoodProgramsPage: React.FC = () => {
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                       <Calendar size={14} color="#087f78" />
-                      <span>Date: {p.programDate}</span>
+                      <span>{p.programDate}</span>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                       <Clock size={14} color="#087f78" />
-                      <span>Serving: {p.startTime} – {p.endTime}</span>
+                      <span>{t('food.serving_time')}: {p.startTime} – {p.endTime}</span>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                       <MapPin size={14} color="#087f78" />
@@ -311,7 +319,7 @@ export const FoodProgramsPage: React.FC = () => {
 
                   {p.instructions && (
                     <div style={{ fontSize: '0.75rem', color: '#64748b', fontStyle: 'italic' }}>
-                      <strong>Pickup Instructions:</strong> {p.instructions}
+                      <strong>{t('food.pickup_notes')}:</strong> {p.instructions}
                     </div>
                   )}
                 </div>
@@ -327,7 +335,7 @@ export const FoodProgramsPage: React.FC = () => {
                       cursor: isFull ? 'not-allowed' : 'pointer',
                     }}
                   >
-                    {isFull ? 'Distribution Full' : 'Reserve Meal Kit'}
+                    {isFull ? t('status.full') : t('food.reserve_btn')}
                   </button>
                 </div>
               </div>
@@ -354,11 +362,11 @@ export const FoodProgramsPage: React.FC = () => {
           }}
         >
           <div className="card" style={{ maxWidth: '600px', width: '100%', maxHeight: '90vh', overflowY: 'auto', padding: '1.75rem' }}>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#0b1b2b', marginBottom: '0.5rem' }}>
-              Schedule Community Food Distribution
+            <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#0b1b2b', marginBottom: '0.5rem' }}>
+              {t('food.schedule_btn')}
             </h3>
             <p style={{ fontSize: '0.875rem', color: '#64748b', marginBottom: '1.25rem' }}>
-              Register an upcoming fresh meal service hosted by your verified organization.
+              {locale === 'ar' ? 'تسجيل وتنسيق توزيع وجبات طازجة عبر منظمتك المعتمدة' : 'Register an upcoming fresh meal service hosted by your verified organization.'}
             </p>
 
             {createFormError && (
@@ -369,8 +377,8 @@ export const FoodProgramsPage: React.FC = () => {
 
             <form onSubmit={handleCreateProgram} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <div>
-                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.25rem' }}>
-                  Host Organization *
+                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.25rem' }}>
+                  {locale === 'ar' ? 'الجهة المستضيفة *' : 'Host Organization *'}
                 </label>
                 <select
                   value={orgId}
@@ -386,23 +394,23 @@ export const FoodProgramsPage: React.FC = () => {
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.25rem' }}>
-                  Program Title *
+                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.25rem' }}>
+                  {locale === 'ar' ? 'عنوان برنامج الوجبات *' : 'Program Title *'}
                 </label>
                 <input
                   type="text"
                   required
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder="e.g. Daily Community Iftar & Dinner Distribution"
+                  placeholder={locale === 'ar' ? 'مثال: وجبة العشاء المجتمعية اليومية في حسينية النور' : 'e.g. Daily Community Dinner Distribution'}
                   style={{ width: '100%', padding: '0.55rem', borderRadius: '6px', border: '1px solid #cbd5e1' }}
                 />
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '1rem' }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.25rem' }}>
-                    Distribution Date *
+                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.25rem' }}>
+                    {locale === 'ar' ? 'تاريخ التوزيع *' : 'Distribution Date *'}
                   </label>
                   <input
                     type="date"
@@ -414,8 +422,8 @@ export const FoodProgramsPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.25rem' }}>
-                    Start Time *
+                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.25rem' }}>
+                    {locale === 'ar' ? 'وقت البدء *' : 'Start Time *'}
                   </label>
                   <input
                     type="time"
@@ -427,8 +435,8 @@ export const FoodProgramsPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.25rem' }}>
-                    End Time *
+                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.25rem' }}>
+                    {locale === 'ar' ? 'وقت الانتهاء *' : 'End Time *'}
                   </label>
                   <input
                     type="time"
@@ -442,22 +450,22 @@ export const FoodProgramsPage: React.FC = () => {
 
               <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '1rem' }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.25rem' }}>
-                    Location / Distribution Address *
+                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.25rem' }}>
+                    {locale === 'ar' ? 'الموقع وعنوان الاستلام *' : 'Location / Address *'}
                   </label>
                   <input
                     type="text"
                     required
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
-                    placeholder="e.g. Al-Husseiniya Courtyard, Najaf"
+                    placeholder={locale === 'ar' ? 'مثال: باحة الحسينية المركزية، النجف الأشرف' : 'e.g. Al-Husseiniya Courtyard, Najaf'}
                     style={{ width: '100%', padding: '0.55rem', borderRadius: '6px', border: '1px solid #cbd5e1' }}
                   />
                 </div>
 
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.25rem' }}>
-                    Meal Capacity *
+                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.25rem' }}>
+                    {locale === 'ar' ? 'العدد المتاح للوجبات *' : 'Meal Capacity *'}
                   </label>
                   <input
                     type="number"
@@ -471,28 +479,28 @@ export const FoodProgramsPage: React.FC = () => {
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.25rem' }}>
-                  Description *
+                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.25rem' }}>
+                  {locale === 'ar' ? 'تفاصيل الوجبة والمعلومات *' : 'Description *'}
                 </label>
                 <textarea
                   required
                   rows={3}
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Details regarding menu, allergens, and dietary accommodations..."
+                  placeholder={locale === 'ar' ? 'تفاصيل القائمة الغذائية وملاحظات الحساسية...' : 'Details regarding menu, allergens, and dietary accommodations...'}
                   style={{ width: '100%', padding: '0.55rem', borderRadius: '6px', border: '1px solid #cbd5e1' }}
                 />
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.25rem' }}>
-                  Pickup Instructions
+                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.25rem' }}>
+                  {t('food.pickup_notes')}
                 </label>
                 <input
                   type="text"
                   value={instructions}
                   onChange={(e) => setInstructions(e.target.value)}
-                  placeholder="e.g. Enter through Gate B, bring confirmation SMS"
+                  placeholder={locale === 'ar' ? 'مثال: الدخول من البوابة الشرقية، إبراز رسالة الحجز' : 'e.g. Enter through Gate B, bring confirmation SMS'}
                   style={{ width: '100%', padding: '0.55rem', borderRadius: '6px', border: '1px solid #cbd5e1' }}
                 />
               </div>
@@ -503,10 +511,10 @@ export const FoodProgramsPage: React.FC = () => {
                   onClick={() => setShowCreateModal(false)}
                   className="btn btn-secondary"
                 >
-                  Cancel
+                  {t('common.cancel')}
                 </button>
                 <button type="submit" className="btn btn-primary">
-                  Publish Meal Distribution
+                  {locale === 'ar' ? 'نشر وتفعيل التوزيع' : 'Publish Meal Distribution'}
                 </button>
               </div>
             </form>

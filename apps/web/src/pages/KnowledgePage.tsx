@@ -9,6 +9,7 @@ import {
   ContributorType,
 } from '@al-husseiniya/types';
 import { useAuth } from '../context/AuthContext';
+import { useLocalization } from '../context/LocalizationContext';
 import {
   BookOpen,
   Info,
@@ -27,6 +28,7 @@ import {
 
 export const KnowledgePage: React.FC = () => {
   const { user, isAuthenticated } = useAuth();
+  const { t, isRtl } = useLocalization();
 
   const [activeTab, setActiveTab] = useState<'catalog' | 'contributor' | 'editorial'>('catalog');
   const [articles, setArticles] = useState<KnowledgeContent[]>([]);
@@ -228,11 +230,11 @@ export const KnowledgePage: React.FC = () => {
       {/* Top Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
-          <h2 style={{ fontSize: '1.75rem', fontWeight: 700, color: '#0b1b2b', letterSpacing: '-0.02em' }}>
-            Knowledge & Cultural Library
+          <h2 style={{ fontSize: '1.75rem', fontWeight: 700, color: '#0b1f2a', letterSpacing: '-0.02em', margin: 0 }}>
+            {t('knowledge.title')}
           </h2>
           <p style={{ color: '#64748b', fontSize: '0.875rem', marginTop: '0.25rem' }}>
-            Educational articles, community guidance, and historical reflections inspired by the enduring values of Karbala.
+            {t('knowledge.subtitle')}
           </p>
         </div>
 
@@ -244,7 +246,7 @@ export const KnowledgePage: React.FC = () => {
               style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem' }}
             >
               <PenTool size={16} />
-              <span>Write Article</span>
+              <span>{t('knowledge.write_btn')}</span>
             </button>
           ) : isAuthenticated && !contributorProfile ? (
             <button
@@ -253,7 +255,7 @@ export const KnowledgePage: React.FC = () => {
               style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem' }}
             >
               <Award size={16} />
-              <span>Become a Contributor</span>
+              <span>{t('knowledge.apply_contributor')}</span>
             </button>
           ) : null}
         </div>
@@ -276,11 +278,9 @@ export const KnowledgePage: React.FC = () => {
       >
         <Info size={20} style={{ flexShrink: 0, marginTop: '2px', color: '#b45309' }} />
         <div>
-          <strong style={{ color: '#92400e' }}>Platform Architectural & Authority Notice:</strong>
+          <strong style={{ color: '#92400e' }}>{t('home.scope.title')}</strong>
           <span style={{ display: 'block', marginTop: '0.2rem' }}>
-            Al-Husseiniya operates strictly as administrative, educational, and technical coordination infrastructure.
-            The platform does not issue religious rulings (fatwas) or resolve theological disputes. Verified scholarly
-            contributors publish under their own named credentials and institutional attributions.
+            {t('home.scope.desc')}
           </span>
         </div>
       </div>
@@ -295,12 +295,12 @@ export const KnowledgePage: React.FC = () => {
             fontSize: '0.875rem',
             background: 'none',
             border: 'none',
-            borderBottom: activeTab === 'catalog' ? '3px solid #1b6b63' : '3px solid transparent',
-            color: activeTab === 'catalog' ? '#1b6b63' : '#64748b',
+            borderBottom: activeTab === 'catalog' ? '3px solid #087f78' : '3px solid transparent',
+            color: activeTab === 'catalog' ? '#087f78' : '#64748b',
             cursor: 'pointer',
           }}
         >
-          Public Articles ({articles.length})
+          {t('knowledge.public_tab')} ({articles.length})
         </button>
 
         {isAuthenticated && (
@@ -312,12 +312,12 @@ export const KnowledgePage: React.FC = () => {
               fontSize: '0.875rem',
               background: 'none',
               border: 'none',
-              borderBottom: activeTab === 'contributor' ? '3px solid #1b6b63' : '3px solid transparent',
-              color: activeTab === 'contributor' ? '#1b6b63' : '#64748b',
+              borderBottom: activeTab === 'contributor' ? '3px solid #087f78' : '3px solid transparent',
+              color: activeTab === 'contributor' ? '#087f78' : '#64748b',
               cursor: 'pointer',
             }}
           >
-            Contributor Portal {contributorProfile && `(${contributorProfile.verificationStatus})`}
+            {t('knowledge.contributor_tab')} {contributorProfile && `(${contributorProfile.verificationStatus})`}
           </button>
         )}
 
@@ -330,8 +330,8 @@ export const KnowledgePage: React.FC = () => {
               fontSize: '0.875rem',
               background: 'none',
               border: 'none',
-              borderBottom: activeTab === 'editorial' ? '3px solid #1b6b63' : '3px solid transparent',
-              color: activeTab === 'editorial' ? '#1b6b63' : '#64748b',
+              borderBottom: activeTab === 'editorial' ? '3px solid #087f78' : '3px solid transparent',
+              color: activeTab === 'editorial' ? '#087f78' : '#64748b',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
@@ -339,7 +339,7 @@ export const KnowledgePage: React.FC = () => {
             }}
           >
             <ShieldCheck size={16} />
-            <span>Editorial Review Queue ({reviewQueue.length})</span>
+            <span>{t('knowledge.editorial_tab')} ({reviewQueue.length})</span>
           </button>
         )}
       </div>
@@ -458,7 +458,7 @@ export const KnowledgePage: React.FC = () => {
                       style={{ fontSize: '0.8125rem', padding: '0.4rem 0.75rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}
                     >
                       <Eye size={14} />
-                      <span>Read Article</span>
+                      <span>{t('knowledge.read_btn')}</span>
                     </button>
                   </div>
                 </div>

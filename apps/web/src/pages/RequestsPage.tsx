@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useLocalization } from '../context/LocalizationContext';
 import ApiClient from '../services/api';
 import { HumanitarianRequest, RequestCategory, RequestStatus, RoleType } from '@al-husseiniya/types';
 import {
@@ -31,6 +32,7 @@ const CANONICAL_STEPS = [
 
 export const RequestsPage: React.FC = () => {
   const { user } = useAuth();
+  const { t, locale, isRtl } = useLocalization();
   const [requests, setRequests] = useState<HumanitarianRequest[]>([]);
   const [categories, setCategories] = useState<RequestCategory[]>([]);
   const [loading, setLoading] = useState(true);
@@ -188,21 +190,21 @@ export const RequestsPage: React.FC = () => {
   const selectedCategoryObj = categories.find((c) => c.id === categoryId);
 
   return (
-    <div style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.75rem', maxWidth: '1200px', margin: '0 auto' }}>
+    <div style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.75rem', maxWidth: '1240px', marginInline: 'auto' }}>
       {/* Top Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
-          <h2 style={{ fontSize: '1.75rem', fontWeight: 700, color: '#0b1f2a', letterSpacing: '-0.02em', margin: 0 }}>
-            Find Help & Relief Assistance
+          <h2 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#0b1f2a', margin: 0 }}>
+            {t('requests.title')}
           </h2>
           <p style={{ color: '#64748b', fontSize: '0.875rem', marginTop: '0.25rem' }}>
-            A safe, dignified space to request essential support from verified community organizations.
+            {t('requests.subtitle')}
           </p>
         </div>
 
-        <button onClick={handleOpenCreateModal} className="btn btn-primary" style={{ padding: '0.55rem 1.25rem' }}>
+        <button onClick={handleOpenCreateModal} className="btn btn-primary" style={{ paddingInline: '1.25rem', paddingBlock: '0.55rem' }}>
           <Plus size={16} />
-          <span>Request Assistance</span>
+          <span>{t('requests.new_btn')}</span>
         </button>
       </div>
 
@@ -212,7 +214,8 @@ export const RequestsPage: React.FC = () => {
           backgroundColor: '#f0fdf4',
           border: '1px solid #bbf7d0',
           borderRadius: '10px',
-          padding: '0.85rem 1.25rem',
+          paddingInline: '1.25rem',
+          paddingBlock: '0.85rem',
           display: 'flex',
           alignItems: 'center',
           gap: '0.75rem',
@@ -221,10 +224,7 @@ export const RequestsPage: React.FC = () => {
         }}
       >
         <ShieldCheck size={20} color="#16a34a" style={{ flexShrink: 0 }} />
-        <div>
-          <strong>Privacy Assured:</strong> Your request details are strictly confidential and only accessible by
-          authorized, verified organization coordinators. We never publish private contact information.
-        </div>
+        <div>{t('requests.privacy_banner')}</div>
       </div>
 
       {actionError && (
@@ -241,40 +241,41 @@ export const RequestsPage: React.FC = () => {
           gap: '1rem',
           flexWrap: 'wrap',
           backgroundColor: '#ffffff',
-          padding: '0.75rem 1rem',
+          paddingInline: '1rem',
+          paddingBlock: '0.75rem',
           borderRadius: '8px',
           border: '1px solid #e2e8f0',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#64748b', fontSize: '0.8125rem' }}>
           <Filter size={15} />
-          <span>Filter:</span>
+          <span>{t('common.filter')}</span>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <label style={{ fontSize: '0.8125rem', color: '#475569' }}>Category:</label>
+          <label style={{ fontSize: '0.8125rem', color: '#475569' }}>{t('common.category')}</label>
           <select
             value={filterCategory}
             onChange={(e) => setFilterCategory(e.target.value)}
-            style={{ padding: '0.35rem 0.6rem', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.8125rem' }}
+            style={{ paddingInline: '0.6rem', paddingBlock: '0.35rem', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.8125rem' }}
           >
-            <option value="ALL">All Categories</option>
+            <option value="ALL">{t('common.all')}</option>
             {categories.map((c) => (
               <option key={c.id} value={c.id}>
-                {c.nameEn}
+                {locale === 'ar' ? (c.nameAr || c.nameEn) : c.nameEn}
               </option>
             ))}
           </select>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <label style={{ fontSize: '0.8125rem', color: '#475569' }}>Status:</label>
+          <label style={{ fontSize: '0.8125rem', color: '#475569' }}>{t('common.status')}</label>
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
-            style={{ padding: '0.35rem 0.6rem', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.8125rem' }}
+            style={{ paddingInline: '0.6rem', paddingBlock: '0.35rem', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.8125rem' }}
           >
-            <option value="ALL">All Statuses</option>
+            <option value="ALL">{t('common.all')}</option>
             <option value="SUBMITTED">SUBMITTED</option>
             <option value="UNDER_REVIEW">UNDER_REVIEW</option>
             <option value="MATCHED">MATCHED</option>
@@ -285,25 +286,27 @@ export const RequestsPage: React.FC = () => {
           </select>
         </div>
 
-        <span style={{ marginLeft: 'auto', fontSize: '0.8125rem', color: '#64748b' }}>
-          Showing {filteredRequests.length} of {requests.length}
+        <span style={{ marginInlineStart: 'auto', fontSize: '0.8125rem', color: '#64748b' }}>
+          {filteredRequests.length} / {requests.length}
         </span>
       </div>
 
       {/* Requests List */}
       {loading ? (
         <div className="card" style={{ textAlign: 'center', padding: '3rem' }}>
-          <p style={{ color: '#64748b' }}>Loading humanitarian requests...</p>
+          <p style={{ color: '#64748b' }}>{t('common.loading')}</p>
         </div>
       ) : filteredRequests.length === 0 ? (
         <div className="card" style={{ textAlign: 'center', padding: '3.5rem 1rem' }}>
-          <AlertCircle size={40} color="#94a3b8" style={{ margin: '0 auto 1rem' }} />
-          <h3 style={{ fontSize: '1.125rem', marginBottom: '0.5rem' }}>No Requests Matching Criteria</h3>
+          <AlertCircle size={40} color="#94a3b8" style={{ marginInline: 'auto', marginBottom: '1rem' }} />
+          <h3 style={{ fontSize: '1.15rem', marginBottom: '0.5rem' }}>
+            {locale === 'ar' ? 'لا توجد طلبات مطابقة لهذه التصفية' : 'No Requests Matching Criteria'}
+          </h3>
           <p style={{ color: '#64748b', fontSize: '0.875rem', marginBottom: '1.5rem' }}>
-            No assistance requests match your active filters.
+            {locale === 'ar' ? 'يمكنك تقديم طلب جديد للحصول على المساعدة اللازمة.' : 'No assistance requests match your active filters.'}
           </p>
           <button onClick={handleOpenCreateModal} className="btn btn-primary">
-            Submit New Request
+            {t('requests.new_btn')}
           </button>
         </div>
       ) : (
@@ -328,11 +331,11 @@ export const RequestsPage: React.FC = () => {
                   <span style={{ fontSize: '0.75rem', color: '#64748b' }}>
                     {req.isPrivate ? (
                       <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}>
-                        <Lock size={12} /> Confidential
+                        <Lock size={12} /> {locale === 'ar' ? 'طلب سري ومحمي' : 'Confidential'}
                       </span>
                     ) : (
                       <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}>
-                        <Globe size={12} /> Community Visible
+                        <Globe size={12} /> {locale === 'ar' ? 'مرئي للعموم' : 'Community Visible'}
                       </span>
                     )}
                   </span>
@@ -344,24 +347,25 @@ export const RequestsPage: React.FC = () => {
                     className="btn btn-secondary"
                     style={{ fontSize: '0.75rem', padding: '0.3rem 0.6rem' }}
                   >
-                    <History size={13} style={{ marginRight: '0.2rem' }} /> History
+                    <History size={13} style={{ marginInlineEnd: '0.25rem' }} />
+                    <span>{locale === 'ar' ? 'سجل الحالة' : 'History'}</span>
                   </button>
                   <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
-                    {new Date(req.createdAt).toLocaleDateString()}
+                    {new Date(req.createdAt).toLocaleDateString(locale === 'ar' ? 'ar-EG' : undefined)}
                   </span>
                 </div>
               </div>
 
               <div>
-                <h3 style={{ fontSize: '1.15rem', fontWeight: 600, color: '#0b1b2b', marginBottom: '0.35rem' }}>
+                <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: '#0b1f2a', marginBottom: '0.35rem' }}>
                   {req.title}
                 </h3>
-                <p style={{ fontSize: '0.875rem', color: '#475569', lineHeight: 1.5, margin: 0 }}>
+                <p style={{ fontSize: '0.875rem', color: '#475569', lineHeight: 1.6, margin: 0 }}>
                   {req.description}
                 </p>
                 {req.location && (
                   <p style={{ fontSize: '0.8125rem', color: '#64748b', marginTop: '0.4rem' }}>
-                    <strong>Location:</strong> {req.location}
+                    <strong>{locale === 'ar' ? 'الموقع:' : 'Location:'}</strong> {req.location}
                   </p>
                 )}
               </div>
@@ -377,8 +381,8 @@ export const RequestsPage: React.FC = () => {
                       <div key={s} style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.7rem', whiteSpace: 'nowrap' }}>
                         <div
                           style={{
-                            width: '18px',
-                            height: '18px',
+                            width: '20px',
+                            height: '20px',
                             borderRadius: '50%',
                             backgroundColor: isCurrent ? '#087f78' : isDone ? '#10b981' : '#e2e8f0',
                             color: isDone || isCurrent ? '#ffffff' : '#64748b',
@@ -394,7 +398,11 @@ export const RequestsPage: React.FC = () => {
                         <span style={{ color: isCurrent ? '#087f78' : isDone ? '#1e293b' : '#94a3b8', fontWeight: isCurrent ? 700 : 500 }}>
                           {s.replace('_', ' ')}
                         </span>
-                        {idx < CANONICAL_STEPS.length - 1 && <span style={{ color: '#cbd5e1', margin: '0 0.2rem' }}>&rarr;</span>}
+                        {idx < CANONICAL_STEPS.length - 1 && (
+                          <span style={{ color: '#cbd5e1', marginInline: '0.3rem' }} className="dir-flip">
+                            &rarr;
+                          </span>
+                        )}
                       </div>
                     );
                   })}
@@ -404,30 +412,32 @@ export const RequestsPage: React.FC = () => {
               {/* Staff / Coordinator Status Controls */}
               {isStaffOrAdmin && (
                 <div style={{ backgroundColor: '#f8fafc', padding: '0.6rem 0.75rem', borderRadius: '6px', display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#475569' }}>Staff Actions:</span>
+                  <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#475569' }}>
+                    {locale === 'ar' ? 'إجراءات المنسق:' : 'Staff Actions:'}
+                  </span>
                   {req.status === 'SUBMITTED' && (
                     <button onClick={() => handleUpdateStatus(req.id, 'UNDER_REVIEW')} className="btn btn-secondary" style={{ fontSize: '0.75rem', padding: '0.25rem 0.5rem' }}>
-                      Mark In Review
+                      {locale === 'ar' ? 'بدء المراجعة' : 'Mark In Review'}
                     </button>
                   )}
                   {req.status === 'UNDER_REVIEW' && (
                     <button onClick={() => handleUpdateStatus(req.id, 'MATCHED')} className="btn btn-secondary" style={{ fontSize: '0.75rem', padding: '0.25rem 0.5rem' }}>
-                      Match Responders
+                      {locale === 'ar' ? 'تنسيق مع الجهة' : 'Match Responders'}
                     </button>
                   )}
                   {req.status === 'MATCHED' && (
                     <button onClick={() => handleUpdateStatus(req.id, 'ACCEPTED')} className="btn btn-secondary" style={{ fontSize: '0.75rem', padding: '0.25rem 0.5rem' }}>
-                      Accept Assignment
+                      {locale === 'ar' ? 'قبول التكليف' : 'Accept Assignment'}
                     </button>
                   )}
                   {req.status === 'ACCEPTED' && (
                     <button onClick={() => handleUpdateStatus(req.id, 'IN_PROGRESS')} className="btn btn-secondary" style={{ fontSize: '0.75rem', padding: '0.25rem 0.5rem' }}>
-                      Start Delivery
+                      {locale === 'ar' ? 'بدء التنفيذ' : 'Start Delivery'}
                     </button>
                   )}
                   {req.status === 'IN_PROGRESS' && (
                     <button onClick={() => handleUpdateStatus(req.id, 'COMPLETED')} className="btn btn-primary" style={{ fontSize: '0.75rem', padding: '0.25rem 0.5rem' }}>
-                      Complete Request
+                      {locale === 'ar' ? 'إنجاز الطلب' : 'Complete Request'}
                     </button>
                   )}
                 </div>
@@ -467,13 +477,13 @@ export const RequestsPage: React.FC = () => {
             {/* Modal Header */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
               <div>
-                <h3 style={{ fontSize: '1.35rem', fontWeight: 700, color: '#0b1f2a', margin: 0 }}>
-                  {submissionSuccess ? 'Request Confirmed' : 'Request Humanitarian Assistance'}
+                <h3 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#0b1f2a', margin: 0 }}>
+                  {submissionSuccess ? t('requests.success_title') : t('requests.title')}
                 </h3>
                 <p style={{ fontSize: '0.8125rem', color: '#64748b', margin: '0.2rem 0 0' }}>
                   {submissionSuccess
-                    ? 'Your needs have been received with utmost dignity.'
-                    : `Step ${step} of 4: Dignified Community Support`}
+                    ? (locale === 'ar' ? 'تم استلام احتياجك بكرامة واهتمام تام' : 'Your request details have been securely recorded.')
+                    : (locale === 'ar' ? `المرحلة ${step} من 4: مساندة مجتمعية قائمة على الكرامة` : `Step ${step} of 4: Dignified Community Support`)}
                 </p>
               </div>
               <button
@@ -493,16 +503,15 @@ export const RequestsPage: React.FC = () => {
             {/* Success State Screen */}
             {submissionSuccess ? (
               <div style={{ textAlign: 'center', padding: '1.5rem 0' }}>
-                <CheckCircle2 size={54} color="#16a34a" style={{ margin: '0 auto 1rem' }} />
-                <h4 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#0b1f2a', marginBottom: '0.5rem' }}>
-                  Your request has been securely recorded.
+                <CheckCircle2 size={54} color="#16a34a" style={{ marginInline: 'auto', marginBottom: '1rem' }} />
+                <h4 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#0b1f2a', marginBottom: '0.5rem' }}>
+                  {t('requests.success_title')}
                 </h4>
-                <p style={{ fontSize: '0.875rem', color: '#475569', lineHeight: 1.6, maxWidth: '480px', margin: '0 auto 1.5rem' }}>
-                  A verified coordinator from our community team will review your needs discreetly. You will be
-                  notified on this platform as soon as support is dispatched.
+                <p style={{ fontSize: '0.875rem', color: '#475569', lineHeight: 1.6, maxWidth: '480px', marginInline: 'auto', marginBottom: '1.5rem' }}>
+                  {t('requests.success_desc')}
                 </p>
                 <button onClick={() => setShowModal(false)} className="btn btn-primary">
-                  Return to Requests
+                  {locale === 'ar' ? 'العودة إلى قائمة الطلبات' : 'Return to Requests'}
                 </button>
               </div>
             ) : (
@@ -510,8 +519,8 @@ export const RequestsPage: React.FC = () => {
                 {/* Step 1: Category Selection */}
                 {step === 1 && (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    <h4 style={{ fontSize: '1.05rem', fontWeight: 600, color: '#0b1f2a' }}>
-                      What kind of support is needed?
+                    <h4 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#0b1f2a' }}>
+                      {t('requests.step1')}
                     </h4>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.75rem' }}>
                       {categories.map((c) => {
@@ -532,11 +541,11 @@ export const RequestsPage: React.FC = () => {
                               transition: 'all 0.15s ease',
                             }}
                           >
-                            <span style={{ fontWeight: 600, fontSize: '0.9rem', color: selected ? '#087f78' : '#0b1f2a' }}>
-                              {c.nameEn}
+                            <span style={{ fontWeight: 700, fontSize: '0.9rem', color: selected ? '#087f78' : '#0b1f2a' }}>
+                              {locale === 'ar' ? (c.nameAr || c.nameEn) : c.nameEn}
                             </span>
                             <span style={{ fontSize: '0.75rem', color: '#64748b' }}>
-                              {c.descriptionEn || 'Essential community relief'}
+                              {locale === 'ar' ? (c.descriptionAr || 'إغاثة ودعم مجتمعي أساسي') : (c.descriptionEn || 'Essential community relief')}
                             </span>
                           </div>
                         );
@@ -550,7 +559,8 @@ export const RequestsPage: React.FC = () => {
                         className="btn btn-primary"
                         style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}
                       >
-                        <span>Continue</span> <ArrowRight size={15} />
+                        <span>{t('common.continue')}</span>
+                        <ArrowRight size={15} className="dir-flip" />
                       </button>
                     </div>
                   </div>
@@ -559,38 +569,38 @@ export const RequestsPage: React.FC = () => {
                 {/* Step 2: Details */}
                 {step === 2 && (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    <h4 style={{ fontSize: '1.05rem', fontWeight: 600, color: '#0b1f2a' }}>
-                      Tell us a little more about the situation.
+                    <h4 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#0b1f2a' }}>
+                      {t('requests.step2')}
                     </h4>
                     <div>
-                      <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.25rem' }}>
-                        Request Summary *
+                      <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.25rem' }}>
+                        {t('requests.summary_label')} *
                       </label>
                       <input
                         type="text"
                         required
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
-                        placeholder="e.g. Urgent baby formula and winter blankets for family of four"
+                        placeholder={locale === 'ar' ? 'مثال: سلة غذائية عاجلة وحليب أطفال لعائلة مكونة من 4 أفراد' : 'e.g. Urgent baby formula and winter blankets for family'}
                         style={{ width: '100%', padding: '0.6rem', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.875rem' }}
                       />
                     </div>
                     <div>
-                      <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.25rem' }}>
-                        Description & Details *
+                      <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.25rem' }}>
+                        {t('requests.details_label')} *
                       </label>
                       <textarea
                         required
                         rows={4}
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
-                        placeholder="Share any pertinent context, dietary requirements, or urgency details..."
+                        placeholder={locale === 'ar' ? 'يرجى توضيح أي تفاصيل معيشية أو صحية أو موعد الاحتياج الضروري...' : 'Share any pertinent context, dietary requirements, or urgency details...'}
                         style={{ width: '100%', padding: '0.6rem', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.875rem' }}
                       />
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1rem' }}>
                       <button type="button" onClick={() => setStep(1)} className="btn btn-secondary">
-                        <ArrowLeft size={15} /> Back
+                        <ArrowLeft size={15} className="dir-flip" /> {t('common.back')}
                       </button>
                       <button
                         type="button"
@@ -598,7 +608,7 @@ export const RequestsPage: React.FC = () => {
                         onClick={() => setStep(3)}
                         className="btn btn-primary"
                       >
-                        Continue <ArrowRight size={15} />
+                        {t('common.continue')} <ArrowRight size={15} className="dir-flip" />
                       </button>
                     </div>
                   </div>
@@ -607,19 +617,19 @@ export const RequestsPage: React.FC = () => {
                 {/* Step 3: Location & Privacy */}
                 {step === 3 && (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    <h4 style={{ fontSize: '1.05rem', fontWeight: 600, color: '#0b1f2a' }}>
-                      Where can responders deliver or reach out?
+                    <h4 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#0b1f2a' }}>
+                      {t('requests.step3')}
                     </h4>
                     <div>
-                      <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.25rem' }}>
-                        Location / General Neighborhood *
+                      <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.25rem' }}>
+                        {t('requests.location_label')} *
                       </label>
                       <input
                         type="text"
                         required
                         value={location}
                         onChange={(e) => setLocation(e.target.value)}
-                        placeholder="e.g. Al-Adhamiya, Baghdad or Najaf Old City"
+                        placeholder={locale === 'ar' ? 'مثال: حي الكرامة، النجف الأشرف أو جانب الكرخ، بغداد' : 'e.g. Al-Adhamiya, Baghdad or Najaf Old City'}
                         style={{ width: '100%', padding: '0.6rem', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.875rem' }}
                       />
                     </div>
@@ -632,18 +642,18 @@ export const RequestsPage: React.FC = () => {
                           onChange={(e) => setIsPrivate(e.target.checked)}
                           style={{ width: '16px', height: '16px' }}
                         />
-                        <span style={{ fontSize: '0.875rem', fontWeight: 600, color: '#0b1f2a' }}>
-                          Keep this request private & confidential (Recommended)
+                        <span style={{ fontSize: '0.875rem', fontWeight: 700, color: '#0b1f2a' }}>
+                          {t('requests.private_checkbox')}
                         </span>
                       </label>
-                      <p style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '0.35rem', marginLeft: '1.6rem' }}>
-                        Private requests are only visible to authorized coordinators from verified organizations.
+                      <p style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '0.35rem', marginInlineStart: '1.6rem' }}>
+                        {t('requests.privacy_banner')}
                       </p>
                     </div>
 
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1rem' }}>
                       <button type="button" onClick={() => setStep(2)} className="btn btn-secondary">
-                        <ArrowLeft size={15} /> Back
+                        <ArrowLeft size={15} className="dir-flip" /> {t('common.back')}
                       </button>
                       <button
                         type="button"
@@ -651,7 +661,7 @@ export const RequestsPage: React.FC = () => {
                         onClick={() => setStep(4)}
                         className="btn btn-primary"
                       >
-                        Review Request <ArrowRight size={15} />
+                        {t('common.continue')} <ArrowRight size={15} className="dir-flip" />
                       </button>
                     </div>
                   </div>
@@ -660,34 +670,36 @@ export const RequestsPage: React.FC = () => {
                 {/* Step 4: Review & Submit */}
                 {step === 4 && (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    <h4 style={{ fontSize: '1.05rem', fontWeight: 600, color: '#0b1f2a' }}>
-                      Please review your details before submitting.
+                    <h4 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#0b1f2a' }}>
+                      {t('requests.step4')}
                     </h4>
 
                     <div style={{ backgroundColor: '#f8fafc', padding: '1rem', borderRadius: '8px', display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.875rem' }}>
                       <div>
-                        <strong>Category:</strong> {selectedCategoryObj?.nameEn || 'General'}
+                        <strong>{locale === 'ar' ? 'نوع الدعم:' : 'Category:'}</strong>{' '}
+                        {locale === 'ar' ? (selectedCategoryObj?.nameAr || selectedCategoryObj?.nameEn) : selectedCategoryObj?.nameEn}
                       </div>
                       <div>
-                        <strong>Title:</strong> {title}
+                        <strong>{locale === 'ar' ? 'العنوان:' : 'Title:'}</strong> {title}
                       </div>
                       <div>
-                        <strong>Details:</strong> {description}
+                        <strong>{locale === 'ar' ? 'التفاصيل:' : 'Details:'}</strong> {description}
                       </div>
                       <div>
-                        <strong>Location:</strong> {location}
+                        <strong>{locale === 'ar' ? 'الموقع التقريبي:' : 'Location:'}</strong> {location}
                       </div>
                       <div>
-                        <strong>Confidentiality:</strong> {isPrivate ? 'Confidential (Private to Responders)' : 'Public'}
+                        <strong>{locale === 'ar' ? 'مستوى الخصوصية:' : 'Privacy:'}</strong>{' '}
+                        {isPrivate ? (locale === 'ar' ? 'سري وخاص بالمنسقين فقط' : 'Confidential') : (locale === 'ar' ? 'مرئي للعموم' : 'Public')}
                       </div>
                     </div>
 
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1rem' }}>
                       <button type="button" onClick={() => setStep(3)} className="btn btn-secondary" disabled={submitting}>
-                        <ArrowLeft size={15} /> Edit
+                        <ArrowLeft size={15} className="dir-flip" /> {t('common.back')}
                       </button>
                       <button type="submit" className="btn btn-primary" disabled={submitting}>
-                        {submitting ? 'Submitting...' : 'Confirm & Submit Request'}
+                        {submitting ? t('common.loading') : (locale === 'ar' ? 'تأكيد وإرسال الطلب' : 'Confirm & Submit Request')}
                       </button>
                     </div>
                   </div>
@@ -717,14 +729,16 @@ export const RequestsPage: React.FC = () => {
         >
           <div className="card" style={{ maxWidth: '550px', width: '100%', padding: '1.75rem', maxHeight: '80vh', overflowY: 'auto' }}>
             <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#0b1b2b', marginBottom: '0.5rem' }}>
-              Status Lifecycle History
+              {locale === 'ar' ? 'سجل مراحل الطلب' : 'Status Lifecycle History'}
             </h3>
             <p style={{ fontSize: '0.875rem', color: '#64748b', marginBottom: '1.25rem' }}>
-              For request: <strong>{selectedHistory.requestTitle}</strong>
+              {locale === 'ar' ? 'للطلب:' : 'For request:'} <strong>{selectedHistory.requestTitle}</strong>
             </p>
 
             {selectedHistory.history.length === 0 ? (
-              <p style={{ color: '#64748b', fontSize: '0.875rem' }}>No status transitions recorded yet.</p>
+              <p style={{ color: '#64748b', fontSize: '0.875rem' }}>
+                {locale === 'ar' ? 'لا توجد انتقالات سابقة مسجلة.' : 'No status transitions recorded yet.'}
+              </p>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                 {selectedHistory.history.map((h, i) => (
@@ -741,11 +755,13 @@ export const RequestsPage: React.FC = () => {
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <span className="badge badge-info">{h.newStatus}</span>
                       <span style={{ color: '#94a3b8', fontSize: '0.75rem' }}>
-                        {new Date(h.timestamp || h.createdAt).toLocaleString()}
+                        {new Date(h.timestamp || h.createdAt).toLocaleString(locale === 'ar' ? 'ar-EG' : undefined)}
                       </span>
                     </div>
                     {h.reason && (
-                      <p style={{ color: '#475569', margin: '0.35rem 0 0' }}>Notes: {h.reason}</p>
+                      <p style={{ color: '#475569', margin: '0.35rem 0 0' }}>
+                        {locale === 'ar' ? 'ملاحظة:' : 'Notes:'} {h.reason}
+                      </p>
                     )}
                   </div>
                 ))}
@@ -754,7 +770,7 @@ export const RequestsPage: React.FC = () => {
 
             <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1.25rem' }}>
               <button onClick={() => setSelectedHistory(null)} className="btn btn-secondary">
-                Close
+                {t('common.close')}
               </button>
             </div>
           </div>
