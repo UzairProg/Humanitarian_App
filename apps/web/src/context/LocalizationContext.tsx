@@ -22,6 +22,8 @@ const translations: Record<SupportedLocale, Record<string, string>> = {
     'nav.knowledge': 'المعرفة من كربلاء',
     'nav.volunteers': 'اجعل وقتك أثراً',
     'nav.businesses': 'للأعمال دور',
+    'nav.participate': 'المشاركة المجتمعية',
+    'nav.admin': 'الإدارة والإشراف',
     'nav.moderation': 'طابور الإشراف',
     'nav.audit': 'سجل التدقيق',
     'nav.profile': 'حسابي',
@@ -53,7 +55,7 @@ const translations: Record<SupportedLocale, Record<string, string>> = {
     'status.limited': 'أماكن محدودة',
     'status.closed': 'منتهي',
 
-    // Home Page
+    // Home Page Storytelling & Ecosystem
     'home.eyebrow': 'مجتمع الحسينية • خدمة وكرامة على مدار العام',
     'home.hero.title': 'المساعدة أقرب مما تتوقع',
     'home.hero.desc':
@@ -61,24 +63,78 @@ const translations: Record<SupportedLocale, Record<string, string>> = {
     'home.cta.need_help': 'أحتاج إلى مساعدة',
     'home.cta.want_help': 'أريد أن أساعد',
     'home.cta.explore_meals': 'استكشف الوجبات',
+
+    // Trust Strip
+    'home.trust.verified': 'جهات معتمدة وموثوقة',
+    'home.trust.services': 'خدمات إنسانية متواصلة',
+    'home.trust.volunteers': 'فرص تطوع هادفة',
+    'home.trust.impact': 'أثر موثق وشفاف',
+
+    // Pathways
     'home.pathways.title': 'كيف يمكننا خدمتك اليوم؟',
     'home.pathways.subtitle': 'اختر المسار المناسب لاكتشاف الخدمات الموثوقة أو المشاركة الفعالة في خدمة المجتمع.',
-    'home.pathway.help.title': 'طلب مساعدة',
+    'home.pathway.help.title': 'أحتاج إلى مساعدة',
     'home.pathway.help.desc': 'دعم غذائي وطبي واحتياجات معيشية بخصوصية وكرامة إنسانية تامة.',
-    'home.pathway.meals.title': 'وجبات مجتمعية',
+    'home.pathway.meals.title': 'أبحث عن وجبة',
     'home.pathway.meals.desc': 'وجبات طازجة وساخنة تقدم يومياً بالمجان في مراكز المجتمع.',
-    'home.pathway.volunteer.title': 'اجعل وقتك أثراً',
+    'home.pathway.volunteer.title': 'أريد أن أتطوع',
     'home.pathway.volunteer.desc': 'شارك بوقتك وخبراتك الميدانية في دعم المبادرات الإنسانية.',
-    'home.pathway.business.title': 'للأعمال دور',
+    'home.pathway.business.title': 'أريد أن أساهم',
     'home.pathway.business.desc': 'مساهمة المطاعم والشركات برعاية الوجبات وفائض الطعام والخدمات.',
     'home.pathway.organizations.title': 'جهات تخدم المجتمع',
     'home.pathway.organizations.desc': 'تصفح الحسينيات الموثقة والجمعيات الإنسانية في مدينتك.',
-    'home.meals.title': 'وجبات مجتمعية قريبة منك',
+
+    // Around You
+    'home.around_you.title': 'ما يحدث حولك',
+    'home.around_you.subtitle': 'اكتشف الخدمات والوجبات والفعاليات وفرص المشاركة القريبة منك.',
+
+    // How the Platform Works
+    'home.how_it_works.title': 'كيف تعمل المنصة؟',
+    'home.how_it_works.subtitle': 'خطوات بسيطة وشفافة تربط بين أصحاب الحاجة والمبادرين بالخدمة.',
+    'home.how_it_works.step1_title': '١. اكتشف',
+    'home.how_it_works.step1_desc': 'تصفح الخدمات والوجبات المتاحة والفرص الموثقة في منطقتك.',
+    'home.how_it_works.step2_title': '٢. شارك',
+    'home.how_it_works.step2_desc': 'اختر الطريقة التي تناسبك: طلب مساعدة، أو تطوع بالوقت، أو رعاية وجبات.',
+    'home.how_it_works.step3_title': '٣. تواصل',
+    'home.how_it_works.step3_desc': 'تواصل بسرية ومباشرة مع منسقي الحسينيات والمؤسسات المعتمدة.',
+    'home.how_it_works.step4_title': '٤. اخدم',
+    'home.how_it_works.step4_desc': 'ساهم في إيصال الدعم وحضور المبادرات الميدانية بكل احترام.',
+    'home.how_it_works.step5_title': '٥. اصنع أثراً',
+    'home.how_it_works.step5_desc': 'تابع الأثر الجماعي المتحقق بكل شفافية ومصداقية.',
+
+    // Values from Karbala (Deep Navy Section)
+    'home.values.title': 'من قيم كربلاء إلى خدمة الإنسان',
+    'home.values.subtitle':
+      'الإحسان، والكرامة، والعدالة، وخدمة الإنسان ليست قيماً موسمية. نريد أن نربط الناس والجهات والمبادرات التي تجعل العطاء جزءاً من الحياة اليومية طوال العام.',
+    'home.values.why_karbala': 'لماذا كربلاء؟',
+    'home.values.why_karbala_desc':
+      'في كربلاء، أصبحت الخدمة والعطاء والوقوف مع الإنسان بكرامة جزءاً من تجربة حية يعيشها الملايين. يستلهم هذا المشروع تلك المبادئ ليبني مساحة رقمية تسهل الخدمة والمشاركة والتعلّم لكل إنسان طوال العام.',
+    'home.values.dignity': 'الكرامة',
+    'home.values.dignity_desc': 'كل إنسان يطلب المساعدة يُعامل بأعلى درجات الاحترام والسرية.',
+    'home.values.mercy': 'الرحمة',
+    'home.values.mercy_desc': 'خدمة المجتمع تبدأ من الشعور بالآخر والوقوف الصادق معه.',
+    'home.values.justice': 'العدالة',
+    'home.values.justice_desc': 'وصول الدعم لمن يستحقه بشفافية ونزاهة تامة.',
+    'home.values.service': 'الخدمة',
+    'home.values.service_desc': 'الكل قادر على العطاء بالوقت، أو المهارة، أو الموارد.',
+    'home.values.community': 'المجتمع',
+    'home.values.community_desc': 'الأثر الحقيقي يتعاظم عندما تتكامل جهود الأفراد والمؤسسات.',
+    'home.values.impact': 'الأثر',
+    'home.values.impact_desc': 'توثيق النتائج الإنسانية بشفافية وبناء الثقة المستدامة.',
+
+    // Ecosystem
+    'home.ecosystem.title': 'العطاء له أكثر من طريق',
+    'home.ecosystem.subtitle':
+      'منظومة إنسانية متكاملة تجمع الأفراد، الحسينيات، المتطوعين، والأعمال في خدمة المجتمع.',
+
+    // Meals, Events, Knowledge & Impact
+    'home.meals.title': 'مائدة تجمعنا',
+    'home.meals.subtitle': 'اكتشف الوجبات المجتمعية المتاحة بالقرب منك اليوم.',
     'home.meals.remaining': 'وجبة متبقية',
     'home.meals.details': 'التفاصيل والاتجاهات',
-    'home.events.title': 'فعاليات المجتمع',
+    'home.events.title': 'فعاليات المجتمع والمبادرات',
     'home.events.all': 'كل الفعاليات',
-    'home.knowledge.title': 'من قيم كربلاء',
+    'home.knowledge.title': 'المعرفة من كربلاء',
     'home.knowledge.all': 'مكتبة المعرفة',
     'home.impact.eyebrow': 'أثرنا معاً',
     'home.impact.title': 'كل وجبة وخدمة هي أكثر من رقم، بل كرامة إنسان',
@@ -90,6 +146,11 @@ const translations: Record<SupportedLocale, Record<string, string>> = {
     'home.scope.title': 'طبيعة المنصة وحدود دورها الإداري',
     'home.scope.desc':
       'منصة الحسينية هي بنية تحتية تقنية وإدارية لتنسيق الخدمات المجتمعية والإنسانية. المنصة لا تصدر فتاوى أو أحكاماً شرعية، والمساهمون المعتمدون ينشرون مقالاتهم تحت مسؤوليتهم العلمية.',
+
+    // Final CTA
+    'home.cta.title': 'الخير يبدأ بخطوة',
+    'home.cta.subtitle':
+      'سواء كنت تبحث عن مساعدة، أو ترغب بتقديمها، أو تريد توظيف مهاراتك في خدمة الناس — هناك مكان لك في مجتمع الحسينية.',
 
     // Humanitarian Requests
     'requests.title': 'طلب مساعدة إنسانية',
@@ -222,6 +283,8 @@ const translations: Record<SupportedLocale, Record<string, string>> = {
     'nav.knowledge': 'Knowledge & Values',
     'nav.volunteers': 'Volunteers',
     'nav.businesses': 'Businesses',
+    'nav.participate': 'Community Participation',
+    'nav.admin': 'Administration & Moderation',
     'nav.moderation': 'Moderation Center',
     'nav.audit': 'Audit Logs',
     'nav.profile': 'My Account',
@@ -253,7 +316,7 @@ const translations: Record<SupportedLocale, Record<string, string>> = {
     'status.limited': 'Limited Spots',
     'status.closed': 'Completed',
 
-    // Home Page
+    // Home Page Storytelling & Ecosystem
     'home.eyebrow': 'AL-HUSSEINIYA COMMUNITY • YEAR-ROUND DIGNITY & SERVICE',
     'home.hero.title': 'Help is closer than you think.',
     'home.hero.desc':
@@ -261,19 +324,73 @@ const translations: Record<SupportedLocale, Record<string, string>> = {
     'home.cta.need_help': 'I Need Help',
     'home.cta.want_help': 'I Want to Help',
     'home.cta.explore_meals': 'Explore Meals',
+
+    // Trust Strip
+    'home.trust.verified': 'Verified Partners',
+    'home.trust.services': 'Community Services',
+    'home.trust.volunteers': 'Volunteer Missions',
+    'home.trust.impact': 'Measurable Impact',
+
+    // Pathways
     'home.pathways.title': 'How can we serve you today?',
     'home.pathways.subtitle': 'Choose a pathway to discover verified services or participate in the community.',
-    'home.pathway.help.title': 'Request Help',
+    'home.pathway.help.title': 'I Need Help',
     'home.pathway.help.desc': 'Confidential family relief, emergency food, medical supplies, and living support.',
-    'home.pathway.meals.title': 'Community Meals',
+    'home.pathway.meals.title': 'Find a Meal',
     'home.pathway.meals.desc': 'Fresh, hot meals distributed daily free of charge across community centers.',
     'home.pathway.volunteer.title': 'Volunteer Time',
     'home.pathway.volunteer.desc': 'Lend your time, logistics support, or medical care to community initiatives.',
-    'home.pathway.business.title': 'Business Partners',
+    'home.pathway.business.title': 'Make a Pledge',
     'home.pathway.business.desc': 'Local merchants and caterers pledging surplus food and sponsorship.',
     'home.pathway.organizations.title': 'Organizations',
     'home.pathway.organizations.desc': 'Explore verified Hussainiyas and charitable relief foundations.',
-    'home.meals.title': 'Community Meals Near You',
+
+    // Around You
+    'home.around_you.title': 'What is Around You',
+    'home.around_you.subtitle': 'Discover services, meals, events, and opportunities near you.',
+
+    // How the Platform Works
+    'home.how_it_works.title': 'How the Platform Works',
+    'home.how_it_works.subtitle': 'Simple, transparent steps connecting people in need with community service providers.',
+    'home.how_it_works.step1_title': '1. Discover',
+    'home.how_it_works.step1_desc': 'Explore available meals, relief services, and verified opportunities.',
+    'home.how_it_works.step2_title': '2. Participate',
+    'home.how_it_works.step2_desc': 'Choose your path: request support, volunteer time, or pledge sponsorship.',
+    'home.how_it_works.step3_title': '3. Connect',
+    'home.how_it_works.step3_desc': 'Connect discreetly and directly with certified coordinators.',
+    'home.how_it_works.step4_title': '4. Serve',
+    'home.how_it_works.step4_desc': 'Take active part in meal distributions and humanitarian relief.',
+    'home.how_it_works.step5_title': '5. Create Impact',
+    'home.how_it_works.step5_desc': 'Follow the collective verified impact with complete transparency.',
+
+    // Values from Karbala (Deep Navy Section)
+    'home.values.title': 'From Karbala Values to Human Service',
+    'home.values.subtitle':
+      'Dignity, compassion, justice, and human service are not seasonal. We connect people and organizations to make giving an enduring part of year-round life.',
+    'home.values.why_karbala': 'Why Karbala?',
+    'home.values.why_karbala_desc':
+      'In Karbala, hospitality, selfless service, and standing with people with dignity are part of a living experience shared by millions. This platform carries those enduring values into year-round community service and collective care.',
+    'home.values.dignity': 'Dignity',
+    'home.values.dignity_desc': 'Every person seeking assistance is treated with the highest dignity and privacy.',
+    'home.values.mercy': 'Compassion',
+    'home.values.mercy_desc': 'Community service begins with genuine empathy and solidarity.',
+    'home.values.justice': 'Justice',
+    'home.values.justice_desc': 'Ensuring support reaches those who need it with complete integrity.',
+    'home.values.service': 'Selfless Service',
+    'home.values.service_desc': 'Everyone can contribute through time, skills, or resources.',
+    'home.values.community': 'Community',
+    'home.values.community_desc': 'Real impact multiplies when individuals and organizations unite.',
+    'home.values.impact': 'Impact',
+    'home.values.impact_desc': 'Documenting verified humanitarian outcomes and sustaining trust.',
+
+    // Ecosystem
+    'home.ecosystem.title': 'Giving Has Many Pathways',
+    'home.ecosystem.subtitle':
+      'An integrated humanitarian ecosystem uniting individuals, Hussainiyas, volunteers, and businesses.',
+
+    // Meals, Events, Knowledge & Impact
+    'home.meals.title': 'A Table that Gathers Us',
+    'home.meals.subtitle': 'Discover fresh community meals distributed near you today.',
     'home.meals.remaining': 'meals remaining today',
     'home.meals.details': 'Details & Directions',
     'home.events.title': 'Community Gatherings & Events',
@@ -290,6 +407,11 @@ const translations: Record<SupportedLocale, Record<string, string>> = {
     'home.scope.title': 'Platform Role & Administrative Scope',
     'home.scope.desc':
       'Al-Husseiniya provides technical and operational infrastructure for community coordination. The platform does not independently issue religious rulings (fatwas). Verified scholars publish under their own named credentials.',
+
+    // Final CTA
+    'home.cta.title': 'Goodness Begins with a Single Step',
+    'home.cta.subtitle':
+      'Whether you need assistance, want to offer help, or wish to lend your skills to serve neighbors — there is a place for you in the Al-Husseiniya community.',
 
     // Humanitarian Requests
     'requests.title': 'Find Help & Relief Assistance',
