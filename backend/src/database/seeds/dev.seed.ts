@@ -10,6 +10,8 @@ import {
   ContributorType,
   ContributorReviewStatus,
   ContentPublicationStatus,
+  ReportTargetType,
+  ReportStatus,
   MetricType,
   AuditAction,
 } from '@al-husseiniya/types';
@@ -27,6 +29,8 @@ import {
   OrganizationMemberSchema,
   Business,
   BusinessSchema,
+  BusinessParticipation,
+  BusinessParticipationSchema,
   RequestCategory,
   RequestCategorySchema,
   HumanitarianRequest,
@@ -35,6 +39,8 @@ import {
   FoodProgramSchema,
   Event,
   EventSchema,
+  EventRegistration,
+  EventRegistrationSchema,
   KnowledgeContent,
   KnowledgeContentSchema,
   ContributorProfile,
@@ -43,6 +49,12 @@ import {
   VolunteerProfileSchema,
   VolunteerOpportunity,
   VolunteerOpportunitySchema,
+  VolunteerApplication,
+  VolunteerApplicationSchema,
+  Report,
+  ReportSchema,
+  Notification,
+  NotificationSchema,
   ImpactRecord,
   ImpactRecordSchema,
   AuditLog,
@@ -56,14 +68,19 @@ export async function runDevSeed(connection: Connection): Promise<void> {
   const OrgModel = connection.model(Organization.name, OrganizationSchema);
   const MemberModel = connection.model(OrganizationMember.name, OrganizationMemberSchema);
   const BusinessModel = connection.model(Business.name, BusinessSchema);
+  const BizPartModel = connection.model(BusinessParticipation.name, BusinessParticipationSchema);
   const CategoryModel = connection.model(RequestCategory.name, RequestCategorySchema);
   const RequestModel = connection.model(HumanitarianRequest.name, HumanitarianRequestSchema);
   const FoodModel = connection.model(FoodProgram.name, FoodProgramSchema);
   const EventModel = connection.model(Event.name, EventSchema);
+  const EventRegModel = connection.model(EventRegistration.name, EventRegistrationSchema);
   const KnowledgeModel = connection.model(KnowledgeContent.name, KnowledgeContentSchema);
   const ContribModel = connection.model(ContributorProfile.name, ContributorProfileSchema);
   const VolProfileModel = connection.model(VolunteerProfile.name, VolunteerProfileSchema);
   const VolOppModel = connection.model(VolunteerOpportunity.name, VolunteerOpportunitySchema);
+  const VolAppModel = connection.model(VolunteerApplication.name, VolunteerApplicationSchema);
+  const ReportModel = connection.model(Report.name, ReportSchema);
+  const NotificationModel = connection.model(Notification.name, NotificationSchema);
   const ImpactModel = connection.model(ImpactRecord.name, ImpactRecordSchema);
   const AuditModel = connection.model(AuditLog.name, AuditLogSchema);
 
@@ -98,96 +115,97 @@ export async function runDevSeed(connection: Connection): Promise<void> {
   }
 
   console.log('[Seed] Seeding Users with secure hashed passwords...');
-  const devPasswordHash = await bcrypt.hash(
-    'AlHusseiniyaDev2026!',
-    SECURITY_CONFIG.bcryptSaltRounds,
-  );
+  const defaultPassword = 'AlHusseiniyaDev2026!';
+  const passwordHash = await bcrypt.hash(defaultPassword, SECURITY_CONFIG.bcryptSaltRounds || 10);
 
-  const seedUsersConfig = [
-    { email: 'superadmin@alhusseiniya.org', firstName: 'System', lastName: 'SuperAdmin', role: RoleType.SUPER_ADMIN },
-    { email: 'admin@alhusseiniya.org', firstName: 'Operations', lastName: 'Admin', role: RoleType.ADMIN },
-    { email: 'moderator@alhusseiniya.org', firstName: 'Community', lastName: 'Moderator', role: RoleType.MODERATOR },
-    { email: 'orgadmin@alhusseiniya.org', firstName: 'Relief', lastName: 'Director', role: RoleType.ORGANIZATION_ADMIN },
-    { email: 'orgstaff@alhusseiniya.org', firstName: 'Relief', lastName: 'Staff', role: RoleType.ORGANIZATION_STAFF },
-    { email: 'contributor@alhusseiniya.org', firstName: 'Community', lastName: 'Educator', role: RoleType.CONTRIBUTOR },
-    { email: 'business@alhusseiniya.org', firstName: 'Merchant', lastName: 'Manager', role: RoleType.BUSINESS_ADMIN },
-    { email: 'volunteer@alhusseiniya.org', firstName: 'Active', lastName: 'Volunteer', role: RoleType.VOLUNTEER },
-    { email: 'user@alhusseiniya.org', firstName: 'Community', lastName: 'Member', role: RoleType.INDIVIDUAL },
+  const seedUsers = [
+    {
+      email: 'admin@alhusseiniya.org',
+      firstName: 'Platform',
+      lastName: 'Administrator',
+      roles: [RoleType.SUPER_ADMIN, RoleType.ADMIN],
+    },
+    {
+      email: 'orgadmin@alhusseiniya.org',
+      firstName: 'Zahra',
+      lastName: 'Al-Hashemi',
+      roles: [RoleType.ORGANIZATION_ADMIN],
+    },
+    {
+      email: 'moderator@alhusseiniya.org',
+      firstName: 'Ali',
+      lastName: 'Reza',
+      roles: [RoleType.MODERATOR],
+    },
+    {
+      email: 'contributor@alhusseiniya.org',
+      firstName: 'Dr. Hassan',
+      lastName: 'Al-Musawi',
+      roles: [RoleType.CONTRIBUTOR, RoleType.INDIVIDUAL],
+    },
+    {
+      email: 'volunteer@alhusseiniya.org',
+      firstName: 'Fatima',
+      lastName: 'Karimi',
+      roles: [RoleType.VOLUNTEER, RoleType.INDIVIDUAL],
+    },
+    {
+      email: 'user@alhusseiniya.org',
+      firstName: 'Hussain',
+      lastName: 'Al-Amili',
+      roles: [RoleType.INDIVIDUAL],
+    },
   ];
 
   const createdUsers: Record<string, any> = {};
-
-  for (const config of seedUsersConfig) {
-    let user = await UserModel.findOne({ email: config.email });
-    if (!user) {
-      user = await UserModel.create({
-        email: config.email,
-        passwordHash: devPasswordHash,
-        firstName: config.firstName,
-        lastName: config.lastName,
-        roles: [config.role],
+  for (const u of seedUsers) {
+    let existing = await UserModel.findOne({ email: u.email });
+    if (!existing) {
+      existing = await UserModel.create({
+        ...u,
+        passwordHash,
         status: UserStatus.ACTIVE,
         emailVerified: true,
         phoneVerified: false,
+        locale: 'en',
+        timezone: 'UTC',
       });
     }
-    createdUsers[config.email] = user;
+    createdUsers[u.email] = existing;
   }
 
   console.log('[Seed] Seeding Request Categories...');
-  const categoriesData = [
-    {
-      code: 'FOOD_ASSISTANCE',
-      nameEn: 'Food & Nutrition Support',
-      nameAr: 'دعم غذائي وتمويني',
-      descriptionEn: 'Emergency food baskets, dry rations and daily meal packages',
-      descriptionAr: 'سلل غذائية طارئة وحصص تموينية ووجبات غذائية',
-    },
-    {
-      code: 'MEDICAL_AID',
-      nameEn: 'Medical & Healthcare Aid',
-      nameAr: 'مساعدات طبية ورعاية صحية',
-      descriptionEn: 'Prescriptions, diagnostic help and critical medical supplies',
-      descriptionAr: 'أدوية وفحوصات ومستلزمات طبية ضرورية',
-    },
-    {
-      code: 'SHELTER_HOUSING',
-      nameEn: 'Emergency Shelter & Utilities',
-      nameAr: 'مأوى وسكن طارئ وفواتير',
-      descriptionEn: 'Emergency lodging assistance, winter warming and essential bills',
-      descriptionAr: 'مساعدة إيواء طارئ، تدفئة شتوية ومساعدات مرافق',
-    },
-    {
-      code: 'EDUCATION_AID',
-      nameEn: 'Student & Education Support',
-      nameAr: 'دعم التعليم والطلبة',
-      descriptionEn: 'School supplies, textbooks and academic registration support',
-      descriptionAr: 'قرطاسية وكتب مدرسية ورسوم تسجيل دراسية',
-    },
+  const categories = [
+    { code: 'FOOD_ASSISTANCE', nameEn: 'Food Assistance', nameAr: 'المساعدات الغذائية' },
+    { code: 'WINTER_RELIEF', nameEn: 'Winterization & Blankets', nameAr: 'مساعدات الشتاء والكسوة' },
+    { code: 'MEDICAL_SUPPORT', nameEn: 'Emergency Medical Support', nameAr: 'الدعم الطبي الطارئ' },
+    { code: 'ORPHAN_FAMILY', nameEn: 'Orphan & Family Sponsorship', nameAr: 'كفالة الأيتام والأسر' },
   ];
 
   const createdCategories: Record<string, any> = {};
-  for (const cat of categoriesData) {
-    let category = await CategoryModel.findOne({ code: cat.code });
-    if (!category) {
-      category = await CategoryModel.create({
+  for (const cat of categories) {
+    let existing = await CategoryModel.findOne({ code: cat.code });
+    if (!existing) {
+      existing = await CategoryModel.create({
         ...cat,
+        descriptionEn: `Community assistance category for ${cat.nameEn}`,
+        descriptionAr: `فئة الخدمة المجتمعية لـ ${cat.nameAr}`,
         isActive: true,
       });
     }
-    createdCategories[cat.code] = category;
+    createdCategories[cat.code] = existing;
   }
 
   console.log('[Seed] Seeding Organizations...');
-  let org = await OrgModel.findOne({ slug: 'karbala-relief-network' });
+  let org = await OrgModel.findOne({ slug: 'karbala-relief-foundation' });
   if (!org) {
     org = await OrgModel.create({
-      name: 'Karbala Relief Network',
-      slug: 'karbala-relief-network',
-      description: 'Community humanitarian initiative serving families in need throughout the year.',
-      location: 'Central District, Community Center 4',
-      contactEmail: 'contact@karbalarelief.example.org',
-      contactPhone: '+1-555-0199',
+      name: 'Karbala Relief Foundation',
+      slug: 'karbala-relief-foundation',
+      description: 'Dedicated humanitarian NGO delivering continuous food, water, and emergency family aid.',
+      location: 'Karbala Governorate & Regional Centers',
+      contactEmail: 'contact@karbalarelief.org',
+      contactPhone: '+964 780 123 4567',
       status: 'ACTIVE',
       verificationStatus: VerificationStatus.APPROVED,
       createdById: createdUsers['orgadmin@alhusseiniya.org'].id,
@@ -199,54 +217,61 @@ export async function runDevSeed(connection: Connection): Promise<void> {
       role: 'ADMIN',
       status: 'ACTIVE',
     });
-
-    await MemberModel.create({
-      organizationId: org.id,
-      userId: createdUsers['orgstaff@alhusseiniya.org'].id,
-      role: 'STAFF',
-      status: 'ACTIVE',
-    });
   }
 
   console.log('[Seed] Seeding Business...');
-  let business = await BusinessModel.findOne({ name: 'Al-Baraka Halal Supplies' });
-  if (!business) {
-    business = await BusinessModel.create({
-      name: 'Al-Baraka Halal Supplies',
-      category: 'Food Wholesale & Groceries',
-      description: 'Wholesale grains, packaging and community ration supplies partner.',
-      location: 'Commercial Market Row, Block 12',
-      contactEmail: 'orders@albaraka.example.com',
-      contactPhone: '+1-555-0188',
+  let biz = await BusinessModel.findOne({ name: 'Al-Baraka Halal Provisions' });
+  if (!biz) {
+    biz = await BusinessModel.create({
+      name: 'Al-Baraka Halal Provisions',
+      category: 'WHOLESALE_GROCERY',
+      description: 'Community wholesale grocer providing subsidized rice, grains, and olive oil to registered kitchens.',
+      location: 'Central Market St, Bayt 14',
+      contactEmail: 'baraka.halal@example.org',
+      contactPhone: '+964 770 987 6543',
+      participationTypes: ['MEAL_SUPPORT', 'SURPLUS_FOOD', 'IN_KIND'],
       status: 'ACTIVE',
       verificationStatus: VerificationStatus.APPROVED,
-      ownerId: createdUsers['business@alhusseiniya.org'].id,
+      ownerId: createdUsers['user@alhusseiniya.org'].id,
+    });
+
+    await BizPartModel.create({
+      businessId: biz.id,
+      participationType: 'MEAL_SUPPORT',
+      description: 'Pledge of 500 hot meal rations per month for local relief soup kitchens.',
+      quantity: 500,
+      status: 'APPROVED',
+      submittedById: createdUsers['user@alhusseiniya.org'].id,
+      reviewedById: createdUsers['admin@alhusseiniya.org'].id,
+      notes: 'Verified partner merchant contribution',
     });
   }
 
   console.log('[Seed] Seeding Food Program...');
-  let foodProg = await FoodModel.findOne({ title: 'Weekly Community Meal Distribution' });
+  let foodProg = await FoodModel.findOne({ title: 'Daily Community Iftar & Dinner Rations' });
   if (!foodProg) {
     foodProg = await FoodModel.create({
       organizationId: org.id,
-      title: 'Weekly Community Meal Distribution',
-      description: 'Hot, freshly prepared nutritious meals distributed every Friday to families in need.',
-      location: 'Community Hall 1, Main Plaza',
-      programDate: '2026-10-02',
-      startTime: '12:00',
-      endTime: '15:00',
-      capacity: 300,
+      title: 'Daily Community Iftar & Dinner Rations',
+      description: 'Prepared hot meals and dry ration boxes distributed daily with dignified, contactless vouchers.',
+      location: 'Distribution Pavilion 4, Karbala Outskirts',
+      programDate: new Date().toISOString().split('T')[0],
+      startTime: '17:30',
+      endTime: '20:30',
+      capacity: 350,
       remainingCapacity: 180,
       status: ProgramStatus.ACTIVE,
-      instructions: 'Open to all community members in need. Reusable bags welcomed.',
+      instructions: 'Please present your private digital token at pickup window 2.',
     });
   }
 
   console.log('[Seed] Seeding Humanitarian Request (Private)...');
-  let request = await RequestModel.findOne({ title: 'Emergency Food Basket for Elderly Household' });
-  if (!request) {
-    request = await RequestModel.create({
+  let req = await RequestModel.findOne({ title: 'Emergency Food Basket for Elderly Household' });
+  if (!req) {
+    req = await RequestModel.create({
       requesterId: createdUsers['user@alhusseiniya.org'].id,
+      organizationId: org.id,
+      matchedOrganizationId: org.id,
       categoryId: createdCategories['FOOD_ASSISTANCE'].id,
       title: 'Emergency Food Basket for Elderly Household',
       description: 'Monthly ration support needed for two seniors with restricted mobility.',
@@ -269,7 +294,20 @@ export async function runDevSeed(connection: Connection): Promise<void> {
       startAt: new Date(Date.now() + 86400000 * 3),
       endAt: new Date(Date.now() + 86400000 * 3 + 7200000),
       category: 'COMMUNITY_WORKSHOP',
+      capacity: 40,
+      registrationCount: 1,
+      registrationRequired: true,
+      format: 'ON_SITE',
+      language: 'en',
       status: 'PUBLISHED',
+    });
+
+    await EventRegModel.create({
+      eventId: event.id,
+      userId: createdUsers['volunteer@alhusseiniya.org'].id,
+      status: 'CONFIRMED',
+      notes: 'Available for both setup and breakdown shifts.',
+      registeredAt: new Date(),
     });
   }
 
@@ -278,53 +316,136 @@ export async function runDevSeed(connection: Connection): Promise<void> {
   if (!contrib) {
     contrib = await ContribModel.create({
       userId: createdUsers['contributor@alhusseiniya.org'].id,
-      contributorType: ContributorType.COMMUNITY_EDUCATOR,
-      biography: 'Community researcher and educator focusing on charitable traditions and community welfare.',
-      verificationStatus: VerificationStatus.PENDING,
-      reviewStatus: ContributorReviewStatus.UNDER_ADMIN_REVIEW,
-      visibility: false,
+      contributorType: ContributorType.SCHOLAR,
+      biography: 'Specialist in ethical philosophy and community service traditions with over 15 years of academic engagement.',
+      verificationStatus: VerificationStatus.APPROVED,
+      reviewStatus: ContributorReviewStatus.APPROVED,
+      visibility: true,
+      reviewerId: createdUsers['admin@alhusseiniya.org'].id,
+      reviewedAt: new Date(),
     });
   }
 
-  let knowledge = await KnowledgeModel.findOne({ title: 'The Spirit of Giving: Lessons in Year-Round Service' });
-  if (!knowledge) {
+  // Published article 1
+  let knowledgePub = await KnowledgeModel.findOne({ title: 'Service as Worship: Karbala and the Humanitarian Imperative' });
+  if (!knowledgePub) {
     await KnowledgeModel.create({
-      title: 'The Spirit of Giving: Lessons in Year-Round Service',
-      summary: 'Exploring how the timeless ethics of compassion translate into continuous community action.',
-      body: 'Community service is not restricted to particular seasons. The tradition of caring for neighbors is a year-round commitment...',
+      title: 'Service as Worship: Karbala and the Humanitarian Imperative',
+      summary: 'An exploration of how the stance at Karbala provides a universal framework for standing with the oppressed and hungry.',
+      body: `The events of Karbala are not merely a historical commemoration; they establish a continuous moral duty. Imam Hussain (AS) stood for human dignity, justice, and the defense of the vulnerable. 
+      
+In contemporary practice, this legacy lives through active solidarity: providing clean water to communities, distributing warm nourishment without condescension, and creating institutions that protect widows, orphans, and destitute families. 
+      
+Year-round service honors the sacred covenant that no person should sleep hungry in a community that remembers Ashura.`,
+      contributorId: createdUsers['contributor@alhusseiniya.org'].id,
+      category: 'ETHICS_AND_THEOLOGY',
+      language: 'en',
+      reviewStatus: ContributorReviewStatus.APPROVED,
+      publicationStatus: ContentPublicationStatus.PUBLISHED,
+      reviewerId: createdUsers['admin@alhusseiniya.org'].id,
+      publishedAt: new Date(Date.now() - 86400000 * 5),
+    });
+  }
+
+  // Published article 2 (Arabic)
+  let knowledgeAr = await KnowledgeModel.findOne({ title: 'قِيَمُ العَطاء: الدَّيمومة الإنسانية في سيرة أهل البيت' });
+  if (!knowledgeAr) {
+    await KnowledgeModel.create({
+      title: 'قِيَمُ العَطاء: الدَّيمومة الإنسانية في سيرة أهل البيت',
+      summary: 'دراسة في فلسفة الإيثار وخدمة المحتاجين المستمرة على مدار العام.',
+      body: `إن رسالة كربلاء تتجاوز الأبعاد الزمنية للمواسم الدينية؛ إنها دعوة دائمة لإحقاق الحق وإعانة الضعفاء وإطعام الجياع وحفظ كرامة الإنسان.
+      
+ومن هذا المنطلق، تشكل منصة الحسينية جسراً تقنياً ومجتمعياً يربط المتطوعين والمؤسسات لتقديم يد العون في كل يوم من أيام السنة.`,
       contributorId: createdUsers['contributor@alhusseiniya.org'].id,
       category: 'COMMUNITY_ETHICS',
+      language: 'ar',
+      reviewStatus: ContributorReviewStatus.APPROVED,
+      publicationStatus: ContentPublicationStatus.PUBLISHED,
+      reviewerId: createdUsers['admin@alhusseiniya.org'].id,
+      publishedAt: new Date(Date.now() - 86400000 * 2),
+    });
+  }
+
+  // Draft article
+  let knowledgeDraft = await KnowledgeModel.findOne({ title: 'Preserving Dignity in Direct Charity Delivery' });
+  if (!knowledgeDraft) {
+    await KnowledgeModel.create({
+      title: 'Preserving Dignity in Direct Charity Delivery',
+      summary: 'Guidelines on ensuring privacy and respecting applicant self-worth during aid distribution.',
+      body: 'When extending aid, the giver must never compromise the dignity of the receiver. Private intake workflows are essential...',
+      contributorId: createdUsers['contributor@alhusseiniya.org'].id,
+      category: 'PRACTICAL_GUIDES',
       language: 'en',
-      reviewStatus: ContributorReviewStatus.DRAFT,
-      publicationStatus: ContentPublicationStatus.DRAFT,
+      reviewStatus: ContributorReviewStatus.UNDER_ADMIN_REVIEW,
+      publicationStatus: ContentPublicationStatus.UNDER_REVIEW,
     });
   }
 
   console.log('[Seed] Seeding Volunteer Opportunity & Profile...');
   let volProfile = await VolProfileModel.findOne({ userId: createdUsers['volunteer@alhusseiniya.org'].id });
   if (!volProfile) {
-    await VolProfileModel.create({
+    volProfile = await VolProfileModel.create({
       userId: createdUsers['volunteer@alhusseiniya.org'].id,
-      skills: ['Logistics', 'Driving', 'Translation (Arabic/English)'],
-      interests: ['Food Distribution', 'Elderly Care'],
+      skills: ['Logistics', 'Driving', 'Translation (Arabic/English)', 'First Aid'],
+      interests: ['Food Distribution', 'Elderly Care', 'Event Support'],
       availability: 'Weekends & Friday afternoons',
       location: 'Central District',
+      languages: ['en', 'ar'],
+      preferredCategories: ['COMMUNITY_SERVICE', 'FOOD_DISTRIBUTION'],
+      emergencyContact: '+964 780 999 1122',
       status: 'ACTIVE',
     });
   }
 
   let volOpp = await VolOppModel.findOne({ title: 'Food Distribution Helpers Needed' });
   if (!volOpp) {
-    await VolOppModel.create({
+    volOpp = await VolOppModel.create({
       organizationId: org.id,
       title: 'Food Distribution Helpers Needed',
       description: 'Seeking 8 volunteers to assist in packaging, checking lists and handing out meal kits.',
       location: 'Community Hall 1, Main Plaza',
+      category: 'FOOD_DISTRIBUTION',
+      remoteType: 'ON_SITE',
       startAt: new Date(Date.now() + 86400000 * 2),
       endAt: new Date(Date.now() + 86400000 * 2 + 14400000),
       requirements: ['Punctual', 'Ability to lift 10kg boxes', 'Friendly demeanor'],
       capacity: 8,
       status: 'OPEN',
+    });
+
+    await VolAppModel.create({
+      opportunityId: volOpp.id,
+      userId: createdUsers['volunteer@alhusseiniya.org'].id,
+      status: 'PENDING',
+      message: 'I have experience with inventory packing and speak fluent Arabic and English.',
+      appliedAt: new Date(),
+    });
+  }
+
+  console.log('[Seed] Seeding Moderation Report...');
+  let report = await ReportModel.findOne({ reason: 'Disputed Merchant Operating Hours' });
+  if (!report) {
+    await ReportModel.create({
+      reporterId: createdUsers['user@alhusseiniya.org'].id,
+      targetType: ReportTargetType.BUSINESS,
+      targetId: biz.id,
+      reason: 'Disputed Merchant Operating Hours',
+      description: 'The listed grocery was closed during the stated voucher redemption window on Tuesday morning.',
+      status: ReportStatus.SUBMITTED,
+    });
+  }
+
+  console.log('[Seed] Seeding Notifications...');
+  let notif = await NotificationModel.findOne({ userId: createdUsers['volunteer@alhusseiniya.org'].id });
+  if (!notif) {
+    await NotificationModel.create({
+      userId: createdUsers['volunteer@alhusseiniya.org'].id,
+      type: 'event.registration.confirmed',
+      title: 'Orientation Confirmed',
+      body: 'Your registration for Volunteer Orientation & Winter Aid Planning has been recorded.',
+      referenceType: 'EVENT',
+      referenceId: event.id,
+      readAt: null,
     });
   }
 

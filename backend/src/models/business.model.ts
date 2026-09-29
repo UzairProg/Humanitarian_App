@@ -1,6 +1,11 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
-import { VerificationStatus, IBusiness, IBusinessVerification } from '@al-husseiniya/types';
+import {
+  VerificationStatus,
+  IBusiness,
+  IBusinessVerification,
+  IBusinessParticipation,
+} from '@al-husseiniya/types';
 
 export interface BusinessDocument extends Omit<IBusiness, 'id'>, Document<string> {
   _id: string;
@@ -16,6 +21,7 @@ export const BusinessSchema = new Schema<BusinessDocument>(
     location: { type: String, required: true },
     contactEmail: { type: String, required: true },
     contactPhone: { type: String, default: null },
+    participationTypes: [{ type: String }],
     status: { type: String, default: 'ACTIVE' },
     verificationStatus: {
       type: String,
@@ -45,6 +51,10 @@ BusinessSchema.set('toObject', { virtuals: true });
 
 export const BusinessModel =
   mongoose.models.Business || mongoose.model<BusinessDocument>('Business', BusinessSchema);
+
+// ============================================================================
+// Business Verifications
+// ============================================================================
 
 export interface BusinessVerificationDocument
   extends Omit<IBusinessVerification, 'id'>,
@@ -92,4 +102,76 @@ export const BusinessVerificationModel =
   mongoose.model<BusinessVerificationDocument>(
     'BusinessVerification',
     BusinessVerificationSchema,
+  );
+
+// ============================================================================
+// Business Participations
+// ============================================================================
+
+export interface BusinessParticipationDocument
+  extends Omit<IBusinessParticipation, 'id'>,
+    Document<string> {
+  _id: string;
+  id: string;
+}
+
+export const BusinessParticipationSchema =
+  new Schema<BusinessParticipationDocument>(
+    {
+      _id: { type: String, default: uuidv4 },
+      businessId: { type: String, required: true, index: true },
+      programOrEventId: { type: String, default: null, index: true },
+      participationType: {
+        type: String,
+        enum: [
+          'MEAL_SUPPORT',
+          'SPONSORSHIP',
+          'SURPLUS_FOOD',
+          'VOLUNTEER_SUPPORT',
+          'IN_KIND',
+        ],
+        required: true,
+      },
+      description: { type: String, required: true },
+      quantity: { type: Number, default: 0 },
+      status: {
+        type: String,
+        enum: [
+          'DRAFT',
+          'SUBMITTED',
+          'APPROVED',
+          'ACTIVE',
+          'COMPLETED',
+          'CANCELLED',
+        ],
+        default: 'SUBMITTED',
+        index: true,
+      },
+      submittedById: { type: String, required: true },
+      reviewedById: { type: String, default: null },
+      notes: { type: String, default: null },
+    },
+    {
+      timestamps: true,
+      collection: 'business_participations',
+    },
+  );
+
+BusinessParticipationSchema.virtual('id').get(function (this: any) {
+  return this._id;
+});
+BusinessParticipationSchema.set('toJSON', {
+  virtuals: true,
+  transform: (_doc, ret: any) => {
+    delete ret.__v;
+    return ret;
+  },
+});
+BusinessParticipationSchema.set('toObject', { virtuals: true });
+
+export const BusinessParticipationModel =
+  mongoose.models.BusinessParticipation ||
+  mongoose.model<BusinessParticipationDocument>(
+    'BusinessParticipation',
+    BusinessParticipationSchema,
   );

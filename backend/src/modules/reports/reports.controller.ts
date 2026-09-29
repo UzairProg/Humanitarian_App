@@ -43,17 +43,34 @@ export class ReportsController {
     }
   }
 
+  async getById(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const report = await reportsService.getById(req.params.id);
+      res.status(200).json({
+        success: true,
+        data: report.toJSON(),
+        timestamp: new Date().toISOString(),
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
   async resolve(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       if (!req.user) {
         throw new AppError('Authentication required', 401, 'UNAUTHORIZED');
       }
-      const { resolution } = req.body;
+      const { resolution, status, internalNotes, actionTaken } = req.body;
       if (!resolution) {
         throw new AppError('Resolution notes are required', 400);
       }
 
-      const report = await reportsService.resolve(req.params.id, resolution, req.user.sub);
+      const report = await reportsService.resolve(
+        req.params.id,
+        { resolution, status, internalNotes, actionTaken },
+        req.user.sub,
+      );
       res.status(200).json({
         success: true,
         data: report.toJSON(),

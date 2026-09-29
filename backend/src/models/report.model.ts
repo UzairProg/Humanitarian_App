@@ -29,6 +29,8 @@ export const ReportSchema = new Schema<ReportDocument>(
     },
     assignedReviewerId: { type: String, default: null },
     resolution: { type: String, default: null },
+    internalNotes: { type: String, default: null },
+    actionTaken: { type: String, default: null },
   },
   {
     timestamps: true,

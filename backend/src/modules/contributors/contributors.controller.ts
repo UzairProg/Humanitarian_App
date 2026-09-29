@@ -1,68 +1,105 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Param,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
-import {
-  ContributorsService,
-  ApplyContributorDto,
-  ReviewContributorDto,
-} from './contributors.service';
-import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
-import { PermissionsGuard } from '../../common/guards/permissions.guard';
-import { RequirePermissions } from '../../common/decorators/permissions.decorator';
-import { CurrentUser } from '../../common/decorators/current-user.decorator';
-import { Public } from '../../common/decorators/public.decorator';
-import { JwtPayload, PermissionKey } from '@al-husseiniya/types';
+import { Request, Response, NextFunction } from 'express';
+import { contributorsService } from './contributors.service';
+import { AppError } from '../../middleware/error.middleware';
 
-@ApiTags('Contributors')
-@Controller('api/v1/contributors')
-@UseGuards(JwtAuthGuard, PermissionsGuard)
 export class ContributorsController {
-  constructor(private readonly contribService: ContributorsService) {}
+  async apply(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      if (!req.user) {
+        throw new AppError('Authentication required', 401, 'UNAUTHORIZED');
+      }
 
-  @Post('apply')
-  @ApiOperation({ summary: 'Apply for contributor or specialist profile' })
-  async apply(
-    @Body() dto: ApplyContributorDto,
-    @CurrentUser() user: JwtPayload,
-  ) {
-    return this.contribService.apply(dto, user);
+      const profile = await contributorsService.apply(req.body, req.user);
+      res.status(201).json({
+        success: true,
+        data: profile.toJSON(),
+        timestamp: new Date().toISOString(),
+      });
+    } catch (err) {
+      next(err);
+    }
   }
 
-  @Get('me')
-  @ApiOperation({ summary: 'Get current user contributor profile' })
-  async getMyProfile(@CurrentUser() user: JwtPayload) {
-    return this.contribService.getMyProfile(user);
+  async getMyProfile(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      if (!req.user) {
+        throw new AppError('Authentication required', 401, 'UNAUTHORIZED');
+      }
+
+      const profile = await contributorsService.getMyProfile(req.user);
+      res.status(200).json({
+        success: true,
+        data: profile ? profile.toJSON() : null,
+        timestamp: new Date().toISOString(),
+      });
+    } catch (err) {
+      next(err);
+    }
   }
 
-  @Public()
-  @Get()
-  @ApiOperation({ summary: 'List approved and visible contributors' })
-  async list(@Query('page') page = '1', @Query('limit') limit = '20') {
-    return this.contribService.list(parseInt(page, 10), parseInt(limit, 10));
+  async getById(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const profile = await contributorsService.getById(req.params.id, req.user);
+      res.status(200).json({
+        success: true,
+        data: profile,
+        timestamp: new Date().toISOString(),
+      });
+    } catch (err) {
+      next(err);
+    }
   }
 
-  @Public()
-  @Get(':id')
-  @ApiOperation({ summary: 'Get contributor profile details' })
-  async getById(@Param('id') id: string) {
-    return this.contribService.getById(id);
+  async list(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const page = parseInt(req.query.page as string, 10) || 1;
+      const limit = Math.min(parseInt(req.query.limit as string, 10) || 20, 100);
+      const publicOnly = req.query.publicOnly !== 'false';
+      const status = req.query.status as string;
+
+      const result = await contributorsService.list({
+        page,
+        limit,
+        publicOnly,
+        status,
+      });
+
+      res.status(200).json({
+        success: true,
+        data: result.items,
+        meta: {
+          page,
+          limit,
+          total: result.total,
+          totalPages: Math.ceil(result.total / limit) || 1,
+        },
+        timestamp: new Date().toISOString(),
+      });
+    } catch (err) {
+      next(err);
+    }
   }
 
-  @Post(':id/review')
-  @RequirePermissions(PermissionKey.CONTRIBUTOR_REVIEW)
-  @ApiOperation({ summary: 'Review contributor application status (Reviewers & Admins only)' })
-  async review(
-    @Param('id') id: string,
-    @Body() dto: ReviewContributorDto,
-    @CurrentUser() user: JwtPayload,
-  ) {
-    return this.contribService.review(id, dto, user);
+  async review(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      if (!req.user) {
+        throw new AppError('Authentication required', 401, 'UNAUTHORIZED');
+      }
+
+      const updated = await contributorsService.review(
+        req.params.id,
+        req.body,
+        req.user,
+      );
+      res.status(200).json({
+        success: true,
+        data: updated.toJSON(),
+        timestamp: new Date().toISOString(),
+      });
+    } catch (err) {
+      next(err);
+    }
   }
 }
+
+export const contributorsController = new ContributorsController();

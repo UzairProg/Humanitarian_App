@@ -1,58 +1,186 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Param,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
-import { BusinessesService, CreateBusinessDto, VerifyBusinessDto } from './businesses.service';
-import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
-import { PermissionsGuard } from '../../common/guards/permissions.guard';
-import { RequirePermissions } from '../../common/decorators/permissions.decorator';
-import { CurrentUser } from '../../common/decorators/current-user.decorator';
-import { Public } from '../../common/decorators/public.decorator';
-import { JwtPayload, PermissionKey } from '@al-husseiniya/types';
+import { Request, Response, NextFunction } from 'express';
+import { businessesService } from './businesses.service';
+import { AppError } from '../../middleware/error.middleware';
 
-@ApiTags('Businesses')
-@Controller('api/v1/businesses')
-@UseGuards(JwtAuthGuard, PermissionsGuard)
 export class BusinessesController {
-  constructor(private readonly businessService: BusinessesService) {}
+  async create(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      if (!req.user) {
+        throw new AppError('Authentication required', 401, 'UNAUTHORIZED');
+      }
 
-  @Post()
-  @ApiOperation({ summary: 'Register a business entity' })
-  async create(
-    @Body() dto: CreateBusinessDto,
-    @CurrentUser() user: JwtPayload,
-  ) {
-    return this.businessService.create(dto, user);
+      const business = await businessesService.create(req.body, req.user);
+      res.status(201).json({
+        success: true,
+        data: business.toJSON(),
+        timestamp: new Date().toISOString(),
+      });
+    } catch (err) {
+      next(err);
+    }
   }
 
-  @Public()
-  @Get()
-  @ApiOperation({ summary: 'List businesses' })
-  async list(@Query('page') page = '1', @Query('limit') limit = '20') {
-    return this.businessService.list(parseInt(page, 10), parseInt(limit, 10));
+  async list(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const page = parseInt(req.query.page as string, 10) || 1;
+      const limit = Math.min(parseInt(req.query.limit as string, 10) || 20, 100);
+      const category = req.query.category as string;
+      const verifiedOnly = req.query.verifiedOnly === 'true';
+      const search = req.query.search as string;
+
+      const result = await businessesService.list({
+        page,
+        limit,
+        category,
+        verifiedOnly,
+        search,
+      });
+
+      res.status(200).json({
+        success: true,
+        data: result.items.map((b) => b.toJSON()),
+        meta: {
+          page,
+          limit,
+          total: result.total,
+          totalPages: Math.ceil(result.total / limit) || 1,
+        },
+        timestamp: new Date().toISOString(),
+      });
+    } catch (err) {
+      next(err);
+    }
   }
 
-  @Public()
-  @Get(':id')
-  @ApiOperation({ summary: 'Get business details by ID' })
-  async getById(@Param('id') id: string) {
-    return this.businessService.getById(id);
+  async getById(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const business = await businessesService.getById(req.params.id);
+      res.status(200).json({
+        success: true,
+        data: business.toJSON(),
+        timestamp: new Date().toISOString(),
+      });
+    } catch (err) {
+      next(err);
+    }
   }
 
-  @Post(':id/verify')
-  @RequirePermissions(PermissionKey.BUSINESS_VERIFY)
-  @ApiOperation({ summary: 'Review and update business verification status (Reviewers only)' })
-  async verify(
-    @Param('id') id: string,
-    @Body() dto: VerifyBusinessDto,
-    @CurrentUser() user: JwtPayload,
-  ) {
-    return this.businessService.verify(id, dto, user);
+  async update(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      if (!req.user) {
+        throw new AppError('Authentication required', 401, 'UNAUTHORIZED');
+      }
+
+      const business = await businessesService.update(
+        req.params.id,
+        req.body,
+        req.user,
+      );
+      res.status(200).json({
+        success: true,
+        data: business.toJSON(),
+        timestamp: new Date().toISOString(),
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async verify(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      if (!req.user) {
+        throw new AppError('Authentication required', 401, 'UNAUTHORIZED');
+      }
+
+      const business = await businessesService.verify(
+        req.params.id,
+        req.body,
+        req.user,
+      );
+      res.status(200).json({
+        success: true,
+        data: business.toJSON(),
+        timestamp: new Date().toISOString(),
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async createParticipation(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      if (!req.user) {
+        throw new AppError('Authentication required', 401, 'UNAUTHORIZED');
+      }
+
+      const participation = await businessesService.createParticipation(
+        req.params.id,
+        req.body,
+        req.user,
+      );
+      res.status(201).json({
+        success: true,
+        data: participation.toJSON(),
+        timestamp: new Date().toISOString(),
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async listParticipations(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      if (!req.user) {
+        throw new AppError('Authentication required', 401, 'UNAUTHORIZED');
+      }
+
+      const items = await businessesService.listParticipations(
+        req.params.id,
+        req.user,
+      );
+      res.status(200).json({
+        success: true,
+        data: items.map((i) => i.toJSON()),
+        timestamp: new Date().toISOString(),
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async updateParticipationStatus(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      if (!req.user) {
+        throw new AppError('Authentication required', 401, 'UNAUTHORIZED');
+      }
+
+      const updated = await businessesService.updateParticipationStatus(
+        req.params.participationId,
+        req.body.status,
+        req.body.notes,
+        req.user,
+      );
+      res.status(200).json({
+        success: true,
+        data: updated.toJSON(),
+        timestamp: new Date().toISOString(),
+      });
+    } catch (err) {
+      next(err);
+    }
   }
 }
+
+export const businessesController = new BusinessesController();

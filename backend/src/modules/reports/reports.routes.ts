@@ -9,10 +9,24 @@ const router = Router();
 router.use(authenticateJwt);
 
 router.post('/', (req, res, next) => reportsController.create(req, res, next));
+
 router.get(
   '/',
   requireRoles(RoleType.MODERATOR, RoleType.ADMIN, RoleType.SUPER_ADMIN),
   (req, res, next) => reportsController.list(req, res, next),
+);
+
+router.get(
+  '/:id',
+  requireRoles(RoleType.MODERATOR, RoleType.ADMIN, RoleType.SUPER_ADMIN),
+  (req, res, next) => reportsController.getById(req, res, next),
+);
+
+// Support both POST and PATCH for resolution
+router.post(
+  '/:id/resolve',
+  requireRoles(RoleType.MODERATOR, RoleType.ADMIN, RoleType.SUPER_ADMIN),
+  (req, res, next) => reportsController.resolve(req, res, next),
 );
 router.patch(
   '/:id/resolve',

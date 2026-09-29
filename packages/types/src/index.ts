@@ -273,6 +273,7 @@ export interface IBusiness {
   location: string;
   contactEmail: string;
   contactPhone?: string | null;
+  participationTypes?: string[];
   status: string;
   verificationStatus: VerificationStatus;
   ownerId: string;
@@ -353,9 +354,24 @@ export interface IEvent {
   endAt: Date;
   category: string;
   status: string;
+  capacity?: number;
+  registrationCount?: number;
+  registrationRequired?: boolean;
+  format?: 'ON_SITE' | 'ONLINE' | 'HYBRID';
+  accessibilityInfo?: string | null;
+  language?: string;
   mediaUrl?: string | null;
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface IEventRegistration {
+  id: string;
+  eventId: string;
+  userId: string;
+  status: 'CONFIRMED' | 'CANCELLED';
+  registeredAt: Date;
+  notes?: string | null;
 }
 
 export interface IKnowledgeContent {
@@ -369,6 +385,9 @@ export interface IKnowledgeContent {
   language: string;
   reviewStatus: ContributorReviewStatus;
   publicationStatus: ContentPublicationStatus;
+  reviewerId?: string | null;
+  reviewNotes?: string | null;
+  publishedAt?: Date | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -382,6 +401,9 @@ export interface IContributorProfile {
   verificationStatus: VerificationStatus;
   reviewStatus: ContributorReviewStatus;
   visibility: boolean;
+  reviewerId?: string | null;
+  reviewNotes?: string | null;
+  reviewedAt?: Date | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -393,6 +415,9 @@ export interface IVolunteerProfile {
   interests: string[];
   availability: string;
   location: string;
+  languages?: string[];
+  preferredCategories?: string[];
+  emergencyContact?: string | null;
   status: string;
   createdAt: Date;
   updatedAt: Date;
@@ -404,11 +429,40 @@ export interface IVolunteerOpportunity {
   title: string;
   description: string;
   location: string;
+  category?: string;
+  remoteType?: 'ON_SITE' | 'REMOTE' | 'HYBRID';
   startAt: Date;
   endAt: Date;
   requirements: string[];
   capacity: number;
   status: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface IVolunteerApplication {
+  id: string;
+  opportunityId: string;
+  userId: string;
+  status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'COMPLETED' | 'CANCELLED';
+  message?: string | null;
+  reviewedById?: string | null;
+  reviewNotes?: string | null;
+  appliedAt: Date;
+  reviewedAt?: Date | null;
+}
+
+export interface IBusinessParticipation {
+  id: string;
+  businessId: string;
+  programOrEventId?: string | null;
+  participationType: 'MEAL_SUPPORT' | 'SPONSORSHIP' | 'SURPLUS_FOOD' | 'VOLUNTEER_SUPPORT' | 'IN_KIND';
+  description: string;
+  quantity?: number;
+  status: 'DRAFT' | 'SUBMITTED' | 'APPROVED' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
+  submittedById: string;
+  reviewedById?: string | null;
+  notes?: string | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -424,6 +478,8 @@ export interface IReport {
   status: ReportStatus;
   assignedReviewerId?: string | null;
   resolution?: string | null;
+  internalNotes?: string | null;
+  actionTaken?: string | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -549,10 +605,13 @@ export type HumanitarianRequest = IHumanitarianRequest;
 export type RequestStatusHistory = IRequestStatusHistory;
 export type FoodProgram = IFoodProgram;
 export type Event = IEvent;
+export type EventRegistration = IEventRegistration;
 export type KnowledgeContent = IKnowledgeContent;
 export type ContributorProfile = IContributorProfile;
 export type VolunteerProfile = IVolunteerProfile;
 export type VolunteerOpportunity = IVolunteerOpportunity;
+export type VolunteerApplication = IVolunteerApplication;
+export type BusinessParticipation = IBusinessParticipation;
 export type Report = IReport;
 export type Notification = INotification;
 export type ImpactRecord = IImpactRecord;

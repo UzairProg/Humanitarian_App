@@ -1,6 +1,7 @@
-import { ReportStatus, ReportTargetType, JwtPayload } from '@al-husseiniya/types';
+import { ReportStatus, ReportTargetType, AuditAction } from '@al-husseiniya/types';
 import { ReportModel, ReportDocument } from '../../models/report.model';
 import { auditService } from '../../services/audit.service';
+import { notificationService } from '../../services/notification.service';
 import { AppError } from '../../middleware/error.middleware';
 
 export interface CreateReportInput {
@@ -9,6 +10,13 @@ export interface CreateReportInput {
   reason: string;
   description: string;
   evidenceUrl?: string;
+}
+
+export interface ResolveReportInput {
+  status?: ReportStatus;
+  resolution: string;
+  internalNotes?: string;
+  actionTaken?: string;
 }
 
 export class ReportsService {
@@ -29,10 +37,10 @@ export class ReportsService {
 
     await auditService.record({
       actorId: reporterId,
-      action: 'REPORT_CREATE',
+      action: AuditAction.CREATE,
       targetType: 'REPORT',
       targetId: report.id,
-      metadata: { reason: report.reason },
+      metadata: { reason: report.reason, targetType: report.targetType },
     });
 
     return report;
@@ -57,9 +65,17 @@ export class ReportsService {
     };
   }
 
+  async getById(id: string): Promise<ReportDocument> {
+    const report = await ReportModel.findById(id).exec();
+    if (!report) {
+      throw new AppError('Report not found', 404, 'NOT_FOUND');
+    }
+    return report;
+  }
+
   async resolve(
     id: string,
-    resolution: string,
+    input: ResolveReportInput,
     reviewerId: string,
   ): Promise<ReportDocument> {
     const report = await ReportModel.findById(id).exec();
@@ -67,17 +83,34 @@ export class ReportsService {
       throw new AppError('Report not found', 404, 'NOT_FOUND');
     }
 
-    report.status = ReportStatus.RESOLVED;
-    report.resolution = resolution;
+    report.status = input.status || ReportStatus.RESOLVED;
+    report.resolution = input.resolution;
+    if (input.internalNotes) report.internalNotes = input.internalNotes;
+    if (input.actionTaken) report.actionTaken = input.actionTaken;
     report.assignedReviewerId = reviewerId;
     const saved = await report.save();
 
+    // Notify the reporter
+    await notificationService.create({
+      userId: report.reporterId,
+      type: 'report.resolved',
+      title: 'Report Status Updated',
+      body: `Your community report regarding ${report.targetType} has been reviewed and marked as ${report.status}. Thank you for helping keep Al-Husseiniya safe and trustworthy.`,
+      referenceType: 'REPORT',
+      referenceId: report.id,
+      payload: { status: report.status },
+    });
+
     await auditService.record({
       actorId: reviewerId,
-      action: 'REPORT_RESOLVE',
+      action: AuditAction.STATUS_CHANGE,
       targetType: 'REPORT',
       targetId: report.id,
-      metadata: { resolution },
+      metadata: {
+        resolution: input.resolution,
+        status: report.status,
+        actionTaken: input.actionTaken,
+      },
     });
 
     return saved;

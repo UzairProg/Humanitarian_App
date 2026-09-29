@@ -9,7 +9,9 @@ import {
   IContributorProfile,
 } from '@al-husseiniya/types';
 
-export interface KnowledgeContentDocument extends Omit<IKnowledgeContent, 'id'>, Document<string> {
+export interface KnowledgeContentDocument
+  extends Omit<IKnowledgeContent, 'id'>,
+    Document<string> {
   _id: string;
   id: string;
 }
@@ -17,13 +19,13 @@ export interface KnowledgeContentDocument extends Omit<IKnowledgeContent, 'id'>,
 export const KnowledgeContentSchema = new Schema<KnowledgeContentDocument>(
   {
     _id: { type: String, default: uuidv4 },
-    title: { type: String, required: true },
+    title: { type: String, required: true, trim: true },
     summary: { type: String, required: true },
     body: { type: String, required: true },
     mediaUrl: { type: String, default: null },
     contributorId: { type: String, required: true, index: true },
-    category: { type: String, required: true },
-    language: { type: String, default: 'en' },
+    category: { type: String, required: true, index: true },
+    language: { type: String, default: 'en', index: true },
     reviewStatus: {
       type: String,
       enum: Object.values(ContributorReviewStatus),
@@ -36,6 +38,9 @@ export const KnowledgeContentSchema = new Schema<KnowledgeContentDocument>(
       default: ContentPublicationStatus.DRAFT,
       index: true,
     },
+    reviewerId: { type: String, default: null },
+    reviewNotes: { type: String, default: null },
+    publishedAt: { type: Date, default: null },
   },
   {
     timestamps: true,
@@ -57,43 +62,56 @@ KnowledgeContentSchema.set('toObject', { virtuals: true });
 
 export const KnowledgeContentModel =
   mongoose.models.KnowledgeContent ||
-  mongoose.model<KnowledgeContentDocument>('KnowledgeContent', KnowledgeContentSchema);
+  mongoose.model<KnowledgeContentDocument>(
+    'KnowledgeContent',
+    KnowledgeContentSchema,
+  );
 
-export interface ContributorProfileDocument extends Omit<IContributorProfile, 'id'>, Document<string> {
+// ============================================================================
+// Contributor Profiles
+// ============================================================================
+
+export interface ContributorProfileDocument
+  extends Omit<IContributorProfile, 'id'>,
+    Document<string> {
   _id: string;
   id: string;
 }
 
-export const ContributorProfileSchema = new Schema<ContributorProfileDocument>(
-  {
-    _id: { type: String, default: uuidv4 },
-    userId: { type: String, required: true, unique: true, index: true },
-    contributorType: {
-      type: String,
-      enum: Object.values(ContributorType),
-      required: true,
+export const ContributorProfileSchema =
+  new Schema<ContributorProfileDocument>(
+    {
+      _id: { type: String, default: uuidv4 },
+      userId: { type: String, required: true, unique: true, index: true },
+      contributorType: {
+        type: String,
+        enum: Object.values(ContributorType),
+        required: true,
+      },
+      biography: { type: String, required: true },
+      credentialsMetadata: { type: Schema.Types.Mixed, default: null },
+      verificationStatus: {
+        type: String,
+        enum: Object.values(VerificationStatus),
+        default: VerificationStatus.PENDING,
+        index: true,
+      },
+      reviewStatus: {
+        type: String,
+        enum: Object.values(ContributorReviewStatus),
+        default: ContributorReviewStatus.SUBMITTED,
+        index: true,
+      },
+      visibility: { type: Boolean, default: false },
+      reviewerId: { type: String, default: null },
+      reviewNotes: { type: String, default: null },
+      reviewedAt: { type: Date, default: null },
     },
-    biography: { type: String, required: true },
-    credentialsMetadata: { type: Schema.Types.Mixed, default: null },
-    verificationStatus: {
-      type: String,
-      enum: Object.values(VerificationStatus),
-      default: VerificationStatus.PENDING,
-      index: true,
+    {
+      timestamps: true,
+      collection: 'contributor_profiles',
     },
-    reviewStatus: {
-      type: String,
-      enum: Object.values(ContributorReviewStatus),
-      default: ContributorReviewStatus.SUBMITTED,
-      index: true,
-    },
-    visibility: { type: Boolean, default: false },
-  },
-  {
-    timestamps: true,
-    collection: 'contributor_profiles',
-  },
-);
+  );
 
 ContributorProfileSchema.virtual('id').get(function (this: any) {
   return this._id;
@@ -109,4 +127,7 @@ ContributorProfileSchema.set('toObject', { virtuals: true });
 
 export const ContributorProfileModel =
   mongoose.models.ContributorProfile ||
-  mongoose.model<ContributorProfileDocument>('ContributorProfile', ContributorProfileSchema);
+  mongoose.model<ContributorProfileDocument>(
+    'ContributorProfile',
+    ContributorProfileSchema,
+  );

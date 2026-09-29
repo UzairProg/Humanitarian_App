@@ -4,6 +4,7 @@ import { HumanitarianRequestModel } from '../models/humanitarian-request.model';
 import { FoodProgramModel } from '../models/food-program.model';
 import { OrganizationModel } from '../models/organization.model';
 import { EventModel } from '../models/event.model';
+import { VolunteerProfileModel, VolunteerOpportunityModel } from '../models/volunteer.model';
 import { RequestStatus, ProgramStatus } from '@al-husseiniya/types';
 
 export interface RecordImpactOptions {
@@ -35,6 +36,12 @@ export class ImpactService {
     activePrograms: number;
     verifiedOrganizations: number;
     eventsConducted: number;
+    activeVolunteersCount: number;
+    upcomingEventsCount: number;
+    totalMealsDistributed: number;
+    totalRequestsFulfilled: number;
+    activeProgramsCount: number;
+    verifiedOrganizationsCount: number;
   }> {
     // 1. Aggregated meals from impact records
     const mealAgg = await ImpactRecordModel.aggregate([
@@ -60,7 +67,12 @@ export class ImpactService {
 
     // 5. Events conducted / scheduled
     const eventsConducted = await EventModel.countDocuments({
-      status: { $in: ['PUBLISHED', 'COMPLETED'] },
+      status: { $in: ['PUBLISHED', 'REGISTRATION_OPEN', 'OPEN', 'COMPLETED'] },
+    });
+
+    // 6. Active volunteer count
+    const activeVolunteersCount = await VolunteerProfileModel.countDocuments({
+      status: 'ACTIVE',
     });
 
     return {
@@ -69,6 +81,12 @@ export class ImpactService {
       activePrograms,
       verifiedOrganizations,
       eventsConducted,
+      activeVolunteersCount,
+      upcomingEventsCount: eventsConducted,
+      totalMealsDistributed: mealsDistributed,
+      totalRequestsFulfilled: requestsFulfilled,
+      activeProgramsCount: activePrograms,
+      verifiedOrganizationsCount: verifiedOrganizations,
     };
   }
 
@@ -80,6 +98,7 @@ export class ImpactService {
     requestsFulfilled: number;
     activePrograms: number;
     eventsHosted: number;
+    volunteerOpportunities: number;
   }> {
     const mealAgg = await ImpactRecordModel.aggregate([
       {
@@ -108,11 +127,16 @@ export class ImpactService {
       status: { $in: ['PUBLISHED', 'COMPLETED'] },
     });
 
+    const volunteerOpportunities = await VolunteerOpportunityModel.countDocuments({
+      organizationId,
+    });
+
     return {
       mealsDistributed,
       requestsFulfilled,
       activePrograms,
       eventsHosted,
+      volunteerOpportunities,
     };
   }
 }

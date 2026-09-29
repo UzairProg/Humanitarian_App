@@ -1,59 +1,214 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
-import {
-  VolunteersService,
-  UpsertVolunteerProfileDto,
-  CreateOpportunityDto,
-} from './volunteers.service';
-import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
-import { CurrentUser } from '../../common/decorators/current-user.decorator';
-import { Public } from '../../common/decorators/public.decorator';
-import { JwtPayload } from '@al-husseiniya/types';
+import { Request, Response, NextFunction } from 'express';
+import { volunteersService } from './volunteers.service';
+import { AppError } from '../../middleware/error.middleware';
 
-@ApiTags('Volunteers')
-@Controller('api/v1/volunteers')
-@UseGuards(JwtAuthGuard)
 export class VolunteersController {
-  constructor(private readonly volunteersService: VolunteersService) {}
+  async upsertProfile(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      if (!req.user) {
+        throw new AppError('Authentication required', 401, 'UNAUTHORIZED');
+      }
 
-  @Post('profile')
-  @ApiOperation({ summary: 'Create or update volunteer service profile' })
-  async upsertProfile(
-    @Body() dto: UpsertVolunteerProfileDto,
-    @CurrentUser() user: JwtPayload,
-  ) {
-    return this.volunteersService.upsertProfile(dto, user);
+      const profile = await volunteersService.upsertProfile(req.user.sub, req.body);
+      res.status(200).json({
+        success: true,
+        data: profile.toJSON(),
+        timestamp: new Date().toISOString(),
+      });
+    } catch (err) {
+      next(err);
+    }
   }
 
-  @Get('profile/me')
-  @ApiOperation({ summary: 'Get current user volunteer profile' })
-  async getMyProfile(@CurrentUser() user: JwtPayload) {
-    return this.volunteersService.getMyProfile(user);
+  async getMyProfile(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      if (!req.user) {
+        throw new AppError('Authentication required', 401, 'UNAUTHORIZED');
+      }
+
+      const profile = await volunteersService.getMyProfile(req.user.sub);
+      res.status(200).json({
+        success: true,
+        data: profile ? profile.toJSON() : null,
+        timestamp: new Date().toISOString(),
+      });
+    } catch (err) {
+      next(err);
+    }
   }
 
-  @Post('opportunities')
-  @ApiOperation({ summary: 'Create a volunteer opportunity for an organization' })
-  async createOpportunity(@Body() dto: CreateOpportunityDto) {
-    return this.volunteersService.createOpportunity(dto);
+  async listOpportunities(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const page = parseInt(req.query.page as string, 10) || 1;
+      const limit = Math.min(parseInt(req.query.limit as string, 10) || 20, 100);
+      const organizationId = req.query.organizationId as string;
+      const category = req.query.category as string;
+      const search = req.query.search as string;
+      const status = req.query.status as string;
+
+      const result = await volunteersService.listOpportunities({
+        page,
+        limit,
+        organizationId,
+        category,
+        search,
+        status,
+      });
+
+      res.status(200).json({
+        success: true,
+        data: result.items.map((i) => i.toJSON()),
+        meta: {
+          page,
+          limit,
+          total: result.total,
+          totalPages: Math.ceil(result.total / limit) || 1,
+        },
+        timestamp: new Date().toISOString(),
+      });
+    } catch (err) {
+      next(err);
+    }
   }
 
-  @Public()
-  @Get('opportunities')
-  @ApiOperation({ summary: 'List open volunteer opportunities' })
-  async listOpportunities(
-    @Query('page') page = '1',
-    @Query('limit') limit = '20',
-  ) {
-    return this.volunteersService.listOpportunities(
-      parseInt(page, 10),
-      parseInt(limit, 10),
-    );
+  async getOpportunityById(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const opp = await volunteersService.getOpportunityById(req.params.id);
+      res.status(200).json({
+        success: true,
+        data: opp.toJSON(),
+        timestamp: new Date().toISOString(),
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async createOpportunity(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      if (!req.user) {
+        throw new AppError('Authentication required', 401, 'UNAUTHORIZED');
+      }
+
+      const opp = await volunteersService.createOpportunity(req.body, req.user);
+      res.status(201).json({
+        success: true,
+        data: opp.toJSON(),
+        timestamp: new Date().toISOString(),
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async updateOpportunity(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      if (!req.user) {
+        throw new AppError('Authentication required', 401, 'UNAUTHORIZED');
+      }
+
+      const opp = await volunteersService.updateOpportunity(
+        req.params.id,
+        req.body,
+        req.user,
+      );
+      res.status(200).json({
+        success: true,
+        data: opp.toJSON(),
+        timestamp: new Date().toISOString(),
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async apply(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      if (!req.user) {
+        throw new AppError('Authentication required', 401, 'UNAUTHORIZED');
+      }
+
+      const app = await volunteersService.apply(
+        req.params.id,
+        req.user,
+        req.body.message,
+      );
+      res.status(201).json({
+        success: true,
+        data: app.toJSON(),
+        timestamp: new Date().toISOString(),
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async listApplicationsForOpportunity(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      if (!req.user) {
+        throw new AppError('Authentication required', 401, 'UNAUTHORIZED');
+      }
+
+      const apps = await volunteersService.listApplicationsForOpportunity(
+        req.params.id,
+        req.user,
+      );
+      res.status(200).json({
+        success: true,
+        data: apps,
+        timestamp: new Date().toISOString(),
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async getMyApplications(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      if (!req.user) {
+        throw new AppError('Authentication required', 401, 'UNAUTHORIZED');
+      }
+
+      const apps = await volunteersService.getMyApplications(req.user.sub);
+      res.status(200).json({
+        success: true,
+        data: apps,
+        timestamp: new Date().toISOString(),
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async updateApplicationStatus(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      if (!req.user) {
+        throw new AppError('Authentication required', 401, 'UNAUTHORIZED');
+      }
+
+      const app = await volunteersService.updateApplicationStatus(
+        req.params.id,
+        req.body.status,
+        req.body.reviewNotes,
+        req.user,
+      );
+      res.status(200).json({
+        success: true,
+        data: app.toJSON(),
+        timestamp: new Date().toISOString(),
+      });
+    } catch (err) {
+      next(err);
+    }
   }
 }
+
+export const volunteersController = new VolunteersController();

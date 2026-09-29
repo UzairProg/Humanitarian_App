@@ -11,6 +11,8 @@ router.get('/unread-count', (req, res, next) =>
   notificationsController.getUnreadCount(req, res, next),
 );
 router.patch('/read-all', (req, res, next) => notificationsController.markAllRead(req, res, next));
+router.post('/read-all', (req, res, next) => notificationsController.markAllRead(req, res, next));
 router.patch('/:id/read', (req, res, next) => notificationsController.markRead(req, res, next));
+router.post('/:id/read', (req, res, next) => notificationsController.markRead(req, res, next));
 
 export const notificationsRouter = router;
