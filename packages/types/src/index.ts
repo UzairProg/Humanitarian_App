@@ -516,3 +516,27 @@ export interface AuthSession {
   permissions: PermissionKey[];
   tokens: AuthTokens;
 }
+
+// Convenient type aliases
+export type User = IUser;
+export type Role = IRole;
+export type Permission = IPermission;
+export type Organization = IOrganization;
+export type OrganizationMember = IOrganizationMember;
+export type OrganizationVerification = IOrganizationVerification;
+export type Business = IBusiness;
+export type BusinessVerification = IBusinessVerification;
+export type RequestCategory = IRequestCategory;
+export type HumanitarianRequest = IHumanitarianRequest;
+export type RequestStatusHistory = IRequestStatusHistory;
+export type FoodProgram = IFoodProgram;
+export type Event = IEvent;
+export type KnowledgeContent = IKnowledgeContent;
+export type ContributorProfile = IContributorProfile;
+export type VolunteerProfile = IVolunteerProfile;
+export type VolunteerOpportunity = IVolunteerOpportunity;
+export type Report = IReport;
+export type Notification = INotification;
+export type ImpactRecord = IImpactRecord;
+export type AuditLog = IAuditLog;
+
