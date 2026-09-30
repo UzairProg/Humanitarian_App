@@ -10,6 +10,7 @@ export interface FoodProgramAvailabilityDocument extends Document<string> {
   status: string;
   notes?: string | null;
   timestamp: Date;
+  isDemo?: boolean;
 }
 
 export const FoodProgramAvailabilitySchema = new Schema<FoodProgramAvailabilityDocument>(
@@ -21,6 +22,7 @@ export const FoodProgramAvailabilitySchema = new Schema<FoodProgramAvailabilityD
     status: { type: String, default: 'RESERVED' },
     notes: { type: String, default: null },
     timestamp: { type: Date, default: Date.now },
+    isDemo: { type: Boolean, default: false, index: true },
   },
   {
     timestamps: true,

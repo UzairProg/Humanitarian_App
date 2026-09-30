@@ -25,6 +25,8 @@
     "format": "prettier --write \"**/*.{ts,tsx,js,json,md}\"",
     "db:migrate": "npm --workspace=backend run db:migrate",
     "db:seed": "npm --workspace=backend run db:seed",
+    "seed:demo": "npm --workspace=backend run seed:demo",
+    "seed:demo:reset": "npm --workspace=backend run seed:demo:reset",
     "clean": "npm run --workspaces --if-present clean"
   },
   "devDependencies": {

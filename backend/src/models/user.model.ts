@@ -6,6 +6,7 @@ export interface UserDocument extends Omit<IUser, 'id'>, Document<string> {
   _id: string;
   id: string;
   passwordHash: string;
+  isDemo?: boolean;
 }
 
 export const UserSchema = new Schema<UserDocument>(
@@ -39,6 +40,7 @@ export const UserSchema = new Schema<UserDocument>(
       enum: Object.values(RoleType),
       default: [RoleType.INDIVIDUAL],
     },
+    isDemo: { type: Boolean, default: false, index: true },
     deletedAt: { type: Date, default: null },
   },
   {

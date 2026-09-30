@@ -14,6 +14,7 @@ export interface HumanitarianRequestDocument
   acceptedAt?: Date;
   completedAt?: Date;
   cancelledAt?: Date;
+  isDemo?: boolean;
   metadata?: Record<string, any>;
 }
 
@@ -41,6 +42,7 @@ export const HumanitarianRequestSchema = new Schema<HumanitarianRequestDocument>
       index: true,
     },
     isPrivate: { type: Boolean, default: true },
+    isDemo: { type: Boolean, default: false, index: true },
     submittedAt: { type: Date, default: Date.now },
     acceptedAt: { type: Date, default: null },
     completedAt: { type: Date, default: null },

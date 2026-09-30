@@ -7,6 +7,7 @@ export interface NotificationDocument extends Omit<INotification, 'id'>, Documen
   id: string;
   referenceType?: string | null;
   referenceId?: string | null;
+  isDemo?: boolean;
 }
 
 export const NotificationSchema = new Schema<NotificationDocument>(
@@ -20,6 +21,7 @@ export const NotificationSchema = new Schema<NotificationDocument>(
     referenceId: { type: String, default: null },
     payload: { type: Schema.Types.Mixed, default: {} },
     readAt: { type: Date, default: null, index: true },
+    isDemo: { type: Boolean, default: false, index: true },
   },
   {
     timestamps: true,

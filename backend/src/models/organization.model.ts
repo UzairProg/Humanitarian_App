@@ -5,6 +5,7 @@ import { VerificationStatus, IOrganization } from '@al-husseiniya/types';
 export interface OrganizationDocument extends Omit<IOrganization, 'id'>, Document<string> {
   _id: string;
   id: string;
+  isDemo?: boolean;
 }
 
 export const OrganizationSchema = new Schema<OrganizationDocument>(
@@ -31,6 +32,7 @@ export const OrganizationSchema = new Schema<OrganizationDocument>(
       default: VerificationStatus.UNVERIFIED,
       index: true,
     },
+    isDemo: { type: Boolean, default: false, index: true },
     createdById: { type: String, required: true, index: true },
   },
   {

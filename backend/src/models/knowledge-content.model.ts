@@ -14,6 +14,7 @@ export interface KnowledgeContentDocument
     Document<string> {
   _id: string;
   id: string;
+  isDemo?: boolean;
 }
 
 export const KnowledgeContentSchema = new Schema<KnowledgeContentDocument>(
@@ -41,6 +42,7 @@ export const KnowledgeContentSchema = new Schema<KnowledgeContentDocument>(
     reviewerId: { type: String, default: null },
     reviewNotes: { type: String, default: null },
     publishedAt: { type: Date, default: null },
+    isDemo: { type: Boolean, default: false, index: true },
   },
   {
     timestamps: true,
@@ -76,6 +78,7 @@ export interface ContributorProfileDocument
     Document<string> {
   _id: string;
   id: string;
+  isDemo?: boolean;
 }
 
 export const ContributorProfileSchema =
@@ -106,6 +109,7 @@ export const ContributorProfileSchema =
       reviewerId: { type: String, default: null },
       reviewNotes: { type: String, default: null },
       reviewedAt: { type: Date, default: null },
+      isDemo: { type: Boolean, default: false, index: true },
     },
     {
       timestamps: true,

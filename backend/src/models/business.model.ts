@@ -10,6 +10,7 @@ import {
 export interface BusinessDocument extends Omit<IBusiness, 'id'>, Document<string> {
   _id: string;
   id: string;
+  isDemo?: boolean;
 }
 
 export const BusinessSchema = new Schema<BusinessDocument>(
@@ -30,6 +31,7 @@ export const BusinessSchema = new Schema<BusinessDocument>(
       index: true,
     },
     ownerId: { type: String, required: true, index: true },
+    isDemo: { type: Boolean, default: false, index: true },
   },
   {
     timestamps: true,

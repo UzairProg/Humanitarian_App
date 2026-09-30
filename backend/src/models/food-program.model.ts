@@ -5,6 +5,7 @@ import { ProgramStatus, IFoodProgram } from '@al-husseiniya/types';
 export interface FoodProgramDocument extends Omit<IFoodProgram, 'id'>, Document<string> {
   _id: string;
   id: string;
+  isDemo?: boolean;
 }
 
 export const FoodProgramSchema = new Schema<FoodProgramDocument>(
@@ -26,6 +27,7 @@ export const FoodProgramSchema = new Schema<FoodProgramDocument>(
       index: true,
     },
     instructions: { type: String, default: null },
+    isDemo: { type: Boolean, default: false, index: true },
   },
   {
     timestamps: true,

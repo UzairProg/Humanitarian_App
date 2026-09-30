@@ -5,6 +5,7 @@ import { ReportStatus, ReportTargetType, IReport } from '@al-husseiniya/types';
 export interface ReportDocument extends Omit<IReport, 'id'>, Document<string> {
   _id: string;
   id: string;
+  isDemo?: boolean;
 }
 
 export const ReportSchema = new Schema<ReportDocument>(
@@ -31,6 +32,7 @@ export const ReportSchema = new Schema<ReportDocument>(
     resolution: { type: String, default: null },
     internalNotes: { type: String, default: null },
     actionTaken: { type: String, default: null },
+    isDemo: { type: Boolean, default: false, index: true },
   },
   {
     timestamps: true,

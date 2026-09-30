@@ -29,9 +29,14 @@ export const LoginPage: React.FC = () => {
     }
   };
 
-  const handleQuickFill = (demoEmail: string) => {
+  const isDevOrDemo =
+    Boolean((import.meta as any).env?.DEV) ||
+    window.location.hostname === 'localhost' ||
+    window.location.hostname.includes('demo');
+
+  const handleQuickFill = (demoEmail: string, demoPass = 'DemoPass@12345') => {
     setEmail(demoEmail);
-    setPassword('AlHusseiniyaDev2026!');
+    setPassword(demoPass);
   };
 
   return (
@@ -204,46 +209,88 @@ export const LoginPage: React.FC = () => {
             </button>
           </form>
 
-          {/* Quick Fill Personas */}
-          <div style={{ marginTop: '2rem', borderTop: '1px solid #f1f5f9', paddingTop: '1.25rem' }}>
-            <p style={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', marginBottom: '0.6rem', letterSpacing: '0.04em' }}>
-              {isRtl ? 'التبديل السريع بين الحسابات التجريبية' : 'Quick Persona Switch (Demo)'}
-            </p>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.4rem' }}>
-              <button
-                type="button"
-                onClick={() => handleQuickFill('admin@alhusseiniya.org')}
-                className="btn btn-secondary"
-                style={{ fontSize: '0.75rem', padding: '0.35rem 0.5rem' }}
-              >
-                {isRtl ? 'مدير المنصة (Admin)' : 'Administrator'}
-              </button>
-              <button
-                type="button"
-                onClick={() => handleQuickFill('orgadmin@alhusseiniya.org')}
-                className="btn btn-secondary"
-                style={{ fontSize: '0.75rem', padding: '0.35rem 0.5rem' }}
-              >
-                {isRtl ? 'مسؤول حسينية (Org)' : 'Org Admin'}
-              </button>
-              <button
-                type="button"
-                onClick={() => handleQuickFill('moderator@alhusseiniya.org')}
-                className="btn btn-secondary"
-                style={{ fontSize: '0.75rem', padding: '0.35rem 0.5rem' }}
-              >
-                {isRtl ? 'مشرف أمان (Mod)' : 'Moderator'}
-              </button>
-              <button
-                type="button"
-                onClick={() => handleQuickFill('user@alhusseiniya.org')}
-                className="btn btn-secondary"
-                style={{ fontSize: '0.75rem', padding: '0.35rem 0.5rem' }}
-              >
-                {isRtl ? 'مستخدم مجتمعي (User)' : 'Community User'}
-              </button>
+          {/* Quick Fill Personas — Development / Demo Helper */}
+          {isDevOrDemo && (
+            <div style={{ marginTop: '1.75rem', borderTop: '1px solid #f1f5f9', paddingTop: '1.25rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                <p style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', margin: 0, letterSpacing: '0.04em' }}>
+                  {isRtl ? 'حسابات العرض التجريبي (Demo Personas)' : 'CEO Demonstration Accounts'}
+                </p>
+                <span style={{ fontSize: '0.65rem', color: '#b45309', fontWeight: 600, backgroundColor: '#fef3c7', padding: '0.1rem 0.4rem', borderRadius: '4px' }}>
+                  DEMO ONLY
+                </span>
+              </div>
+              <p style={{ fontSize: '0.6875rem', color: '#94a3b8', margin: '0 0 0.65rem', lineHeight: 1.4 }}>
+                {isRtl ? 'حسابات وهمية مجهزة لتجربة المنصة بالكامل. كلمة المرور: DemoPass@12345' : 'Fictional demo profiles. Pre-loaded with DemoPass@12345.'}
+              </p>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.35rem' }}>
+                <button
+                  type="button"
+                  onClick={() => handleQuickFill('demo.admin@demo.alhusseiniya.app')}
+                  className="btn btn-secondary"
+                  style={{ fontSize: '0.72rem', padding: '0.35rem 0.5rem', textAlign: 'start' }}
+                >
+                  {isRtl ? '👑 مدير المنصة (Admin)' : '👑 Admin'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleQuickFill('demo.organization@demo.alhusseiniya.app')}
+                  className="btn btn-secondary"
+                  style={{ fontSize: '0.72rem', padding: '0.35rem 0.5rem', textAlign: 'start' }}
+                >
+                  {isRtl ? '🏢 حسينية / جهة (Org Admin)' : '🏢 Org Admin (Hassan)'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleQuickFill('demo.requester@demo.alhusseiniya.app')}
+                  className="btn btn-secondary"
+                  style={{ fontSize: '0.72rem', padding: '0.35rem 0.5rem', textAlign: 'start' }}
+                >
+                  {isRtl ? '🤝 طالب مساعدة (Requester)' : '🤝 Requester (Omar)'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleQuickFill('demo.individual@demo.alhusseiniya.app')}
+                  className="btn btn-secondary"
+                  style={{ fontSize: '0.72rem', padding: '0.35rem 0.5rem', textAlign: 'start' }}
+                >
+                  {isRtl ? '👤 فرد مجتمعي (Individual)' : '👤 Individual (Amina)'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleQuickFill('demo.volunteer@demo.alhusseiniya.app')}
+                  className="btn btn-secondary"
+                  style={{ fontSize: '0.72rem', padding: '0.35rem 0.5rem', textAlign: 'start' }}
+                >
+                  {isRtl ? '🌱 متطوع (Volunteer)' : '🌱 Volunteer (Zainab)'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleQuickFill('demo.business@demo.alhusseiniya.app')}
+                  className="btn btn-secondary"
+                  style={{ fontSize: '0.72rem', padding: '0.35rem 0.5rem', textAlign: 'start' }}
+                >
+                  {isRtl ? '🥖 شريك تجاري (Business)' : '🥖 Business (Karim)'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleQuickFill('demo.contributor@demo.alhusseiniya.app')}
+                  className="btn btn-secondary"
+                  style={{ fontSize: '0.72rem', padding: '0.35rem 0.5rem', textAlign: 'start' }}
+                >
+                  {isRtl ? '✍️ مساهم معرفي (Contributor)' : '✍️ Contributor (Mahdi)'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleQuickFill('demo.moderator@demo.alhusseiniya.app')}
+                  className="btn btn-secondary"
+                  style={{ fontSize: '0.72rem', padding: '0.35rem 0.5rem', textAlign: 'start' }}
+                >
+                  {isRtl ? '🛡️ مشرف محتوى (Moderator)' : '🛡️ Moderator (Demo)'}
+                </button>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>

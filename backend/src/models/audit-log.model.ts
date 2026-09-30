@@ -5,6 +5,7 @@ import { IAuditLog } from '@al-husseiniya/types';
 export interface AuditLogDocument extends Omit<IAuditLog, 'id'>, Document<string> {
   _id: string;
   id: string;
+  isDemo?: boolean;
 }
 
 export const AuditLogSchema = new Schema<AuditLogDocument>(
@@ -19,6 +20,7 @@ export const AuditLogSchema = new Schema<AuditLogDocument>(
     ipAddress: { type: String, default: null },
     userAgent: { type: String, default: null },
     timestamp: { type: Date, default: Date.now, index: true },
+    isDemo: { type: Boolean, default: false, index: true },
   },
   {
     timestamps: true,

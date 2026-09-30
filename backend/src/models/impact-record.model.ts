@@ -5,6 +5,7 @@ import { MetricType, IImpactRecord } from '@al-husseiniya/types';
 export interface ImpactRecordDocument extends Omit<IImpactRecord, 'id'>, Document<string> {
   _id: string;
   id: string;
+  isDemo?: boolean;
 }
 
 export const ImpactRecordSchema = new Schema<ImpactRecordDocument>(
@@ -21,6 +22,7 @@ export const ImpactRecordSchema = new Schema<ImpactRecordDocument>(
     value: { type: Number, required: true, min: 0 },
     source: { type: String, required: true },
     timestamp: { type: Date, default: Date.now, index: true },
+    isDemo: { type: Boolean, default: false, index: true },
   },
   {
     timestamps: true,

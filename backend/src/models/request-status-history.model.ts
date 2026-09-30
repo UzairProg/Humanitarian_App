@@ -7,6 +7,7 @@ export interface RequestStatusHistoryDocument
     Document<string> {
   _id: string;
   id: string;
+  isDemo?: boolean;
 }
 
 export const RequestStatusHistorySchema = new Schema<RequestStatusHistoryDocument>(
@@ -26,6 +27,7 @@ export const RequestStatusHistorySchema = new Schema<RequestStatusHistoryDocumen
     changedById: { type: String, required: true },
     reason: { type: String, default: null },
     timestamp: { type: Date, default: Date.now },
+    isDemo: { type: Boolean, default: false, index: true },
   },
   {
     timestamps: true,

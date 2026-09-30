@@ -249,7 +249,33 @@ export const Footer: React.FC = () => {
             {locale === 'ar' ? 'مكرسة لخدمة المجتمع الإنساني بكرامة واحترام.' : 'Dedicated to community service with complete dignity.'}
           </div>
 
-          <div style={{ display: 'flex', gap: '1.25rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', flexWrap: 'wrap' }}>
+            <span
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.35rem',
+                padding: '0.15rem 0.5rem',
+                borderRadius: '4px',
+                backgroundColor: 'rgba(222, 185, 95, 0.12)',
+                border: '1px solid rgba(222, 185, 95, 0.3)',
+                color: '#deb95f',
+                fontSize: '0.6875rem',
+                fontWeight: 600,
+                letterSpacing: '0.02em',
+              }}
+            >
+              <span
+                style={{
+                  width: '5px',
+                  height: '5px',
+                  borderRadius: '50%',
+                  backgroundColor: '#deb95f',
+                  display: 'inline-block',
+                }}
+              />
+              {locale === 'ar' ? 'نسخة تجريبية' : 'Demo Environment'}
+            </span>
             <span>{locale === 'ar' ? 'خصوصية تامة' : 'Privacy Assured'}</span>
             <span>{locale === 'ar' ? 'جهات معتمدة' : 'Verified Partners'}</span>
             <span>{locale === 'ar' ? 'تنسيق مجتمعي دائم' : 'Year-Round Care'}</span>

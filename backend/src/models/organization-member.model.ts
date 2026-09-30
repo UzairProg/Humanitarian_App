@@ -5,6 +5,7 @@ import { IOrganizationMember } from '@al-husseiniya/types';
 export interface OrganizationMemberDocument extends Omit<IOrganizationMember, 'id'>, Document<string> {
   _id: string;
   id: string;
+  isDemo?: boolean;
 }
 
 export const OrganizationMemberSchema = new Schema<OrganizationMemberDocument>(
@@ -15,6 +16,7 @@ export const OrganizationMemberSchema = new Schema<OrganizationMemberDocument>(
     role: { type: String, default: 'MEMBER' },
     status: { type: String, default: 'ACTIVE' },
     joinedAt: { type: Date, default: Date.now },
+    isDemo: { type: Boolean, default: false, index: true },
   },
   {
     timestamps: true,

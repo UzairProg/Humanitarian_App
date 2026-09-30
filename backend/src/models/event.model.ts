@@ -5,6 +5,7 @@ import { IEvent, IEventRegistration } from '@al-husseiniya/types';
 export interface EventDocument extends Omit<IEvent, 'id'>, Document<string> {
   _id: string;
   id: string;
+  isDemo?: boolean;
 }
 
 export const EventSchema = new Schema<EventDocument>(
@@ -46,6 +47,7 @@ export const EventSchema = new Schema<EventDocument>(
       index: true,
     },
     mediaUrl: { type: String, default: null },
+    isDemo: { type: Boolean, default: false, index: true },
   },
   {
     timestamps: true,
@@ -79,6 +81,7 @@ export interface EventRegistrationDocument
     Document<string> {
   _id: string;
   id: string;
+  isDemo?: boolean;
 }
 
 export const EventRegistrationSchema = new Schema<EventRegistrationDocument>(
@@ -94,6 +97,7 @@ export const EventRegistrationSchema = new Schema<EventRegistrationDocument>(
     },
     registeredAt: { type: Date, default: Date.now },
     notes: { type: String, default: null },
+    isDemo: { type: Boolean, default: false, index: true },
   },
   {
     timestamps: true,

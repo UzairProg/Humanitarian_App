@@ -11,6 +11,7 @@ export interface VolunteerProfileDocument
     Document<string> {
   _id: string;
   id: string;
+  isDemo?: boolean;
 }
 
 export const VolunteerProfileSchema = new Schema<VolunteerProfileDocument>(
@@ -25,6 +26,7 @@ export const VolunteerProfileSchema = new Schema<VolunteerProfileDocument>(
     preferredCategories: [{ type: String }],
     emergencyContact: { type: String, default: null },
     status: { type: String, default: 'ACTIVE' },
+    isDemo: { type: Boolean, default: false, index: true },
   },
   {
     timestamps: true,
@@ -60,6 +62,7 @@ export interface VolunteerOpportunityDocument
     Document<string> {
   _id: string;
   id: string;
+  isDemo?: boolean;
 }
 
 export const VolunteerOpportunitySchema =
@@ -86,6 +89,7 @@ export const VolunteerOpportunitySchema =
         default: 'OPEN',
         index: true,
       },
+      isDemo: { type: Boolean, default: false, index: true },
     },
     {
       timestamps: true,
@@ -121,6 +125,7 @@ export interface VolunteerApplicationDocument
     Document<string> {
   _id: string;
   id: string;
+  isDemo?: boolean;
 }
 
 export const VolunteerApplicationSchema =
@@ -140,6 +145,7 @@ export const VolunteerApplicationSchema =
       reviewNotes: { type: String, default: null },
       appliedAt: { type: Date, default: Date.now },
       reviewedAt: { type: Date, default: null },
+      isDemo: { type: Boolean, default: false, index: true },
     },
     {
       timestamps: true,
