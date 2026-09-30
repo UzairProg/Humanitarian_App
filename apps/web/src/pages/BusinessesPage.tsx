@@ -15,11 +15,13 @@ import {
   Search,
   ShieldCheck,
   AlertCircle,
+  ChevronDown,
+  Sparkles,
 } from 'lucide-react';
 
 export const BusinessesPage: React.FC = () => {
   const { user, isAuthenticated } = useAuth();
-  const { t } = useLocalization();
+  const { t, locale, isRtl } = useLocalization();
 
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [loading, setLoading] = useState(true);
@@ -159,158 +161,426 @@ export const BusinessesPage: React.FC = () => {
   };
 
   return (
-    <div style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', maxWidth: '1200px', margin: '0 auto' }}>
-      {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
-        <div>
-          <h2 style={{ fontSize: '1.75rem', fontWeight: 700, color: '#0b1f2a', letterSpacing: '-0.02em', margin: 0 }}>
-            {t('businesses.title')}
-          </h2>
-          <p style={{ color: '#64748b', fontSize: '0.9rem', marginTop: '0.25rem' }}>
-            {t('businesses.subtitle')}
-          </p>
-        </div>
+    <div style={{ backgroundColor: '#fffdfa', minHeight: '100vh', paddingBottom: '3.5rem' }}>
+      {/* Warm Bronze & Terracotta Solidarity Hero Banner */}
+      <div
+        style={{
+          background: 'linear-gradient(135deg, #451a03 0%, #78350f 50%, #b45309 100%)',
+          color: '#ffffff',
+          padding: '3rem 2rem 2.5rem',
+          boxShadow: '0 4px 20px rgba(69, 26, 3, 0.25)',
+          position: 'relative',
+          overflow: 'hidden',
+          borderBottom: '3px solid #f59e0b',
+        }}
+      >
+        {/* Subtle decorative glow */}
+        <div
+          style={{
+            position: 'absolute',
+            top: '-50px',
+            right: '-50px',
+            width: '280px',
+            height: '280px',
+            borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(245, 158, 11, 0.25) 0%, transparent 70%)',
+            pointerEvents: 'none',
+          }}
+        />
 
-        {isAuthenticated && (
-          <button
-            onClick={() => setShowRegisterModal(true)}
-            className="btn btn-teal"
-            style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem' }}
+        <div style={{ maxWidth: '1240px', marginInline: 'auto', display: 'flex', flexDirection: 'column', gap: '1.25rem', position: 'relative' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+            <span
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.4rem',
+                backgroundColor: 'rgba(245, 158, 11, 0.2)',
+                border: '1px solid rgba(245, 158, 11, 0.4)',
+                padding: '0.3rem 0.8rem',
+                borderRadius: '20px',
+                fontSize: '0.78rem',
+                fontWeight: 700,
+                color: '#fef3c7',
+                letterSpacing: '0.04em',
+                textTransform: 'uppercase',
+              }}
+            >
+              <Store size={13} color="#fef3c7" />
+              {locale === 'ar' ? 'دليل التجار والشركاء التجاريين المتضامنين' : 'Solidarity Commercial Directory'}
+            </span>
+            <span
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.3rem',
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                padding: '0.3rem 0.65rem',
+                borderRadius: '20px',
+                fontSize: '0.75rem',
+                color: '#fef3c7',
+              }}
+            >
+              <ShieldCheck size={13} color="#f59e0b" />
+              {locale === 'ar' ? 'تجار معتمدون وملتزمون بالإغاثة' : 'Verified Mutual Aid Merchants'}
+            </span>
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '1.5rem' }}>
+            <div>
+              <h1 style={{ fontSize: '2.3rem', fontWeight: 900, margin: '0 0 0.5rem', letterSpacing: '-0.02em', color: '#ffffff' }}>
+                {t('businesses.title')}
+              </h1>
+              <p style={{ color: '#fef3c7', fontSize: '1rem', margin: 0, maxWidth: '680px', lineHeight: 1.6 }}>
+                {t('businesses.subtitle')}
+              </p>
+            </div>
+
+            {isAuthenticated && (
+              <button
+                onClick={() => setShowRegisterModal(true)}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  backgroundColor: '#f59e0b',
+                  color: '#451a03',
+                  fontWeight: 800,
+                  fontSize: '0.92rem',
+                  padding: '0.85rem 1.6rem',
+                  borderRadius: '10px',
+                  border: 'none',
+                  cursor: 'pointer',
+                  boxShadow: '0 4px 14px rgba(245, 158, 11, 0.4)',
+                  transition: 'all 0.2s ease',
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#fbbf24')}
+                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#f59e0b')}
+              >
+                <PlusCircle size={18} strokeWidth={2.5} />
+                <span>{t('businesses.register_btn')}</span>
+              </button>
+            )}
+          </div>
+
+          {/* Quick Merchant Metrics strip */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+              gap: '1rem',
+              marginTop: '0.5rem',
+              paddingTop: '1.25rem',
+              borderTop: '1px solid rgba(255, 255, 255, 0.12)',
+            }}
           >
-            <PlusCircle size={16} />
-            <span>{t('businesses.register_btn')}</span>
-          </button>
-        )}
-      </div>
-
-      {/* Filter and Search */}
-      <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
-        <div style={{ position: 'relative', flex: 1, minWidth: '240px' }}>
-          <Search size={16} color="#94a3b8" style={{ position: 'absolute', top: '10px', left: '10px' }} />
-          <input
-            type="text"
-            placeholder="Search merchants by name, location..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && loadBusinesses()}
-            style={{ width: '100%', padding: '0.5rem 0.5rem 0.5rem 2.2rem', borderRadius: '6px', border: '1px solid #cbd5e1' }}
-          />
-        </div>
-
-        <select
-          value={categoryFilter}
-          onChange={(e) => setCategoryFilter(e.target.value)}
-          style={{ padding: '0.5rem', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }}
-        >
-          <option value="">All Categories</option>
-          <option value="WHOLESALE_GROCERY">Wholesale Grocery</option>
-          <option value="BAKERY_WHOLESALE">Bakery & Provisions</option>
-          <option value="PHARMACY_MEDICAL">Pharmacy & Supplies</option>
-          <option value="LOGISTICS_TRANSPORT">Logistics & Transport</option>
-        </select>
-
-        <button onClick={loadBusinesses} className="btn btn-secondary" style={{ padding: '0.5rem 1rem' }}>
-          Filter
-        </button>
-      </div>
-
-      {/* Business Cards Grid */}
-      {loading ? (
-        <div className="card" style={{ textAlign: 'center', padding: '3rem' }}>
-          <p style={{ color: '#64748b' }}>Loading business registry...</p>
-        </div>
-      ) : businesses.length === 0 ? (
-        <div className="card" style={{ textAlign: 'center', padding: '3rem' }}>
-          <Store size={32} color="#94a3b8" style={{ margin: '0 auto 0.75rem' }} />
-          <h3 style={{ fontSize: '1.1rem', fontWeight: 600 }}>No Businesses Registered</h3>
-          <p style={{ color: '#64748b', fontSize: '0.85rem' }}>
-            Be the first community merchant to register and pledge service support.
-          </p>
-        </div>
-      ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '1.5rem' }}>
-          {businesses.map((biz) => {
-            const isVerified = biz.verificationStatus === VerificationStatus.APPROVED;
-            return (
-              <div key={biz.id} className="card" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span className="badge badge-neutral">{biz.category}</span>
-                  {isVerified ? (
-                    <span className="badge badge-success" style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                      <CheckCircle2 size={12} />
-                      <span>Verified Partner</span>
-                    </span>
-                  ) : (
-                    <span className="badge badge-warning" style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                      <Clock size={12} />
-                      <span>Pending Verification</span>
-                    </span>
-                  )}
-                </div>
-
-                <div>
-                  <h3 style={{ fontSize: '1.125rem', fontWeight: 600, color: '#0b1b2b', marginBottom: '0.35rem' }}>
-                    {biz.name}
-                  </h3>
-                  <p style={{ fontSize: '0.85rem', color: '#475569', lineHeight: 1.5 }}>
-                    {biz.description}
-                  </p>
-                </div>
-
-                {biz.participationTypes && biz.participationTypes.length > 0 && (
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem' }}>
-                    {biz.participationTypes.map((t, idx) => (
-                      <span key={idx} className="badge badge-teal" style={{ fontSize: '0.7rem' }}>
-                        {t.replace('_', ' ')}
-                      </span>
-                    ))}
-                  </div>
-                )}
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', fontSize: '0.8125rem', color: '#64748b', borderTop: '1px solid #f1f5f9', paddingTop: '0.75rem' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                    <MapPin size={14} color="#64748b" />
-                    <span>{biz.location}</span>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                    <Mail size={14} color="#64748b" />
-                    <span>{biz.contactEmail}</span>
-                  </div>
-                  {biz.contactPhone && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                      <Phone size={14} color="#64748b" />
-                      <span>{biz.contactPhone}</span>
-                    </div>
-                  )}
-                </div>
-
-                <div style={{ display: 'flex', gap: '0.5rem', marginTop: 'auto', paddingTop: '0.5rem' }}>
-                  <button
-                    onClick={() => openParticipationModal(biz)}
-                    className="btn btn-secondary"
-                    style={{ flex: 1, padding: '0.45rem', fontSize: '0.8rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem' }}
-                  >
-                    <HandHeart size={14} />
-                    <span>Community Pledges</span>
-                  </button>
-
-                  {canVerify && !isVerified && (
-                    <button
-                      onClick={() => handleVerifyBusiness(biz.id, VerificationStatus.APPROVED)}
-                      className="btn btn-teal"
-                      style={{ padding: '0.45rem 0.75rem', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}
-                      title="Verify Merchant"
-                    >
-                      <ShieldCheck size={14} />
-                      <span>Verify</span>
-                    </button>
-                  )}
-                </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <div style={{ width: '38px', height: '38px', borderRadius: '8px', backgroundColor: 'rgba(245, 158, 11, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#f59e0b' }}>
+                <Store size={20} />
               </div>
-            );
-          })}
+              <div>
+                <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#ffffff' }}>{businesses.length} Merchants</div>
+                <div style={{ fontSize: '0.75rem', color: '#fef3c7' }}>{locale === 'ar' ? 'متاجر وشركات مسجلة' : 'Registered Solidarity Partners'}</div>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <div style={{ width: '38px', height: '38px', borderRadius: '8px', backgroundColor: 'rgba(245, 158, 11, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#f59e0b' }}>
+                <HandHeart size={20} />
+              </div>
+              <div>
+                <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#ffffff' }}>Mutual Aid</div>
+                <div style={{ fontSize: '0.75rem', color: '#fef3c7' }}>{locale === 'ar' ? 'تعهدات تموينية وإغاثية' : 'Surplus & Meal Pledges'}</div>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <div style={{ width: '38px', height: '38px', borderRadius: '8px', backgroundColor: 'rgba(245, 158, 11, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#f59e0b' }}>
+                <Sparkles size={20} />
+              </div>
+              <div>
+                <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#ffffff' }}>Fair Trade</div>
+                <div style={{ fontSize: '0.75rem', color: '#fef3c7' }}>{locale === 'ar' ? 'تجارة عادلة وتكافل أهلي' : 'Dignified Community Commerce'}</div>
+              </div>
+            </div>
+          </div>
         </div>
-      )}
+      </div>
+
+      <div style={{ maxWidth: '1240px', marginInline: 'auto', padding: '2rem 1.5rem', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+        {/* Filter and Search */}
+        <div
+          style={{
+            display: 'flex',
+            gap: '1rem',
+            flexWrap: 'wrap',
+            alignItems: 'center',
+            backgroundColor: '#ffffff',
+            padding: '1rem 1.25rem',
+            borderRadius: '12px',
+            border: '1.5px solid #fed7aa',
+            boxShadow: '0 2px 10px rgba(69, 26, 3, 0.03)',
+          }}
+        >
+          <div style={{ position: 'relative', flex: 1, minWidth: '240px' }}>
+            <Search size={16} color="#b45309" style={{ position: 'absolute', top: '12px', left: '12px' }} />
+            <input
+              type="text"
+              placeholder="Search merchants by name, location..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && loadBusinesses()}
+              style={{ width: '100%', padding: '0.55rem 0.55rem 0.55rem 2.4rem', borderRadius: '8px', border: '1.5px solid #fed7aa', fontSize: '0.85rem', outline: 'none' }}
+            />
+          </div>
+
+          <div style={{ position: 'relative' }}>
+            <select
+              value={categoryFilter}
+              onChange={(e) => setCategoryFilter(e.target.value)}
+              style={{
+                appearance: 'none',
+                padding: '0.55rem 2rem 0.55rem 0.85rem',
+                borderRadius: '8px',
+                border: '1.5px solid #fed7aa',
+                fontSize: '0.82rem',
+                fontWeight: 600,
+                backgroundColor: '#fffbeb',
+                color: '#451a03',
+                cursor: 'pointer',
+                outline: 'none',
+              }}
+            >
+              <option value="">All Categories</option>
+              <option value="WHOLESALE_GROCERY">Wholesale Grocery</option>
+              <option value="BAKERY_WHOLESALE">Bakery & Provisions</option>
+              <option value="PHARMACY_MEDICAL">Pharmacy & Supplies</option>
+              <option value="LOGISTICS_TRANSPORT">Logistics & Transport</option>
+            </select>
+            <ChevronDown size={14} color="#b45309" style={{ position: 'absolute', right: '0.6rem', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
+          </div>
+
+          <button
+            onClick={loadBusinesses}
+            style={{
+              padding: '0.55rem 1.25rem',
+              borderRadius: '8px',
+              backgroundColor: '#b45309',
+              color: '#ffffff',
+              fontWeight: 700,
+              fontSize: '0.82rem',
+              border: 'none',
+              cursor: 'pointer',
+            }}
+          >
+            Filter
+          </button>
+        </div>
+
+        {/* Business Cards Grid */}
+        {loading ? (
+          <div className="card" style={{ textAlign: 'center', padding: '3.5rem', backgroundColor: '#ffffff', borderRadius: '14px', border: '1px solid #fed7aa' }}>
+            <p style={{ color: '#b45309', fontWeight: 600 }}>Loading business registry...</p>
+          </div>
+        ) : businesses.length === 0 ? (
+          <div className="card" style={{ textAlign: 'center', padding: '3.5rem', backgroundColor: '#ffffff', borderRadius: '14px', border: '1px solid #fed7aa' }}>
+            <Store size={32} color="#b45309" style={{ margin: '0 auto 0.75rem' }} />
+            <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#451a03' }}>No Businesses Registered</h3>
+            <p style={{ color: '#64748b', fontSize: '0.85rem' }}>
+              Be the first community merchant to register and pledge service support.
+            </p>
+          </div>
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: '1.5rem' }}>
+            {businesses.map((biz) => {
+              const isVerified = biz.verificationStatus === VerificationStatus.APPROVED;
+              return (
+                <div
+                  key={biz.id}
+                  style={{
+                    backgroundColor: '#ffffff',
+                    borderRadius: '14px',
+                    border: '1.5px solid #fed7aa',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    boxShadow: '0 4px 14px rgba(69, 26, 3, 0.04)',
+                    overflow: 'hidden',
+                    transition: 'transform 0.15s ease, box-shadow 0.15s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-3px)';
+                    e.currentTarget.style.boxShadow = '0 10px 24px rgba(180, 83, 9, 0.1)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'none';
+                    e.currentTarget.style.boxShadow = '0 4px 14px rgba(69, 26, 3, 0.04)';
+                  }}
+                >
+                  {/* Top Warm Bronze Accent Line */}
+                  <div style={{ height: '4px', background: 'linear-gradient(90deg, #78350f, #f59e0b)' }} />
+
+                  <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span
+                        style={{
+                          fontSize: '0.72rem',
+                          fontWeight: 700,
+                          backgroundColor: '#fef3c7',
+                          color: '#92400e',
+                          padding: '0.2rem 0.55rem',
+                          borderRadius: '6px',
+                          border: '1px solid #fde68a',
+                        }}
+                      >
+                        {biz.category}
+                      </span>
+                      {isVerified ? (
+                        <span
+                          style={{
+                            fontSize: '0.72rem',
+                            fontWeight: 700,
+                            backgroundColor: 'rgba(245, 158, 11, 0.15)',
+                            color: '#b45309',
+                            border: '1px solid #f59e0b',
+                            padding: '0.2rem 0.55rem',
+                            borderRadius: '12px',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '0.3rem',
+                          }}
+                        >
+                          <ShieldCheck size={12} color="#b45309" />
+                          <span>Verified Partner</span>
+                        </span>
+                      ) : (
+                        <span className="badge badge-warning" style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                          <Clock size={12} />
+                          <span>Pending Verification</span>
+                        </span>
+                      )}
+                    </div>
+
+                    <div>
+                      <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#451a03', margin: '0 0 0.35rem', lineHeight: 1.3 }}>
+                        {biz.name}
+                      </h3>
+                      <p style={{ fontSize: '0.875rem', color: '#475569', lineHeight: 1.6, margin: 0 }}>
+                        {biz.description}
+                      </p>
+                    </div>
+
+                    {biz.participationTypes && biz.participationTypes.length > 0 && (
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem' }}>
+                        {biz.participationTypes.map((t, idx) => (
+                          <span
+                            key={idx}
+                            style={{
+                              fontSize: '0.72rem',
+                              fontWeight: 700,
+                              backgroundColor: '#fffbeb',
+                              color: '#92400e',
+                              padding: '0.2rem 0.5rem',
+                              borderRadius: '6px',
+                              border: '1px solid #fde68a',
+                            }}
+                          >
+                            🤝 {t.replace('_', ' ')}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+
+                    <div
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '0.35rem',
+                        fontSize: '0.8125rem',
+                        color: '#64748b',
+                        backgroundColor: '#fffdfa',
+                        padding: '0.75rem',
+                        borderRadius: '8px',
+                        border: '1px solid #fef3c7',
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                        <MapPin size={14} color="#b45309" />
+                        <span>{biz.location}</span>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                        <Mail size={14} color="#b45309" />
+                        <span>{biz.contactEmail}</span>
+                      </div>
+                      {biz.contactPhone && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                          <Phone size={14} color="#b45309" />
+                          <span>{biz.contactPhone}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div style={{ borderTop: '1px solid #fef3c7', padding: '1rem 1.5rem', display: 'flex', gap: '0.5rem', backgroundColor: '#ffffff' }}>
+                    <button
+                      onClick={() => openParticipationModal(biz)}
+                      style={{
+                        flex: 1,
+                        padding: '0.55rem 1rem',
+                        borderRadius: '8px',
+                        backgroundColor: '#fffbeb',
+                        color: '#92400e',
+                        border: '1px solid #fde68a',
+                        fontWeight: 700,
+                        fontSize: '0.82rem',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '0.35rem',
+                        transition: 'all 0.15s ease',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = '#92400e';
+                        e.currentTarget.style.color = '#ffffff';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = '#fffbeb';
+                        e.currentTarget.style.color = '#92400e';
+                      }}
+                    >
+                      <HandHeart size={14} />
+                      <span>Community Pledges</span>
+                    </button>
+
+                    {canVerify && !isVerified && (
+                      <button
+                        onClick={() => handleVerifyBusiness(biz.id, VerificationStatus.APPROVED)}
+                        style={{
+                          padding: '0.55rem 0.85rem',
+                          borderRadius: '8px',
+                          backgroundColor: '#b45309',
+                          color: '#ffffff',
+                          fontWeight: 700,
+                          fontSize: '0.82rem',
+                          border: 'none',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.25rem',
+                        }}
+                        title="Verify Merchant"
+                      >
+                        <ShieldCheck size={14} />
+                        <span>Verify</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
 
       {/* MODAL 1: REGISTER BUSINESS */}
       {showRegisterModal && (
@@ -575,6 +845,7 @@ export const BusinessesPage: React.FC = () => {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 };

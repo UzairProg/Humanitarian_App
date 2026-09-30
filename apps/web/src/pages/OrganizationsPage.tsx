@@ -38,7 +38,7 @@ interface OrgDetailModalData {
 
 export const OrganizationsPage: React.FC = () => {
   const { hasPermission, isAuthenticated } = useAuth();
-  const { t, isRtl } = useLocalization();
+  const { t, locale, isRtl } = useLocalization();
   const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedOrg, setSelectedOrg] = useState<OrgDetailModalData | null>(null);
@@ -167,176 +167,388 @@ export const OrganizationsPage: React.FC = () => {
   });
 
   return (
-    <div style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
-      {/* Top Banner */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
-        <div>
-          <h2 style={{ fontSize: '1.75rem', fontWeight: 700, color: '#0b1f2a', letterSpacing: '-0.02em', margin: 0 }}>
-            {t('orgs.title')}
-          </h2>
-          <p style={{ color: '#64748b', fontSize: '0.875rem', marginTop: '0.25rem' }}>
-            {t('orgs.subtitle')}
-          </p>
-        </div>
-
-        {isAuthenticated && (
-          <button
-            onClick={() => setShowRegisterModal(true)}
-            className="btn btn-primary"
-            style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.55rem 1.25rem' }}
-          >
-            <Plus size={16} />
-            <span>{t('orgs.register_btn')}</span>
-          </button>
-        )}
-      </div>
-
-      {/* Filter and Search Bar */}
+    <div style={{ backgroundColor: '#f4f7fb', minHeight: '100vh', paddingBottom: '3.5rem' }}>
+      {/* Imperial Heritage Navy & Gold Hero Banner */}
       <div
         style={{
-          backgroundColor: '#ffffff',
-          padding: '0.85rem 1rem',
-          borderRadius: '10px',
-          border: '1px solid #e2e8f0',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '1rem',
-          flexWrap: 'wrap',
+          background: 'linear-gradient(135deg, #071524 0%, #0d2238 50%, #163654 100%)',
+          color: '#ffffff',
+          padding: '3rem 2rem 2.5rem',
+          boxShadow: '0 4px 20px rgba(7, 21, 36, 0.25)',
+          position: 'relative',
+          overflow: 'hidden',
+          borderBottom: '3px solid #deb95f',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flex: '1 1 280px' }}>
-          <Search size={16} color="#94a3b8" />
-          <input
-            type="text"
-            placeholder={t('orgs.search_placeholder')}
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            style={{ width: '100%', padding: '0.4rem 0.6rem', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.8125rem' }}
-          />
+        {/* Subtle decorative gold crest glow */}
+        <div
+          style={{
+            position: 'absolute',
+            top: '-60px',
+            right: '-60px',
+            width: '260px',
+            height: '260px',
+            borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(222, 185, 95, 0.2) 0%, transparent 70%)',
+            pointerEvents: 'none',
+          }}
+        />
+
+        <div style={{ maxWidth: '1240px', marginInline: 'auto', display: 'flex', flexDirection: 'column', gap: '1.25rem', position: 'relative' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+            <span
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.4rem',
+                backgroundColor: 'rgba(222, 185, 95, 0.15)',
+                border: '1px solid rgba(222, 185, 95, 0.4)',
+                padding: '0.3rem 0.8rem',
+                borderRadius: '20px',
+                fontSize: '0.78rem',
+                fontWeight: 700,
+                color: '#deb95f',
+                letterSpacing: '0.04em',
+                textTransform: 'uppercase',
+              }}
+            >
+              <Building2 size={13} color="#deb95f" />
+              {locale === 'ar' ? 'السجل المدني والمؤسسات المعتمدة' : 'Civic Institutional Registry'}
+            </span>
+            <span
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.3rem',
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                padding: '0.3rem 0.65rem',
+                borderRadius: '20px',
+                fontSize: '0.75rem',
+                color: '#cbd5e1',
+              }}
+            >
+              <ShieldCheck size={13} color="#deb95f" />
+              {locale === 'ar' ? 'تدقيق الحوكمة والنزاهة 100%' : '100% Governance Vetted'}
+            </span>
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '1.5rem' }}>
+            <div>
+              <h1 style={{ fontSize: '2.3rem', fontWeight: 900, margin: '0 0 0.5rem', letterSpacing: '-0.02em', color: '#ffffff' }}>
+                {t('orgs.title')}
+              </h1>
+              <p style={{ color: '#cbd5e1', fontSize: '1rem', margin: 0, maxWidth: '680px', lineHeight: 1.6 }}>
+                {t('orgs.subtitle')}
+              </p>
+            </div>
+
+            {isAuthenticated && (
+              <button
+                onClick={() => setShowRegisterModal(true)}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  backgroundColor: '#deb95f',
+                  color: '#071524',
+                  fontWeight: 800,
+                  fontSize: '0.92rem',
+                  padding: '0.85rem 1.6rem',
+                  borderRadius: '10px',
+                  border: 'none',
+                  cursor: 'pointer',
+                  boxShadow: '0 4px 14px rgba(222, 185, 95, 0.4)',
+                  transition: 'all 0.2s ease',
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#edd38c')}
+                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#deb95f')}
+              >
+                <Plus size={18} strokeWidth={2.5} />
+                <span>{t('orgs.register_btn')}</span>
+              </button>
+            )}
+          </div>
+
+          {/* Institutional Integrity Badges Strip */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+              gap: '1rem',
+              marginTop: '0.5rem',
+              paddingTop: '1.25rem',
+              borderTop: '1px solid rgba(255, 255, 255, 0.12)',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <div style={{ width: '38px', height: '38px', borderRadius: '8px', backgroundColor: 'rgba(222, 185, 95, 0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#deb95f' }}>
+                <Building2 size={20} />
+              </div>
+              <div>
+                <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#ffffff' }}>4 Active Hubs</div>
+                <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>{locale === 'ar' ? 'هيئات موثقة ومعتمدة' : 'Verified Relief Foundations'}</div>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <div style={{ width: '38px', height: '38px', borderRadius: '8px', backgroundColor: 'rgba(222, 185, 95, 0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#deb95f' }}>
+                <ShieldCheck size={20} />
+              </div>
+              <div>
+                <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#ffffff' }}>Audited & Safe</div>
+                <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>{locale === 'ar' ? 'سجل رقابي ومالي شفاف' : 'Full Operational Transparency'}</div>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <div style={{ width: '38px', height: '38px', borderRadius: '8px', backgroundColor: 'rgba(222, 185, 95, 0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#deb95f' }}>
+                <Activity size={20} />
+              </div>
+              <div>
+                <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#ffffff' }}>24/7 Field Dispatch</div>
+                <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>{locale === 'ar' ? 'جاهزية طوارئ وإمداد' : 'Continuous Relief Deployment'}</div>
+              </div>
+            </div>
+          </div>
         </div>
-
-        <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8125rem', color: '#475569', cursor: 'pointer' }}>
-          <input
-            type="checkbox"
-            checked={filterVerifiedOnly}
-            onChange={(e) => setFilterVerifiedOnly(e.target.checked)}
-            style={{ width: '16px', height: '16px' }}
-          />
-          <span>{t('orgs.filter_verified')}</span>
-        </label>
-
-        <span style={{ marginInlineStart: 'auto', fontSize: '0.8125rem', color: '#64748b' }}>
-          {filteredOrgs.length} / {organizations.length}
-        </span>
       </div>
 
-      {/* Organizations Grid */}
-      {loading ? (
-        <div className="card" style={{ textAlign: 'center', padding: '3rem' }}>
-          <p style={{ color: '#64748b' }}>{t('common.loading')}</p>
-        </div>
-      ) : filteredOrgs.length === 0 ? (
-        <div className="card" style={{ textAlign: 'center', padding: '3rem' }}>
-          <p style={{ color: '#64748b' }}>{t('orgs.no_orgs')}</p>
-        </div>
-      ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '1.5rem' }}>
-          {filteredOrgs.map((org) => {
-            const isVerified = org.verificationStatus === VerificationStatus.APPROVED;
+      <div style={{ maxWidth: '1240px', marginInline: 'auto', padding: '2rem 1.5rem', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+        {/* Filter and Search Bar */}
+        <div
+          style={{
+            backgroundColor: '#ffffff',
+            padding: '1rem 1.25rem',
+            borderRadius: '12px',
+            border: '1.5px solid #cbd5e1',
+            boxShadow: '0 2px 10px rgba(0, 0, 0, 0.03)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '1rem',
+            flexWrap: 'wrap',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flex: '1 1 280px' }}>
+            <Search size={18} color="#0d2238" />
+            <input
+              type="text"
+              placeholder={t('orgs.search_placeholder')}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '0.55rem 0.75rem',
+                borderRadius: '8px',
+                border: '1.5px solid #cbd5e1',
+                fontSize: '0.85rem',
+                outline: 'none',
+              }}
+            />
+          </div>
 
-            return (
-              <div
-                key={org.id}
-                className="card"
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'space-between',
-                  borderRadius: '12px',
-                  border: '1px solid #e2e8f0',
-                }}
-              >
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.82rem', fontWeight: 600, color: '#0f172a', cursor: 'pointer' }}>
+            <input
+              type="checkbox"
+              checked={filterVerifiedOnly}
+              onChange={(e) => setFilterVerifiedOnly(e.target.checked)}
+              style={{ width: '16px', height: '16px', accentColor: '#0d2238' }}
+            />
+            <span>{t('orgs.filter_verified')}</span>
+          </label>
+
+          <span style={{ marginInlineStart: 'auto', fontSize: '0.82rem', fontWeight: 700, color: '#071524', backgroundColor: '#e2e8f0', padding: '0.35rem 0.75rem', borderRadius: '6px' }}>
+            {filteredOrgs.length} / {organizations.length}
+          </span>
+        </div>
+
+        {/* Organizations Grid */}
+        {loading ? (
+          <div className="card" style={{ textAlign: 'center', padding: '3.5rem', backgroundColor: '#ffffff', borderRadius: '14px', border: '1px solid #cbd5e1' }}>
+            <p style={{ color: '#0d2238', fontWeight: 600 }}>{t('common.loading')}</p>
+          </div>
+        ) : filteredOrgs.length === 0 ? (
+          <div className="card" style={{ textAlign: 'center', padding: '3.5rem', backgroundColor: '#ffffff', borderRadius: '14px', border: '1px solid #cbd5e1' }}>
+            <p style={{ color: '#64748b' }}>{t('orgs.no_orgs')}</p>
+          </div>
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: '1.5rem' }}>
+            {filteredOrgs.map((org) => {
+              const isVerified = org.verificationStatus === VerificationStatus.APPROVED;
+
+              return (
+                <div
+                  key={org.id}
+                  style={{
+                    backgroundColor: '#ffffff',
+                    borderRadius: '14px',
+                    border: '1.5px solid #cbd5e1',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    boxShadow: '0 4px 14px rgba(7, 21, 36, 0.04)',
+                    overflow: 'hidden',
+                    transition: 'transform 0.15s ease, box-shadow 0.15s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-3px)';
+                    e.currentTarget.style.boxShadow = '0 10px 24px rgba(7, 21, 36, 0.1)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'none';
+                    e.currentTarget.style.boxShadow = '0 4px 14px rgba(7, 21, 36, 0.04)';
+                  }}
+                >
+                  {/* Top Architectural Navy & Gold Bar */}
+                  <div
+                    style={{
+                      background: 'linear-gradient(135deg, #071524 0%, #0d2238 60%, #163654 100%)',
+                      padding: '1.25rem',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      borderBottom: '2px solid #deb95f',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                       <div
                         style={{
-                          width: '40px',
-                          height: '40px',
-                          borderRadius: '8px',
-                          backgroundColor: '#0b1f2a',
+                          width: '44px',
+                          height: '44px',
+                          borderRadius: '50%',
+                          backgroundColor: '#071524',
+                          border: '2px solid #deb95f',
                           color: '#deb95f',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          fontWeight: 700,
-                          fontSize: '1.1rem',
+                          fontWeight: 800,
+                          fontSize: '1.15rem',
+                          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.25)',
                         }}
                       >
                         {org.name ? org.name[0] : 'O'}
                       </div>
                       <div>
-                        <h3 style={{ fontSize: '1.15rem', fontWeight: 600, color: '#0b1b2b', margin: 0 }}>
+                        <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#ffffff', margin: 0, lineHeight: 1.25 }}>
                           {org.name}
                         </h3>
-                        <div style={{ fontSize: '0.75rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: '0.3rem', marginTop: '0.15rem' }}>
-                          <MapPin size={12} color="#087f78" /> {org.location}
+                        <div style={{ fontSize: '0.75rem', color: '#deb95f', display: 'flex', alignItems: 'center', gap: '0.3rem', marginTop: '0.2rem' }}>
+                          <MapPin size={12} color="#deb95f" /> {org.location}
                         </div>
                       </div>
                     </div>
 
                     {isVerified ? (
-                      <span className="verified-pill" title="Verified by Al-Husseiniya administrative team">
-                        <ShieldCheck size={13} /> {t('status.verified')}
+                      <span
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '0.3rem',
+                          fontSize: '0.72rem',
+                          fontWeight: 700,
+                          backgroundColor: 'rgba(222, 185, 95, 0.2)',
+                          color: '#deb95f',
+                          border: '1px solid #deb95f',
+                          padding: '0.25rem 0.6rem',
+                          borderRadius: '20px',
+                        }}
+                        title="Verified by Al-Husseiniya administrative team"
+                      >
+                        <ShieldCheck size={13} color="#deb95f" /> {t('status.verified')}
                       </span>
                     ) : (
                       <span className="badge badge-warning">{t('status.pending')}</span>
                     )}
                   </div>
 
-                  <p style={{ fontSize: '0.875rem', color: '#475569', lineHeight: 1.5, margin: 0 }}>
-                    {org.description}
-                  </p>
+                  {/* Body Content */}
+                  <div style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+                    <p style={{ fontSize: '0.875rem', color: '#475569', lineHeight: 1.6, margin: 0 }}>
+                      {org.description}
+                    </p>
 
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', fontSize: '0.75rem', color: '#64748b' }}>
-                    {org.contactEmail && (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                        <Mail size={12} /> {org.contactEmail}
-                      </div>
-                    )}
-                    {org.contactPhone && (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                        <Phone size={12} /> {org.contactPhone}
-                      </div>
+                    {/* Civic Operational Highlights Strip */}
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.45rem', marginTop: '0.25rem' }}>
+                      <span style={{ fontSize: '0.72rem', fontWeight: 700, backgroundColor: '#f1f5f9', color: '#0d2238', padding: '0.25rem 0.55rem', borderRadius: '6px', border: '1px solid #e2e8f0' }}>
+                        🏛️ Registered Entity
+                      </span>
+                      <span style={{ fontSize: '0.72rem', fontWeight: 700, backgroundColor: '#f1f5f9', color: '#0d2238', padding: '0.25rem 0.55rem', borderRadius: '6px', border: '1px solid #e2e8f0' }}>
+                        🍲 Relief Distribution
+                      </span>
+                      <span style={{ fontSize: '0.72rem', fontWeight: 700, backgroundColor: '#f1f5f9', color: '#0d2238', padding: '0.25rem 0.55rem', borderRadius: '6px', border: '1px solid #e2e8f0' }}>
+                        ⚖️ Verified Governance
+                      </span>
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem', fontSize: '0.78rem', color: '#64748b', marginTop: '0.5rem', backgroundColor: '#f8fafc', padding: '0.75rem', borderRadius: '8px', border: '1px solid #f1f5f9' }}>
+                      {org.contactEmail && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                          <Mail size={13} color="#0d2238" /> <span>{org.contactEmail}</span>
+                        </div>
+                      )}
+                      {org.contactPhone && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                          <Phone size={13} color="#0d2238" /> <span>{org.contactPhone}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Card Footer */}
+                  <div
+                    style={{
+                      borderTop: '1px solid #f1f5f9',
+                      padding: '1rem 1.25rem',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      backgroundColor: '#ffffff',
+                    }}
+                  >
+                    <button
+                      onClick={() => handleViewDetails(org)}
+                      style={{
+                        padding: '0.5rem 1rem',
+                        borderRadius: '8px',
+                        backgroundColor: '#071524',
+                        color: '#deb95f',
+                        border: '1px solid #deb95f',
+                        fontWeight: 700,
+                        fontSize: '0.8rem',
+                        cursor: 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.4rem',
+                        transition: 'all 0.15s ease',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = '#deb95f';
+                        e.currentTarget.style.color = '#071524';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = '#071524';
+                        e.currentTarget.style.color = '#deb95f';
+                      }}
+                    >
+                      <span>{t('orgs.details_btn')}</span>
+                      <span className="dir-flip">&rarr;</span>
+                    </button>
+
+                    {canVerify && !isVerified && (
+                      <button
+                        onClick={() => handleVerify(org.id)}
+                        className="btn btn-primary"
+                        style={{ fontSize: '0.75rem', padding: '0.35rem 0.65rem' }}
+                      >
+                        {t('orgs.verify_btn')}
+                      </button>
                     )}
                   </div>
                 </div>
-
-                <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '1rem', marginTop: '1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <button
-                    onClick={() => handleViewDetails(org)}
-                    className="btn btn-secondary"
-                    style={{ fontSize: '0.8125rem', padding: '0.4rem 0.85rem', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
-                  >
-                    <span>{t('orgs.details_btn')}</span>
-                    <span className="dir-flip">&rarr;</span>
-                  </button>
-
-                  {canVerify && !isVerified && (
-                    <button
-                      onClick={() => handleVerify(org.id)}
-                      className="btn btn-primary"
-                      style={{ fontSize: '0.75rem', padding: '0.35rem 0.65rem' }}
-                    >
-                      {t('orgs.verify_btn')}
-                    </button>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
+              );
+            })}
+          </div>
+        )}
 
       {/* Organization Detail & Impact Modal */}
       {selectedOrg && (
@@ -583,6 +795,7 @@ export const OrganizationsPage: React.FC = () => {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 };

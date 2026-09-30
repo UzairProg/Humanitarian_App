@@ -24,11 +24,13 @@ import {
   Award,
   Globe,
   Filter,
+  ChevronDown,
+  Sparkles,
 } from 'lucide-react';
 
 export const KnowledgePage: React.FC = () => {
   const { user, isAuthenticated } = useAuth();
-  const { t, isRtl } = useLocalization();
+  const { t, locale, isRtl } = useLocalization();
 
   const [activeTab, setActiveTab] = useState<'catalog' | 'contributor' | 'editorial'>('catalog');
   const [articles, setArticles] = useState<KnowledgeContent[]>([]);
@@ -226,247 +228,584 @@ export const KnowledgePage: React.FC = () => {
   };
 
   return (
-    <div style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', maxWidth: '1200px', margin: '0 auto' }}>
-      {/* Top Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
-        <div>
-          <h2 style={{ fontSize: '1.75rem', fontWeight: 700, color: '#0b1f2a', letterSpacing: '-0.02em', margin: 0 }}>
-            {t('knowledge.title')}
-          </h2>
-          <p style={{ color: '#64748b', fontSize: '0.875rem', marginTop: '0.25rem' }}>
-            {t('knowledge.subtitle')}
-          </p>
-        </div>
-
-        <div style={{ display: 'flex', gap: '0.75rem' }}>
-          {isAuthenticated && contributorProfile?.verificationStatus === 'APPROVED' ? (
-            <button
-              onClick={() => setShowDraftModal(true)}
-              className="btn btn-primary"
-              style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem' }}
-            >
-              <PenTool size={16} />
-              <span>{t('knowledge.write_btn')}</span>
-            </button>
-          ) : isAuthenticated && !contributorProfile ? (
-            <button
-              onClick={() => setShowApplyModal(true)}
-              className="btn btn-secondary"
-              style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem' }}
-            >
-              <Award size={16} />
-              <span>{t('knowledge.apply_contributor')}</span>
-            </button>
-          ) : null}
-        </div>
-      </div>
-
-      {/* Mandatory Architectural / Religious Authority Disclaimer */}
-      <div
-        style={{
-          backgroundColor: '#fbf4e6',
-          border: '1px solid #f5e4be',
-          color: '#7e5b10',
-          padding: '1rem 1.25rem',
-          borderRadius: '8px',
-          display: 'flex',
-          alignItems: 'flex-start',
-          gap: '0.85rem',
-          fontSize: '0.8125rem',
-          lineHeight: 1.5,
-        }}
-      >
-        <Info size={20} style={{ flexShrink: 0, marginTop: '2px', color: '#b45309' }} />
-        <div>
-          <strong style={{ color: '#92400e' }}>{t('home.scope.title')}</strong>
-          <span style={{ display: 'block', marginTop: '0.2rem' }}>
-            {t('home.scope.desc')}
-          </span>
-        </div>
-      </div>
-
-      {/* Navigation Tabs */}
-      <div style={{ display: 'flex', borderBottom: '1px solid #e2e8f0', gap: '1rem' }}>
-        <button
-          onClick={() => setActiveTab('catalog')}
+    <div style={{ backgroundColor: '#f8fafc', minHeight: '100vh', padding: '1.5rem 1rem 3rem' }}>
+      <div style={{ maxWidth: '1240px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
+        {/* Scholarly Deep Sapphire Hero Banner */}
+        <div
           style={{
-            padding: '0.75rem 1.25rem',
-            fontWeight: 600,
-            fontSize: '0.875rem',
-            background: 'none',
-            border: 'none',
-            borderBottom: activeTab === 'catalog' ? '3px solid #087f78' : '3px solid transparent',
-            color: activeTab === 'catalog' ? '#087f78' : '#64748b',
-            cursor: 'pointer',
+            background: 'linear-gradient(135deg, #091320 0%, #0f2744 50%, #0c4a6e 100%)',
+            borderRadius: '18px',
+            padding: '2.5rem 2.25rem',
+            color: '#ffffff',
+            boxShadow: '0 12px 32px rgba(12, 74, 110, 0.22)',
+            position: 'relative',
+            overflow: 'hidden',
+            borderBottom: '3px solid #38bdf8',
           }}
         >
-          {t('knowledge.public_tab')} ({articles.length})
-        </button>
-
-        {isAuthenticated && (
-          <button
-            onClick={() => setActiveTab('contributor')}
-            style={{
-              padding: '0.75rem 1.25rem',
-              fontWeight: 600,
-              fontSize: '0.875rem',
-              background: 'none',
-              border: 'none',
-              borderBottom: activeTab === 'contributor' ? '3px solid #087f78' : '3px solid transparent',
-              color: activeTab === 'contributor' ? '#087f78' : '#64748b',
-              cursor: 'pointer',
-            }}
-          >
-            {t('knowledge.contributor_tab')} {contributorProfile && `(${contributorProfile.verificationStatus})`}
-          </button>
-        )}
-
-        {isModeratorOrAdmin && (
-          <button
-            onClick={() => setActiveTab('editorial')}
-            style={{
-              padding: '0.75rem 1.25rem',
-              fontWeight: 600,
-              fontSize: '0.875rem',
-              background: 'none',
-              border: 'none',
-              borderBottom: activeTab === 'editorial' ? '3px solid #087f78' : '3px solid transparent',
-              color: activeTab === 'editorial' ? '#087f78' : '#64748b',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.4rem',
-            }}
-          >
-            <ShieldCheck size={16} />
-            <span>{t('knowledge.editorial_tab')} ({reviewQueue.length})</span>
-          </button>
-        )}
-      </div>
-
-      {/* Tab 1: Public Catalog */}
-      {activeTab === 'catalog' && (
-        <>
-          {/* Filters Bar */}
+          {/* Subtle Ambient Decorative Circles */}
           <div
             style={{
-              display: 'flex',
-              gap: '1rem',
-              alignItems: 'center',
-              flexWrap: 'wrap',
-              backgroundColor: '#f8fafc',
-              padding: '0.75rem 1rem',
-              borderRadius: '8px',
-              border: '1px solid #e2e8f0',
+              position: 'absolute',
+              top: '-30px',
+              right: '-30px',
+              width: '200px',
+              height: '200px',
+              borderRadius: '50%',
+              background: 'radial-gradient(circle, rgba(56, 189, 248, 0.15) 0%, transparent 70%)',
+              pointerEvents: 'none',
             }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#64748b', fontSize: '0.875rem' }}>
-              <Filter size={15} />
-              <span>Filter:</span>
-            </div>
+          />
+          <div
+            style={{
+              position: 'absolute',
+              bottom: '-40px',
+              left: '10%',
+              width: '180px',
+              height: '180px',
+              borderRadius: '50%',
+              background: 'radial-gradient(circle, rgba(14, 165, 233, 0.12) 0%, transparent 70%)',
+              pointerEvents: 'none',
+            }}
+          />
 
-            <select
-              value={selectedLanguage}
-              onChange={(e) => setSelectedLanguage(e.target.value as any)}
-              style={{
-                padding: '0.4rem 0.75rem',
-                borderRadius: '6px',
-                border: '1px solid #cbd5e1',
-                fontSize: '0.8125rem',
-                backgroundColor: '#ffffff',
-              }}
-            >
-              <option value="all">All Languages</option>
-              <option value="en">English</option>
-              <option value="ar">العربية (Arabic)</option>
-            </select>
+          <div style={{ position: 'relative', zIndex: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1.5rem' }}>
+            <div style={{ maxWidth: '720px' }}>
+              <div
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  backgroundColor: 'rgba(56, 189, 248, 0.14)',
+                  border: '1px solid rgba(56, 189, 248, 0.35)',
+                  padding: '0.35rem 0.85rem',
+                  borderRadius: '999px',
+                  fontSize: '0.8125rem',
+                  fontWeight: 600,
+                  color: '#bae6fd',
+                  marginBottom: '1rem',
+                  letterSpacing: '0.02em',
+                }}
+              >
+                <BookOpen size={15} color="#38bdf8" />
+                <span>Scholarly Library & Thought Leadership • الفكر والمعرفة</span>
+              </div>
 
-            <select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              style={{
-                padding: '0.4rem 0.75rem',
-                borderRadius: '6px',
-                border: '1px solid #cbd5e1',
-                fontSize: '0.8125rem',
-                backgroundColor: '#ffffff',
-              }}
-            >
-              <option value="all">All Categories</option>
-              <option value="Theological Ethics & Morality">Theological Ethics & Morality</option>
-              <option value="Historical Reflections">Historical Reflections</option>
-              <option value="Humanitarian Service">Humanitarian Service</option>
-              <option value="Community Welfare">Community Welfare</option>
-            </select>
-          </div>
+              <h1 style={{ fontSize: '2.15rem', fontWeight: 800, margin: '0 0 0.65rem 0', color: '#ffffff', letterSpacing: '-0.025em', lineHeight: 1.2 }}>
+                {t('knowledge.title')}
+              </h1>
 
-          {loading ? (
-            <div className="card" style={{ textAlign: 'center', padding: '3rem' }}>
-              <p style={{ color: '#64748b' }}>Loading published knowledge content...</p>
-            </div>
-          ) : articles.length === 0 ? (
-            <div className="card" style={{ textAlign: 'center', padding: '3rem' }}>
-              <p style={{ color: '#64748b' }}>No articles match your selected criteria.</p>
-            </div>
-          ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '1.5rem' }}>
-              {articles.map((item) => (
-                <div
-                  key={item.id}
-                  className="card"
+              <p style={{ color: '#cbd5e1', fontSize: '0.975rem', lineHeight: 1.6, margin: '0 0 1.25rem 0' }}>
+                {t('knowledge.subtitle')} Explore peer-reviewed theological treatises, ethical analyses, and humanitarian histories authored by authenticated scholars and community educators.
+              </p>
+
+              {/* Academic Charter Pills */}
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.65rem' }}>
+                <span
                   style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
-                    borderRadius: '12px',
-                    border: '1px solid #e2e8f0',
-                    boxShadow: '0 2px 6px rgba(0,0,0,0.03)',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.35rem',
+                    padding: '0.3rem 0.65rem',
+                    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                    borderRadius: '6px',
+                    fontSize: '0.75rem',
+                    color: '#e2e8f0',
+                    border: '1px solid rgba(255, 255, 255, 0.15)',
                   }}
                 >
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span className="badge badge-info">{item.category}</span>
-                      <span
+                  <Sparkles size={12} color="#38bdf8" />
+                  Peer-Reviewed Treatises
+                </span>
+                <span
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.35rem',
+                    padding: '0.3rem 0.65rem',
+                    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                    borderRadius: '6px',
+                    fontSize: '0.75rem',
+                    color: '#e2e8f0',
+                    border: '1px solid rgba(255, 255, 255, 0.15)',
+                  }}
+                >
+                  <Globe size={12} color="#38bdf8" />
+                  Bilingual Arabic & English
+                </span>
+                <span
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.35rem',
+                    padding: '0.3rem 0.65rem',
+                    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                    borderRadius: '6px',
+                    fontSize: '0.75rem',
+                    color: '#e2e8f0',
+                    border: '1px solid rgba(255, 255, 255, 0.15)',
+                  }}
+                >
+                  <ShieldCheck size={12} color="#38bdf8" />
+                  Strict Ethical Review Charter
+                </span>
+              </div>
+            </div>
+
+            {/* Author / Contributor CTA */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', alignSelf: 'center' }}>
+              {isAuthenticated && contributorProfile?.verificationStatus === 'APPROVED' ? (
+                <button
+                  onClick={() => setShowDraftModal(true)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    padding: '0.75rem 1.35rem',
+                    backgroundColor: '#0284c7',
+                    color: '#ffffff',
+                    border: 'none',
+                    borderRadius: '10px',
+                    fontWeight: 700,
+                    fontSize: '0.9rem',
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 14px rgba(2, 132, 199, 0.4)',
+                    transition: 'all 0.2s',
+                  }}
+                >
+                  <PenTool size={16} />
+                  <span>{t('knowledge.write_btn')}</span>
+                </button>
+              ) : isAuthenticated && !contributorProfile ? (
+                <button
+                  onClick={() => setShowApplyModal(true)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    padding: '0.75rem 1.35rem',
+                    backgroundColor: 'rgba(255, 255, 255, 0.12)',
+                    color: '#ffffff',
+                    border: '1px solid rgba(255, 255, 255, 0.25)',
+                    borderRadius: '10px',
+                    fontWeight: 700,
+                    fontSize: '0.9rem',
+                    cursor: 'pointer',
+                    backdropFilter: 'blur(4px)',
+                  }}
+                >
+                  <Award size={16} color="#38bdf8" />
+                  <span>{t('knowledge.apply_contributor')}</span>
+                </button>
+              ) : null}
+            </div>
+          </div>
+        </div>
+
+        {/* Mandatory Architectural & Scope Disclaimer */}
+        <div
+          style={{
+            backgroundColor: '#fefce8',
+            border: '1px solid #fef08a',
+            borderLeft: '4px solid #ca8a04',
+            color: '#854d0e',
+            padding: '1rem 1.25rem',
+            borderRadius: '10px',
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: '0.85rem',
+            fontSize: '0.8125rem',
+            lineHeight: 1.55,
+            boxShadow: '0 2px 6px rgba(0,0,0,0.02)',
+          }}
+        >
+          <Info size={19} style={{ flexShrink: 0, marginTop: '2px', color: '#ca8a04' }} />
+          <div>
+            <strong style={{ color: '#713f12', fontSize: '0.85rem' }}>{t('home.scope.title')}</strong>
+            <span style={{ display: 'block', marginTop: '0.2rem', color: '#854d0e' }}>
+              {t('home.scope.desc')}
+            </span>
+          </div>
+        </div>
+
+        {/* Navigation Tabs */}
+        <div
+          style={{
+            display: 'flex',
+            borderBottom: '2px solid #e2e8f0',
+            gap: '0.75rem',
+            paddingBottom: '0.25rem',
+          }}
+        >
+          <button
+            onClick={() => setActiveTab('catalog')}
+            style={{
+              padding: '0.65rem 1.25rem',
+              fontWeight: 700,
+              fontSize: '0.9rem',
+              background: activeTab === 'catalog' ? '#e0f2fe' : 'transparent',
+              border: 'none',
+              borderBottom: activeTab === 'catalog' ? '3px solid #0284c7' : '3px solid transparent',
+              borderRadius: '8px 8px 0 0',
+              color: activeTab === 'catalog' ? '#0369a1' : '#64748b',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              transition: 'all 0.15s',
+            }}
+          >
+            <BookOpen size={16} />
+            <span>{t('knowledge.public_tab')} ({articles.length})</span>
+          </button>
+
+          {isAuthenticated && (
+            <button
+              onClick={() => setActiveTab('contributor')}
+              style={{
+                padding: '0.65rem 1.25rem',
+                fontWeight: 700,
+                fontSize: '0.9rem',
+                background: activeTab === 'contributor' ? '#e0f2fe' : 'transparent',
+                border: 'none',
+                borderBottom: activeTab === 'contributor' ? '3px solid #0284c7' : '3px solid transparent',
+                borderRadius: '8px 8px 0 0',
+                color: activeTab === 'contributor' ? '#0369a1' : '#64748b',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                transition: 'all 0.15s',
+              }}
+            >
+              <PenTool size={16} />
+              <span>{t('knowledge.contributor_tab')} {contributorProfile && `(${contributorProfile.verificationStatus})`}</span>
+            </button>
+          )}
+
+          {isModeratorOrAdmin && (
+            <button
+              onClick={() => setActiveTab('editorial')}
+              style={{
+                padding: '0.65rem 1.25rem',
+                fontWeight: 700,
+                fontSize: '0.9rem',
+                background: activeTab === 'editorial' ? '#e0f2fe' : 'transparent',
+                border: 'none',
+                borderBottom: activeTab === 'editorial' ? '3px solid #0284c7' : '3px solid transparent',
+                borderRadius: '8px 8px 0 0',
+                color: activeTab === 'editorial' ? '#0369a1' : '#64748b',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                transition: 'all 0.15s',
+              }}
+            >
+              <ShieldCheck size={16} />
+              <span>{t('knowledge.editorial_tab')} ({reviewQueue.length})</span>
+            </button>
+          )}
+        </div>
+
+        {/* Tab 1: Public Catalog */}
+        {activeTab === 'catalog' && (
+          <>
+            {/* Custom Curated Filter Controls */}
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                gap: '1rem',
+                backgroundColor: '#ffffff',
+                padding: '1rem 1.25rem',
+                borderRadius: '12px',
+                border: '1px solid #e2e8f0',
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.03)',
+              }}
+            >
+              {/* Category Quick Filter Pills */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                <span style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#64748b', display: 'flex', alignItems: 'center', gap: '0.35rem', marginRight: '0.25rem' }}>
+                  <Filter size={14} color="#0284c7" />
+                  Category:
+                </span>
+                {[
+                  { label: 'All Categories', value: 'all' },
+                  { label: 'Ethics & Morality', value: 'Theological Ethics & Morality' },
+                  { label: 'Historical Reflections', value: 'Historical Reflections' },
+                  { label: 'Humanitarian Service', value: 'Humanitarian Service' },
+                  { label: 'Community Welfare', value: 'Community Welfare' },
+                ].map((cat) => {
+                  const isActive = selectedCategory === cat.value;
+                  return (
+                    <button
+                      key={cat.value}
+                      onClick={() => setSelectedCategory(cat.value)}
+                      style={{
+                        padding: '0.35rem 0.8rem',
+                        borderRadius: '999px',
+                        fontSize: '0.78rem',
+                        fontWeight: isActive ? 700 : 500,
+                        border: isActive ? '1.5px solid #0284c7' : '1px solid #cbd5e1',
+                        backgroundColor: isActive ? '#f0f9ff' : '#ffffff',
+                        color: isActive ? '#0369a1' : '#475569',
+                        cursor: 'pointer',
+                        transition: 'all 0.15s ease',
+                      }}
+                    >
+                      {cat.label}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Language Dropdown Selector */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                <span style={{ fontSize: '0.8125rem', fontWeight: 600, color: '#64748b', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                  <Globe size={14} color="#0284c7" />
+                  Language:
+                </span>
+                <div style={{ position: 'relative', display: 'inline-block' }}>
+                  <select
+                    value={selectedLanguage}
+                    onChange={(e) => setSelectedLanguage(e.target.value as any)}
+                    style={{
+                      appearance: 'none',
+                      WebkitAppearance: 'none',
+                      padding: '0.45rem 2.2rem 0.45rem 0.85rem',
+                      borderRadius: '8px',
+                      border: '1.5px solid #cbd5e1',
+                      backgroundColor: '#ffffff',
+                      color: '#0f172a',
+                      fontSize: '0.8125rem',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      outline: 'none',
+                      boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+                    }}
+                  >
+                    <option value="all">🌐 All Languages</option>
+                    <option value="en">🇬🇧 English</option>
+                    <option value="ar">العربية (Arabic)</option>
+                  </select>
+                  <ChevronDown
+                    size={14}
+                    style={{
+                      position: 'absolute',
+                      right: '0.75rem',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      pointerEvents: 'none',
+                      color: '#64748b',
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {loading ? (
+              <div
+                style={{
+                  textAlign: 'center',
+                  padding: '3.5rem 2rem',
+                  backgroundColor: '#ffffff',
+                  borderRadius: '16px',
+                  border: '1px solid #e2e8f0',
+                }}
+              >
+                <div style={{ display: 'inline-block', width: '32px', height: '32px', border: '3px solid #e2e8f0', borderTopColor: '#0284c7', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+                <p style={{ color: '#64748b', marginTop: '1rem', fontSize: '0.9rem' }}>Loading scholarly knowledge treatises...</p>
+              </div>
+            ) : articles.length === 0 ? (
+              <div
+                style={{
+                  textAlign: 'center',
+                  padding: '3.5rem 2rem',
+                  backgroundColor: '#ffffff',
+                  borderRadius: '16px',
+                  border: '1px solid #e2e8f0',
+                }}
+              >
+                <BookOpen size={42} color="#94a3b8" style={{ margin: '0 auto 1rem' }} />
+                <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: '#0f172a', margin: '0 0 0.5rem 0' }}>
+                  No Treatises Match Filter
+                </h3>
+                <p style={{ color: '#64748b', fontSize: '0.875rem', margin: '0 0 1rem 0' }}>
+                  Try switching categories or view all published works.
+                </p>
+                <button
+                  onClick={() => {
+                    setSelectedCategory('all');
+                    setSelectedLanguage('all');
+                  }}
+                  style={{
+                    padding: '0.45rem 1rem',
+                    backgroundColor: '#0284c7',
+                    color: '#ffffff',
+                    border: 'none',
+                    borderRadius: '8px',
+                    fontSize: '0.85rem',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                  }}
+                >
+                  Clear Filters
+                </button>
+              </div>
+            ) : (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: '1.5rem' }}>
+                {articles.map((item) => {
+                  const estReadingTime = Math.max(3, Math.ceil((item.body?.length || 600) / 450));
+                  return (
+                    <div
+                      key={item.id}
+                      style={{
+                        backgroundColor: '#ffffff',
+                        borderRadius: '16px',
+                        border: '1px solid #e2e8f0',
+                        boxShadow: '0 4px 14px rgba(15, 23, 42, 0.04)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'space-between',
+                        overflow: 'hidden',
+                        position: 'relative',
+                        transition: 'transform 0.2s, box-shadow 0.2s',
+                      }}
+                    >
+                      {/* Top Scholarly Accent Line */}
+                      <div style={{ height: '4px', background: 'linear-gradient(90deg, #0284c7, #38bdf8)' }} />
+
+                      <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.85rem', flex: 1 }}>
+                        {/* Meta Tags Row */}
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
+                          <span
+                            style={{
+                              fontSize: '0.75rem',
+                              fontWeight: 700,
+                              padding: '0.25rem 0.65rem',
+                              borderRadius: '6px',
+                              backgroundColor: '#f0f9ff',
+                              color: '#0369a1',
+                              border: '1px solid #bae6fd',
+                            }}
+                          >
+                            {item.category}
+                          </span>
+
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                            <span
+                              style={{
+                                fontSize: '0.72rem',
+                                color: '#64748b',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '0.25rem',
+                                backgroundColor: '#f8fafc',
+                                padding: '0.2rem 0.5rem',
+                                borderRadius: '4px',
+                                border: '1px solid #e2e8f0',
+                              }}
+                            >
+                              <Clock size={12} color="#64748b" />
+                              {estReadingTime} min read
+                            </span>
+
+                            <span
+                              style={{
+                                fontSize: '0.72rem',
+                                padding: '0.2rem 0.5rem',
+                                borderRadius: '4px',
+                                backgroundColor: item.language === 'ar' ? '#fef3c7' : '#f1f5f9',
+                                color: item.language === 'ar' ? '#92400e' : '#475569',
+                                fontWeight: 700,
+                                border: item.language === 'ar' ? '1px solid #fde68a' : '1px solid #e2e8f0',
+                              }}
+                            >
+                              {item.language === 'ar' ? 'العربية' : 'EN'}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Article Title */}
+                        <h3
+                          style={{
+                            fontSize: '1.25rem',
+                            fontWeight: 800,
+                            color: '#0f172a',
+                            lineHeight: 1.35,
+                            margin: 0,
+                            letterSpacing: '-0.015em',
+                          }}
+                        >
+                          {item.title}
+                        </h3>
+
+                        {/* Summary Excerpt */}
+                        <p
+                          style={{
+                            fontSize: '0.875rem',
+                            color: '#475569',
+                            lineHeight: 1.6,
+                            margin: 0,
+                            display: '-webkit-box',
+                            WebkitLineClamp: 3,
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden',
+                          }}
+                        >
+                          {item.summary}
+                        </p>
+                      </div>
+
+                      {/* Card Footer */}
+                      <div
                         style={{
-                          fontSize: '0.75rem',
-                          padding: '0.2rem 0.5rem',
-                          borderRadius: '4px',
-                          backgroundColor: '#f1f5f9',
-                          color: '#475569',
-                          fontWeight: 600,
+                          backgroundColor: '#f8fafc',
+                          borderTop: '1px solid #f1f5f9',
+                          padding: '0.85rem 1.5rem',
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
                         }}
                       >
-                        {item.language === 'ar' ? 'العربية' : 'EN'}
-                      </span>
+                        <span style={{ fontSize: '0.78rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                          <BookOpen size={13} color="#94a3b8" />
+                          {item.publishedAt ? new Date(item.publishedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : 'Published'}
+                        </span>
+
+                        <button
+                          onClick={() => setReadingArticle(item)}
+                          style={{
+                            fontSize: '0.8125rem',
+                            fontWeight: 700,
+                            padding: '0.45rem 0.95rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.4rem',
+                            backgroundColor: 'linear-gradient(135deg, #0284c7, #0369a1)',
+                            background: '#0284c7',
+                            color: '#ffffff',
+                            border: 'none',
+                            borderRadius: '8px',
+                            cursor: 'pointer',
+                            boxShadow: '0 2px 6px rgba(2, 132, 199, 0.25)',
+                            transition: 'all 0.15s',
+                          }}
+                        >
+                          <Eye size={14} />
+                          <span>{t('knowledge.read_btn')}</span>
+                        </button>
+                      </div>
                     </div>
-
-                    <h3 style={{ fontSize: '1.2rem', fontWeight: 600, color: '#0b1b2b', lineHeight: 1.35 }}>
-                      {item.title}
-                    </h3>
-                    <p style={{ fontSize: '0.875rem', color: '#475569', lineHeight: 1.6 }}>
-                      {item.summary}
-                    </p>
-                  </div>
-
-                  <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '1rem', marginTop: '1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
-                      {item.publishedAt ? new Date(item.publishedAt).toLocaleDateString() : 'Published'}
-                    </span>
-                    <button
-                      onClick={() => setReadingArticle(item)}
-                      className="btn btn-secondary"
-                      style={{ fontSize: '0.8125rem', padding: '0.4rem 0.75rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}
-                    >
-                      <Eye size={14} />
-                      <span>{t('knowledge.read_btn')}</span>
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </>
-      )}
+                  );
+                })}
+              </div>
+            )}
+          </>
+        )}
 
       {/* Tab 2: Contributor Portal */}
       {activeTab === 'contributor' && (
@@ -1029,6 +1368,7 @@ export const KnowledgePage: React.FC = () => {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 };
