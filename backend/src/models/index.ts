@@ -17,3 +17,5 @@ export * from './business.model';
 export * from './report.model';
 export * from './knowledge-content.model';
 export * from './volunteer.model';
+export * from './company.model';
+export * from './company-product.model';

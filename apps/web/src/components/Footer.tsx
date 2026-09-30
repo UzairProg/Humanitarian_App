@@ -1,10 +1,25 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useLocalization } from '../context/LocalizationContext';
-import { Info, HeartHandshake, ShieldCheck, Heart } from 'lucide-react';
+import { Info, HeartHandshake, ShieldCheck, Heart, ExternalLink } from 'lucide-react';
+import { ApiClient } from '../services/api';
+import { ICompany } from '@al-husseiniya/types';
 
 export const Footer: React.FC = () => {
   const { t, locale, isRtl } = useLocalization();
+  const [company, setCompany] = useState<ICompany | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    ApiClient.request<ICompany>('/company').then((res) => {
+      if (active && res.success && res.data) {
+        setCompany(res.data);
+      }
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   return (
     <footer
@@ -39,20 +54,81 @@ export const Footer: React.FC = () => {
               >
                 ح
               </div>
-              <span style={{ fontSize: '1.2rem', fontWeight: 800, color: '#ffffff' }}>
-                {t('app.title')}
-              </span>
+              <div>
+                <span style={{ fontSize: '1.2rem', fontWeight: 800, color: '#ffffff', display: 'block', lineHeight: 1.15 }}>
+                  {t('app.title')}
+                </span>
+                <span style={{ fontSize: '0.6875rem', color: '#cbd5e1', fontWeight: 500 }}>
+                  {t('app.tagline')}
+                </span>
+              </div>
             </div>
             <p style={{ fontSize: '0.8125rem', color: '#94a3b8', lineHeight: 1.65, margin: 0 }}>
               {locale === 'ar'
                 ? 'تنسيق إنساني وخدمة مجتمعية مستمرة على مدار العام مستلهمة من قيم كربلاء الخالدة، لربط أصحاب الحاجة بالجهات الموثوقة والمتطوعين بكرامة واحترام.'
                 : 'Dignified humanitarian coordination and community welfare inspired by the enduring values of Karbala. Available year-round to connect those in need with trusted responders.'}
             </p>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem', color: '#deb95f', fontSize: '0.75rem', fontWeight: 600 }}>
+
+            {/* Subtle Parent Company Relationship */}
+            <div
+              style={{
+                marginTop: '0.25rem',
+                padding: '0.6rem 0.75rem',
+                borderRadius: '6px',
+                backgroundColor: 'rgba(255, 255, 255, 0.03)',
+                border: '1px solid rgba(255, 255, 255, 0.07)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.25rem',
+              }}
+            >
+              <div style={{ fontSize: '0.75rem', color: '#cbd5e1', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                <span style={{ color: '#0e7490' }}>●</span>
+                <span>{locale === 'ar' ? 'جزء من منظومة Faeda' : 'A Faeda product'}</span>
+              </div>
+              {company?.website ? (
+                <a
+                  href={company.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    fontSize: '0.7rem',
+                    color: '#67e8f9',
+                    textDecoration: 'none',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.25rem',
+                    fontWeight: 500,
+                  }}
+                >
+                  <span>{locale === 'ar' ? 'اكتشف Faeda' : 'Explore Faeda'}</span>
+                  <ExternalLink size={11} />
+                </a>
+              ) : (
+                <a
+                  href="#faeda-ecosystem"
+                  style={{
+                    fontSize: '0.7rem',
+                    color: '#94a3b8',
+                    textDecoration: 'none',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.25rem',
+                    fontWeight: 500,
+                  }}
+                >
+                  <span>{locale === 'ar' ? 'اكتشف منظومة Faeda' : 'Explore Faeda Ecosystem'}</span>
+                  <span>&darr;</span>
+                </a>
+              )}
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.25rem', color: '#deb95f', fontSize: '0.75rem', fontWeight: 600 }}>
               <ShieldCheck size={16} />
               <span>{locale === 'ar' ? 'منصة مجتمعية مستقلة وموثقة' : 'Independent Community Platform'}</span>
             </div>
           </div>
+
 
           {/* Column 2: الخدمات (Services) */}
           <div>
@@ -167,9 +243,11 @@ export const Footer: React.FC = () => {
           }}
         >
           <div>
-            &copy; {new Date().getFullYear()} {t('app.title')}.{' '}
+            &copy; {new Date().getFullYear()} {t('app.title')}{' '}
+            <span style={{ color: '#94a3b8' }}>({locale === 'ar' ? 'إحدى منصات Faeda' : 'A Faeda product'})</span>.{' '}
             {locale === 'ar' ? 'مكرسة لخدمة المجتمع الإنساني بكرامة واحترام.' : 'Dedicated to community service with complete dignity.'}
           </div>
+
           <div style={{ display: 'flex', gap: '1.25rem' }}>
             <span>{locale === 'ar' ? 'خصوصية تامة' : 'Privacy Assured'}</span>
             <span>{locale === 'ar' ? 'جهات معتمدة' : 'Verified Partners'}</span>

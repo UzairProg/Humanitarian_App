@@ -26,6 +26,8 @@ import {
   NotificationSchema,
   ImpactRecordSchema,
   AuditLogSchema,
+  CompanySchema,
+  CompanyProductSchema,
 } from '../../models';
 
 export const User = { name: 'User' };
@@ -54,6 +56,8 @@ export const Report = { name: 'Report' };
 export const Notification = { name: 'Notification' };
 export const ImpactRecord = { name: 'ImpactRecord' };
 export const AuditLog = { name: 'AuditLog' };
+export const Company = { name: 'Company' };
+export const CompanyProduct = { name: 'CompanyProduct' };
 
 export const ALL_MONGOOSE_MODELS = [
   { name: 'User', schema: UserSchema },
@@ -81,4 +85,7 @@ export const ALL_MONGOOSE_MODELS = [
   { name: 'Notification', schema: NotificationSchema },
   { name: 'ImpactRecord', schema: ImpactRecordSchema },
   { name: 'AuditLog', schema: AuditLogSchema },
+  { name: 'Company', schema: CompanySchema },
+  { name: 'CompanyProduct', schema: CompanyProductSchema },
 ];
+

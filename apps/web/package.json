@@ -2,7 +2,7 @@
   "name": "@al-husseiniya/web",
   "version": "1.0.0",
   "private": true,
-  "description": "Al-Husseiniya Web Application — Provider and Administration Portals",
+  "description": "Al-Husseiniya Web Application: Provider and Administration Portals",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",

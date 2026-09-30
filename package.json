@@ -2,7 +2,7 @@
   "name": "al-husseiniya-monorepo",
   "version": "1.0.0",
   "private": true,
-  "description": "Al-Husseiniya — Year-round humanitarian & community platform architecture (Phase 1)",
+  "description": "Al-Husseiniya: Year-round humanitarian and community platform architecture (Phase 1)",
   "workspaces": [
     "packages/*",
     "backend",

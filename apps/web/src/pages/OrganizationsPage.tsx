@@ -447,7 +447,7 @@ export const OrganizationsPage: React.FC = () => {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                   {selectedOrg.organization.activeFoodPrograms.map((p) => (
                     <div key={p.id} style={{ padding: '0.65rem 0.85rem', backgroundColor: '#f0fdf4', borderRadius: '6px', fontSize: '0.8125rem', border: '1px solid #bbf7d0' }}>
-                      <strong>{p.title}</strong> — {p.programDate} ({p.startTime} - {p.endTime})
+                      <strong>{p.title}</strong>, {p.programDate} ({p.startTime} - {p.endTime})
                     </div>
                   ))}
                 </div>

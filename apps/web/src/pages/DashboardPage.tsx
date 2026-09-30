@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { useLocalization } from '../context/LocalizationContext';
 import { Link } from 'react-router-dom';
 import ApiClient from '../services/api';
+import { FaedaEcosystemSection } from '../components/FaedaEcosystemSection';
 import {
   HeartHandshake,
   Utensils,
@@ -408,7 +409,7 @@ export const DashboardPage: React.FC = () => {
           >
             <div>
               <div style={{ fontSize: '0.95rem', fontWeight: 800, color: '#0b1f2a' }}>
-                {t('home.onboarding.title')} — {t('home.onboarding.subtitle')}
+                {t('home.onboarding.title')}: {t('home.onboarding.subtitle')}
               </div>
               <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginTop: '0.4rem' }}>
                 <Link
@@ -1800,6 +1801,12 @@ export const DashboardPage: React.FC = () => {
           </div>
         </div>
       </section>
+
+      {/* =========================================================================
+          15. FAEDA PARENT COMPANY & PRODUCT ECOSYSTEM SECTION
+          ========================================================================= */}
+      <FaedaEcosystemSection />
     </div>
   );
 };
+

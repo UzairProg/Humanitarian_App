@@ -15,6 +15,7 @@ import { reportsRouter } from '../modules/reports/reports.routes';
 import { auditRouter } from '../modules/audit/audit.routes';
 import { searchRouter } from '../modules/search/search.routes';
 import { healthRouter } from '../modules/health/health.routes';
+import { companyRouter } from '../modules/company/company.routes';
 
 const apiV1Router = Router();
 
@@ -34,5 +35,7 @@ apiV1Router.use('/reports', reportsRouter);
 apiV1Router.use('/audit', auditRouter);
 apiV1Router.use('/search', searchRouter);
 apiV1Router.use('/health', healthRouter);
+apiV1Router.use('/company', companyRouter);
 
 export { apiV1Router };
+

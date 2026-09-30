@@ -1,5 +1,5 @@
 /**
- * Al-Husseiniya — Shared Types & Domain Contracts
+ * Al-Husseiniya: Shared Types & Domain Contracts
  * Modular Monolith Type System
  */
 
@@ -521,6 +521,47 @@ export interface IAuditLog {
 }
 
 // ============================================================================
+// 3.1 COMPANY & PRODUCT ECOSYSTEM CONTRACTS
+// ============================================================================
+
+export interface LocalizedString {
+  ar: string;
+  en: string;
+}
+
+export interface ICompany {
+  id: string;
+  name: LocalizedString;
+  slug: string;
+  description: LocalizedString;
+  shortDescription: LocalizedString;
+  logo?: string | null;
+  website?: string | null;
+  status: string;
+  displayOrder: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface ICompanyProduct {
+  id: string;
+  companyId: string;
+  name: LocalizedString;
+  slug: string;
+  description: LocalizedString;
+  shortDescription: LocalizedString;
+  logo?: string | null;
+  coverImage?: string | null;
+  website?: string | null;
+  category: LocalizedString | string;
+  status: string;
+  displayOrder: number;
+  featured: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// ============================================================================
 // 4. API, PAGINATION & ERROR CONTRACTS
 // ============================================================================
 
@@ -616,4 +657,6 @@ export type Report = IReport;
 export type Notification = INotification;
 export type ImpactRecord = IImpactRecord;
 export type AuditLog = IAuditLog;
+export type Company = ICompany;
+export type CompanyProduct = ICompanyProduct;
 

@@ -15,7 +15,7 @@ describe('Phase 2 E2E Scenarios (Strict MERN)', () => {
     await teardownTestEnvironment();
   });
 
-  describe('CRITICAL E2E SCENARIO 1 — INDIVIDUAL USER FLOW (Spec Section 48)', () => {
+  describe('CRITICAL E2E SCENARIO 1: INDIVIDUAL USER FLOW (Spec Section 48)', () => {
     let userToken: string;
     let categoryId: string;
     let createdRequestId: string;
@@ -126,7 +126,7 @@ describe('Phase 2 E2E Scenarios (Strict MERN)', () => {
     });
   });
 
-  describe('CRITICAL E2E SCENARIO 2 — ORGANIZATION FLOW (Spec Section 49)', () => {
+  describe('CRITICAL E2E SCENARIO 2: ORGANIZATION FLOW (Spec Section 49)', () => {
     let orgToken: string;
     let orgId: string;
     let userToken: string;

@@ -226,13 +226,31 @@ export const Header: React.FC = () => {
             >
               <BrandLogo size={36} />
               <div>
-                <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0b1f2a', lineHeight: 1.15, whiteSpace: 'nowrap' }}>
-                  {t('app.title')}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', flexWrap: 'nowrap' }}>
+                  <span style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0b1f2a', lineHeight: 1.15, whiteSpace: 'nowrap' }}>
+                    {t('app.title')}
+                  </span>
+                  <span
+                    style={{
+                      fontSize: '0.625rem',
+                      fontWeight: 600,
+                      color: '#0e7490',
+                      backgroundColor: 'rgba(14, 116, 144, 0.08)',
+                      border: '1px solid rgba(14, 116, 144, 0.2)',
+                      borderRadius: '4px',
+                      padding: '1px 6px',
+                      lineHeight: '1.2',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {t('faeda.badge.product')}
+                  </span>
                 </div>
                 <div className="brand-tagline" style={{ fontSize: '0.625rem', color: '#64748b', fontWeight: 500, letterSpacing: '0.01em', whiteSpace: 'nowrap' }}>
                   {t('app.tagline')}
                 </div>
               </div>
+
             </Link>
           </div>
 

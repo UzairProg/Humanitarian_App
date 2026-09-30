@@ -14,6 +14,15 @@ const translations: Record<SupportedLocale, Record<string, string>> = {
     // 1. Navigation & Brand
     'app.title': 'منصة الحسينية',
     'app.tagline': 'منصة إنسانية ومجتمعية على مدار العام',
+    'faeda.badge.product': 'إحدى منصات Faeda',
+    'faeda.badge.ecosystem': 'جزء من منظومة Faeda',
+    'faeda.ecosystem.title': 'منظومة Faeda',
+    'faeda.ecosystem.subtitle': 'منصات رقمية طُوّرت لتلبية احتياجات الناس ودعم المبادرات الإنسانية والمهنية.',
+    'faeda.ecosystem.desc': 'الحسينية هي إحدى منصات منظومة Faeda المتخصصة في العمل الإنساني، وتعمل إلى جانب مبادرات رقمية أخرى مثل وظائف فائدة.',
+    'faeda.ecosystem.explore': 'اكتشف Faeda',
+    'faeda.current_platform': 'المنصة الحالية المفتوحة',
+    'faeda.related_product': 'منتج شقيق ضمن المنظومة',
+    'faeda.learn_more': 'معرفة المزيد',
     'nav.home': 'الرئيسية',
     'nav.help': 'طلب المساعدة',
     'nav.meals': 'الوجبات',
@@ -59,7 +68,7 @@ const translations: Record<SupportedLocale, Record<string, string>> = {
     'home.eyebrow': 'مجتمع الحسينية • خدمة وكرامة على مدار العام',
     'home.hero.title': 'المساعدة أقرب مما تتوقع',
     'home.hero.desc':
-      'من الوجبات المجتمعية والمساعدة الإنسانية إلى التطوع والفعاليات، نربط الناس بالخدمات والأشخاص الذين يصنعون فرقاً حقيقياً — طوال العام مستلهمين قيم كربلاء.',
+      'من الوجبات المجتمعية والإغاثة الإنسانية إلى فرص التطوع والفعاليات، نربط الناس بمن يقدم العون الحقيقي، طوال العام وبروح كربلاء المستمرة.',
     'home.cta.need_help': 'أحتاج إلى مساعدة',
     'home.cta.want_help': 'أريد أن أساعد',
     'home.cta.explore_meals': 'استكشف الوجبات',
@@ -195,7 +204,7 @@ const translations: Record<SupportedLocale, Record<string, string>> = {
     // Final CTA
     'home.cta.title': 'الخير يبدأ بخطوة',
     'home.cta.subtitle':
-      'سواء كنت تبحث عن مساعدة، أو ترغب بتقديمها، أو تريد توظيف مهاراتك في خدمة الناس — هناك مكان لك في مجتمع الحسينية.',
+      'سواء كنت تبحث عن مساعدة، أو ترغب بتقديمها، أو تريد توظيف وقتك وخبرتك في خدمة الناس، هناك مكان لك دائماً بيننا.',
 
     // Humanitarian Requests
     'requests.title': 'طلب مساعدة إنسانية',
@@ -320,6 +329,15 @@ const translations: Record<SupportedLocale, Record<string, string>> = {
     // 1. Navigation & Brand
     'app.title': 'Al-Husseiniya',
     'app.tagline': 'Year-Round Community & Humanitarian Platform',
+    'faeda.badge.product': 'A Faeda product',
+    'faeda.badge.ecosystem': 'Part of the Faeda ecosystem',
+    'faeda.ecosystem.title': 'The Faeda Ecosystem',
+    'faeda.ecosystem.subtitle': 'Practical digital platforms created to support community welfare, relief efforts, and career development.',
+    'faeda.ecosystem.desc': 'Al-Husseiniya is the humanitarian platform within the Faeda ecosystem, operating alongside sister initiatives such as Faeda Jobs.',
+    'faeda.ecosystem.explore': 'Explore Faeda',
+    'faeda.current_platform': 'Current Active Platform',
+    'faeda.related_product': 'Sister Product in Ecosystem',
+    'faeda.learn_more': 'Learn More',
     'nav.home': 'Home',
     'nav.help': 'Help',
     'nav.meals': 'Meals',
@@ -365,7 +383,7 @@ const translations: Record<SupportedLocale, Record<string, string>> = {
     'home.eyebrow': 'AL-HUSSEINIYA COMMUNITY • YEAR-ROUND DIGNITY & SERVICE',
     'home.hero.title': 'Help is closer than you think.',
     'home.hero.desc':
-      'From community meals and humanitarian relief to volunteering and events, we connect people with trusted services that make a real difference — all year round, inspired by the enduring values of Karbala.',
+      'From hot meals and urgent relief to volunteer initiatives and gatherings, we connect people with genuine support all year round, inspired by the enduring values of Karbala.',
     'home.cta.need_help': 'I Need Help',
     'home.cta.want_help': 'I Want to Help',
     'home.cta.explore_meals': 'Explore Meals',
@@ -488,7 +506,7 @@ const translations: Record<SupportedLocale, Record<string, string>> = {
     'home.knowledge.title': 'Values & Knowledge from Karbala',
     'home.knowledge.all': 'Knowledge Library',
     'home.impact.eyebrow': 'Our Impact Together',
-    'home.impact.title': 'Every meal and service is more than a number — it is human dignity.',
+    'home.impact.title': 'Behind every meal and service is a real person and an act of dignity.',
     'home.impact.desc': 'We document verified humanitarian impact with full transparency to ensure ongoing trust.',
     'home.impact.meals': 'Hot Meals Distributed',
     'home.impact.requests': 'Relief Requests Fulfilled',
@@ -501,7 +519,7 @@ const translations: Record<SupportedLocale, Record<string, string>> = {
     // Final CTA
     'home.cta.title': 'Goodness Begins with a Single Step',
     'home.cta.subtitle':
-      'Whether you need assistance, want to offer help, or wish to lend your skills to serve neighbors — there is a place for you in the Al-Husseiniya community.',
+      'Whether you need assistance, want to offer help, or wish to volunteer your time, there is always a place for you in this community.',
 
     // Humanitarian Requests
     'requests.title': 'Find Help & Relief Assistance',

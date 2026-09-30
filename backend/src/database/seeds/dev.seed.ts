@@ -59,7 +59,12 @@ import {
   ImpactRecordSchema,
   AuditLog,
   AuditLogSchema,
+  Company,
+  CompanySchema,
+  CompanyProduct,
+  CompanyProductSchema,
 } from '../schemas';
+
 
 export async function runDevSeed(connection: Connection): Promise<void> {
   const UserModel = connection.model(User.name, UserSchema);
@@ -83,6 +88,8 @@ export async function runDevSeed(connection: Connection): Promise<void> {
   const NotificationModel = connection.model(Notification.name, NotificationSchema);
   const ImpactModel = connection.model(ImpactRecord.name, ImpactRecordSchema);
   const AuditModel = connection.model(AuditLog.name, AuditLogSchema);
+  const CompanyModel = connection.model(Company.name, CompanySchema);
+  const ProductModel = connection.model(CompanyProduct.name, CompanyProductSchema);
 
   console.log('[Seed] Seeding Roles and Permissions...');
   const allPermissions = new Set<string>();
@@ -469,5 +476,115 @@ Year-round service honors the sacred covenant that no person should sleep hungry
     ipAddress: '127.0.0.1',
   });
 
+  console.log('[Seed] Seeding Faeda Parent Company and Products...');
+  let faeda = await CompanyModel.findOne({ slug: 'faeda' });
+  if (!faeda) {
+    faeda = await CompanyModel.create({
+      name: {
+        ar: 'فائدة',
+        en: 'Faeda',
+      },
+      slug: 'faeda',
+      description: {
+        ar: 'منظومة تقنية تطوّر منصات رقمية لخدمة المجتمع، وتسهّل وصول الناس إلى الدعم الإنساني والفرص المهنية.',
+        en: 'A technology group building practical digital platforms that serve communities, connecting people to relief, care, and career opportunities.',
+      },
+      shortDescription: {
+        ar: 'منصات رقمية لخدمة المجتمع',
+        en: 'Community and career platforms',
+      },
+      logo: null,
+      website: null,
+      status: 'ACTIVE',
+      displayOrder: 1,
+    });
+  } else {
+    await CompanyModel.updateOne(
+      { slug: 'faeda' },
+      {
+        $set: {
+          description: {
+            ar: 'منظومة تقنية تطوّر منصات رقمية لخدمة المجتمع، وتسهّل وصول الناس إلى الدعم الإنساني والفرص المهنية.',
+            en: 'A technology group building practical digital platforms that serve communities, connecting people to relief, care, and career opportunities.',
+          },
+          shortDescription: {
+            ar: 'منصات رقمية لخدمة المجتمع',
+            en: 'Community and career platforms',
+          },
+        },
+      },
+    );
+  }
+
+  // 1. Al-Husseiniya (Featured, current product)
+  await ProductModel.findOneAndUpdate(
+    { slug: 'al-husseiniya' },
+    {
+      $set: {
+        companyId: faeda.id || faeda._id,
+        name: {
+          ar: 'منصة الحسينية',
+          en: 'Al-Husseiniya Platform',
+        },
+        slug: 'al-husseiniya',
+        description: {
+          ar: 'منصة مجتمعية وإنسانية تعمل طوال العام لربط أصحاب الحاجة بالجهات المعتمدة والمتطوعين بكرامة ووضوح.',
+          en: 'A community and humanitarian platform operating year-round to connect people in need with verified partners and volunteers with dignity and care.',
+        },
+        shortDescription: {
+          ar: 'منصة إنسانية ومجتمعية على مدار العام',
+          en: 'Year-Round Humanitarian & Community Platform',
+        },
+        category: {
+          ar: 'منصة إنسانية ومجتمعية',
+          en: 'Humanitarian & Community Platform',
+        },
+        logo: null,
+        coverImage: null,
+        website: null,
+        status: 'ACTIVE',
+        displayOrder: 1,
+        featured: true,
+      },
+    },
+    { upsert: true, new: true },
+  );
+
+  // 2. Faeda Jobs (Career/recruitment product)
+  await ProductModel.findOneAndUpdate(
+    { slug: 'faeda-jobs' },
+    {
+      $set: {
+        companyId: faeda.id || faeda._id,
+        name: {
+          ar: 'وظائف فائدة',
+          en: 'Faeda Jobs',
+        },
+        slug: 'faeda-jobs',
+        description: {
+          ar: 'منصة مهنية تساعد الباحثين عن عمل على إيجاد فرص وظيفية تناسب مهاراتهم، وتدعم أصحاب الأعمال في استقطاب الكفاءات.',
+          en: 'A career platform connecting job seekers with meaningful work opportunities and helping organizations find dependable talent.',
+        },
+        shortDescription: {
+          ar: 'منصة التوظيف والتطوير المهني',
+          en: 'Career & Recruitment Platform',
+        },
+        category: {
+          ar: 'منصة التوظيف والمهن',
+          en: 'Career & Recruitment Platform',
+        },
+        logo: null,
+        coverImage: null,
+        website: null,
+        status: 'ACTIVE',
+        displayOrder: 2,
+        featured: false,
+      },
+    },
+    { upsert: true, new: true },
+  );
+
+
   console.log('[Seed] MongoDB Dev seed data successfully seeded!');
 }
+

@@ -309,7 +309,7 @@ export const FoodProgramsPage: React.FC = () => {
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                       <Clock size={14} color="#087f78" />
-                      <span>{t('food.serving_time')}: {p.startTime} – {p.endTime}</span>
+                      <span>{t('food.serving_time')}: {p.startTime} - {p.endTime}</span>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                       <MapPin size={14} color="#087f78" />
