@@ -85,18 +85,18 @@ export const FaedaEcosystemSection: React.FC = () => {
               display: 'inline-flex',
               alignItems: 'center',
               gap: '0.45rem',
-              backgroundColor: 'rgba(14, 116, 144, 0.12)',
-              border: '1px solid rgba(14, 116, 144, 0.3)',
+              backgroundColor: 'rgba(198, 162, 74, 0.12)',
+              border: '1px solid rgba(198, 162, 74, 0.35)',
               borderRadius: '999px',
               padding: '0.3rem 0.85rem',
               fontSize: '0.75rem',
               fontWeight: 600,
-              color: '#38bdf8',
+              color: '#deb95f',
               marginBottom: '1rem',
               letterSpacing: '0.02em',
             }}
           >
-            <Layers size={14} />
+            <Layers size={14} color="#deb95f" />
             <span>{company ? getLocalized(company.name) : t('faeda.ecosystem.title')}</span>
           </div>
 

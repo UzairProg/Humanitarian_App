@@ -73,17 +73,18 @@ export const Footer: React.FC = () => {
             <div
               style={{
                 marginTop: '0.25rem',
-                padding: '0.6rem 0.75rem',
+                padding: '0.65rem 0.85rem',
                 borderRadius: '6px',
-                backgroundColor: 'rgba(255, 255, 255, 0.03)',
-                border: '1px solid rgba(255, 255, 255, 0.07)',
+                backgroundColor: 'rgba(198, 162, 74, 0.06)',
+                border: '1px solid rgba(198, 162, 74, 0.28)',
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.18)',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '0.25rem',
+                gap: '0.3rem',
               }}
             >
-              <div style={{ fontSize: '0.75rem', color: '#cbd5e1', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                <span style={{ color: '#0e7490' }}>●</span>
+              <div style={{ fontSize: '0.75rem', color: '#fbf5e6', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                <span style={{ color: '#c6a24a', textShadow: '0 0 5px rgba(198, 162, 74, 0.8)' }}>●</span>
                 <span>{locale === 'ar' ? 'جزء من منظومة Faeda' : 'A Faeda product'}</span>
               </div>
               {company?.website ? (
@@ -93,7 +94,7 @@ export const Footer: React.FC = () => {
                   rel="noopener noreferrer"
                   style={{
                     fontSize: '0.7rem',
-                    color: '#67e8f9',
+                    color: '#deb95f',
                     textDecoration: 'none',
                     display: 'inline-flex',
                     alignItems: 'center',
@@ -109,7 +110,7 @@ export const Footer: React.FC = () => {
                   href="#faeda-ecosystem"
                   style={{
                     fontSize: '0.7rem',
-                    color: '#94a3b8',
+                    color: '#deb95f',
                     textDecoration: 'none',
                     display: 'inline-flex',
                     alignItems: 'center',
@@ -244,7 +245,7 @@ export const Footer: React.FC = () => {
         >
           <div>
             &copy; {new Date().getFullYear()} {t('app.title')}{' '}
-            <span style={{ color: '#94a3b8' }}>({locale === 'ar' ? 'إحدى منصات Faeda' : 'A Faeda product'})</span>.{' '}
+            <span style={{ color: '#deb95f', fontWeight: 600 }}>({locale === 'ar' ? 'إحدى منصات Faeda' : 'A Faeda product'})</span>.{' '}
             {locale === 'ar' ? 'مكرسة لخدمة المجتمع الإنساني بكرامة واحترام.' : 'Dedicated to community service with complete dignity.'}
           </div>
 

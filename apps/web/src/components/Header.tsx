@@ -231,19 +231,19 @@ export const Header: React.FC = () => {
                     {t('app.title')}
                   </span>
                   <span
-                    style={{
-                      fontSize: '0.625rem',
-                      fontWeight: 600,
-                      color: '#0e7490',
-                      backgroundColor: 'rgba(14, 116, 144, 0.08)',
-                      border: '1px solid rgba(14, 116, 144, 0.2)',
-                      borderRadius: '4px',
-                      padding: '1px 6px',
-                      lineHeight: '1.2',
-                      whiteSpace: 'nowrap',
+                    className="faeda-golden-box"
+                    onClick={(e) => {
+                      const el = document.getElementById('faeda-ecosystem');
+                      if (el) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        el.scrollIntoView({ behavior: 'smooth' });
+                      }
                     }}
+                    title={locale === 'ar' ? 'إحدى منصات منظومة Faeda' : 'A Faeda Ecosystem Product'}
                   >
-                    {t('faeda.badge.product')}
+                    <span className="golden-gem" aria-hidden="true" />
+                    <span>{t('faeda.badge.product')}</span>
                   </span>
                 </div>
                 <div className="brand-tagline" style={{ fontSize: '0.625rem', color: '#64748b', fontWeight: 500, letterSpacing: '0.01em', whiteSpace: 'nowrap' }}>
