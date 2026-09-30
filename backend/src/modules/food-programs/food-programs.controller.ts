@@ -103,6 +103,27 @@ export class FoodProgramsController {
       next(err);
     }
   }
+
+  async cancelReservation(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      if (!req.user) {
+        throw new AppError('Authentication required', 401, 'UNAUTHORIZED');
+      }
+
+      const result = await foodProgramsService.cancelReservation(req.params.reservationId, req.user);
+
+      res.status(200).json({
+        success: true,
+        data: {
+          cancelled: true,
+          program: result.program.toJSON(),
+        },
+        timestamp: new Date().toISOString(),
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
 }
 
 export const foodProgramsController = new FoodProgramsController();

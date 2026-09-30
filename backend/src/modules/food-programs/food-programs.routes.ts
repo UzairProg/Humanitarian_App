@@ -18,5 +18,11 @@ router.patch('/:id', authenticateJwt, (req, res, next) =>
 router.post('/:id/reserve', authenticateJwt, (req, res, next) =>
   foodProgramsController.reserve(req, res, next),
 );
+router.post('/reservations/:reservationId/cancel', authenticateJwt, (req, res, next) =>
+  foodProgramsController.cancelReservation(req, res, next),
+);
+router.delete('/reservations/:reservationId', authenticateJwt, (req, res, next) =>
+  foodProgramsController.cancelReservation(req, res, next),
+);
 
 export const foodProgramsRouter = router;

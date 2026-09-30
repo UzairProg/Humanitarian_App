@@ -25,13 +25,34 @@ export class ReportsService {
       throw new AppError('targetType, targetId, reason, and description are required', 400);
     }
 
+    if (input.evidenceUrl && /^(javascript:|data:|vbscript:)/i.test(input.evidenceUrl.trim())) {
+      throw new AppError('Invalid evidence URL format', 400, 'INVALID_URL');
+    }
+
+    // Prevent duplicate pending reports for the same target by the same reporter within 24 hours
+    const recentDuplicate = await ReportModel.findOne({
+      reporterId,
+      targetType: input.targetType,
+      targetId: input.targetId,
+      status: ReportStatus.SUBMITTED,
+      createdAt: { $gte: new Date(Date.now() - 24 * 60 * 60 * 1000) },
+    }).exec();
+
+    if (recentDuplicate) {
+      throw new AppError(
+        'You have already submitted a pending report for this item. Our moderation team is currently reviewing it.',
+        409,
+        'DUPLICATE_REPORT',
+      );
+    }
+
     const report = await ReportModel.create({
       reporterId,
       targetType: input.targetType,
       targetId: input.targetId,
       reason: input.reason.trim(),
       description: input.description.trim(),
-      evidenceUrl: input.evidenceUrl || null,
+      evidenceUrl: input.evidenceUrl ? input.evidenceUrl.trim() : null,
       status: ReportStatus.SUBMITTED,
     });
 

@@ -101,5 +101,28 @@ npm run build:web
 ## 🔒 Security & Privacy Commitments
 - **Zero Fabricated Metrics**: All impact aggregations reflect real database counts and sums.
 - **Strict Object-Level Authorization**: Requester privacy is enforced on every document retrieval and update. ID manipulation yields 403 Forbidden.
-- **Atomic Food Reservations**: Capacity decrements use MongoDB `$inc` with `$gte` guards to guarantee zero negative allocations.
-- **Audit Trail**: State transitions and administrative verifications are immutably logged.
+- **Atomic Food Reservations & Cancellation**: Capacity decrements use MongoDB `$inc` with `$gte` guards to guarantee zero negative allocations, while reservation cancellations safely return capacity and reopen programs.
+- **Search Sanitization**: All public search queries safely escape regex operators to prevent ReDoS and regex injection, and private humanitarian requests are strictly excluded from search indexes.
+- **Abuse Prevention**: Rate limiters protect authentication and public submission endpoints; duplicate pending reports on the same target within 24 hours are rejected.
+- **Audit Trail**: State transitions, role changes, and administrative verifications are immutably logged with actor IDs and timestamps.
+
+---
+
+## 💾 Backup & Recovery Readiness (Production Ops)
+
+### 1. MongoDB Database Backup
+```bash
+# Dump complete database
+mongodump --uri="$MONGODB_URI" --gzip --archive=/backups/al_husseiniya_$(date +%Y%m%d_%H%M%S).gz
+
+# Restore database
+mongorestore --uri="$MONGODB_URI" --gzip --archive=/backups/al_husseiniya_backup_file.gz --drop
+```
+
+### 2. Environment & Secret Restoration
+- Verify `JWT_ACCESS_SECRET` and `JWT_REFRESH_SECRET` are stored in a secure secret manager (e.g., AWS Secrets Manager, HashiCorp Vault).
+- Production startup automatically halts if default or weak development JWT keys are detected.
+
+### 3. File Asset Storage Recovery
+- When using `STORAGE_DRIVER=s3`, enable S3 Bucket Versioning and Cross-Region Replication for uploaded documents and verification evidence.
+- When using `STORAGE_DRIVER=local`, include `./uploads` in the daily volume snapshot and backup rotation.

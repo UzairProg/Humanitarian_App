@@ -7,7 +7,11 @@ export class AuthorizationService {
    * Object-level authorization for Humanitarian Requests:
    * Private requests can only be accessed by the owner or staff/admins with review permissions.
    */
-  canAccessRequest(user: JwtPayload, request: HumanitarianRequestDocument): boolean {
+  canAccessRequest(
+    user: JwtPayload,
+    request: HumanitarianRequestDocument,
+    userOrgIds?: string[],
+  ): boolean {
     if (this.isSuperAdminOrAdmin(user)) {
       return true;
     }
@@ -18,21 +22,27 @@ export class AuthorizationService {
       return true;
     }
     // Organization staff assigned/matched to the request
+    const orgIds = userOrgIds || (user.orgId ? [user.orgId] : []);
     if (
-      user.orgId &&
-      (request.organizationId === user.orgId || request.matchedOrganizationId === user.orgId)
+      orgIds.length > 0 &&
+      ((request.organizationId && orgIds.includes(request.organizationId)) ||
+        (request.matchedOrganizationId && orgIds.includes(request.matchedOrganizationId)))
     ) {
       return true;
     }
-    // If request is public, allow read
-    if (!request.isPrivate) {
+    // If request is explicitly marked public, allow read
+    if (request.isPrivate === false) {
       return true;
     }
     return false;
   }
 
-  assertCanAccessRequest(user: JwtPayload, request: HumanitarianRequestDocument): void {
-    if (!this.canAccessRequest(user, request)) {
+  assertCanAccessRequest(
+    user: JwtPayload,
+    request: HumanitarianRequestDocument,
+    userOrgIds?: string[],
+  ): void {
+    if (!this.canAccessRequest(user, request, userOrgIds)) {
       throw new AppError(
         'Access denied: You do not own or have authorization for this private request',
         403,

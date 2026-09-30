@@ -234,8 +234,19 @@ export class RequestsService {
       throw new AppError('Humanitarian request not found', 404, 'REQUEST_NOT_FOUND');
     }
 
+    // Retrieve organization memberships if user has org staff roles
+    let userOrgIds: string[] | undefined;
+    if (
+      currentUser.roles?.includes(RoleType.ORGANIZATION_ADMIN) ||
+      currentUser.roles?.includes(RoleType.ORGANIZATION_STAFF)
+    ) {
+      const memberships = await OrganizationMemberModel.find({ userId: currentUser.sub }).exec();
+      userOrgIds = memberships.map((m) => m.organizationId);
+      if (currentUser.orgId) userOrgIds.push(currentUser.orgId);
+    }
+
     // Authoritative Object-Level Authorization Check!
-    authorizationService.assertCanAccessRequest(currentUser, request);
+    authorizationService.assertCanAccessRequest(currentUser, request, userOrgIds);
 
     const history = await RequestStatusHistoryModel.find({ requestId: id })
       .sort({ timestamp: 1 })

@@ -29,6 +29,10 @@ export interface SearchResultItem {
   urlPath: string;
 }
 
+function escapeRegex(text: string): string {
+  return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+}
+
 export class SearchService {
   async search(
     query: string,
@@ -39,7 +43,9 @@ export class SearchService {
       return { results: [], total: 0 };
     }
 
-    const regex = new RegExp(query.trim(), 'i');
+    // Cap query length to 100 chars and safely escape regex special chars
+    const sanitized = escapeRegex(query.trim().slice(0, 100));
+    const regex = new RegExp(sanitized, 'i');
     const results: SearchResultItem[] = [];
 
     // 1. Verified Organizations

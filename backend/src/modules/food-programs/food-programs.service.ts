@@ -206,10 +206,33 @@ export class FoodProgramsService {
       throw new AppError('Reservation count must be at least 1', 400);
     }
 
-    // Atomic update: only succeeds if remainingCapacity >= count
+    // Verify program existence and availability status
+    const existing = await FoodProgramModel.findById(id).exec();
+    if (!existing) {
+      throw new AppError('Food program not found', 404, 'NOT_FOUND');
+    }
+    if (
+      existing.status === ProgramStatus.CLOSED ||
+      existing.status === ProgramStatus.CANCELLED ||
+      existing.status === ProgramStatus.FULL ||
+      existing.remainingCapacity < count
+    ) {
+      throw new AppError(
+        existing.status === ProgramStatus.CLOSED || existing.status === ProgramStatus.CANCELLED
+          ? `This food program is ${existing.status.toLowerCase()} and cannot accept reservations`
+          : 'Not enough remaining meal capacity available for this program',
+        400,
+        existing.status === ProgramStatus.CLOSED || existing.status === ProgramStatus.CANCELLED
+          ? 'PROGRAM_UNAVAILABLE'
+          : 'INSUFFICIENT_CAPACITY',
+      );
+    }
+
+    // Atomic update: only succeeds if remainingCapacity >= count and not cancelled/closed
     const program = await FoodProgramModel.findOneAndUpdate(
       {
         _id: id,
+        status: { $nin: [ProgramStatus.CLOSED, ProgramStatus.CANCELLED] },
         remainingCapacity: { $gte: count },
       },
       {
@@ -230,7 +253,7 @@ export class FoodProgramsService {
     if (program.remainingCapacity === 0) {
       program.status = ProgramStatus.FULL;
       await program.save();
-    } else if (program.remainingCapacity <= 10) {
+    } else if (program.remainingCapacity <= 10 && program.status !== ProgramStatus.LIMITED) {
       program.status = ProgramStatus.LIMITED;
       await program.save();
     }
@@ -264,6 +287,62 @@ export class FoodProgramsService {
     });
 
     return program;
+  }
+
+  /**
+   * Cancel reservation and atomically release capacity back to the program
+   */
+  async cancelReservation(
+    reservationId: string,
+    currentUser: JwtPayload,
+  ): Promise<{ success: boolean; program: FoodProgramDocument }> {
+    const reservation = await FoodProgramAvailabilityModel.findById(reservationId).exec();
+    if (!reservation) {
+      throw new AppError('Reservation not found', 404, 'NOT_FOUND');
+    }
+
+    const isAdmin = authorizationService.isSuperAdminOrAdmin(currentUser);
+    if (!isAdmin && reservation.userId !== currentUser.sub) {
+      throw new AppError('Forbidden: You can only cancel your own reservation', 403, 'FORBIDDEN');
+    }
+
+    if (reservation.status === 'CANCELLED') {
+      throw new AppError('Reservation is already cancelled', 400, 'ALREADY_CANCELLED');
+    }
+
+    reservation.status = 'CANCELLED';
+    await reservation.save();
+
+    // Atomically return capacity to the food program
+    const program = await FoodProgramModel.findById(reservation.programId).exec();
+    if (!program) {
+      throw new AppError('Associated food program not found', 404, 'NOT_FOUND');
+    }
+
+    program.remainingCapacity = Math.min(program.capacity, program.remainingCapacity + reservation.count);
+    if (program.status === ProgramStatus.FULL && program.remainingCapacity > 0) {
+      program.status = program.remainingCapacity <= 10 ? ProgramStatus.LIMITED : ProgramStatus.OPEN;
+    }
+    await program.save();
+
+    await notificationService.create({
+      userId: reservation.userId || currentUser.sub,
+      type: 'MEAL_RESERVATION_CANCELLED',
+      title: 'Reservation Cancelled',
+      body: `Your reservation for "${program.title}" has been cancelled.`,
+      referenceType: 'FOOD_PROGRAM',
+      referenceId: program.id,
+    });
+
+    await auditService.record({
+      actorId: currentUser.sub,
+      action: 'FOOD_PROGRAM_RESERVATION_CANCEL',
+      targetType: 'FOOD_PROGRAM',
+      targetId: program.id,
+      metadata: { reservationId, returnedCount: reservation.count },
+    });
+
+    return { success: true, program };
   }
 }
 

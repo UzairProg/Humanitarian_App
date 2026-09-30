@@ -42,3 +42,25 @@ export const env = {
   // Audit
   ENABLE_AUDIT_LOGGING: process.env.ENABLE_AUDIT_LOGGING !== 'false',
 };
+
+// Production Security Assertion
+if (env.NODE_ENV === 'production') {
+  if (
+    !process.env.JWT_ACCESS_SECRET ||
+    process.env.JWT_ACCESS_SECRET.includes('dev_jwt') ||
+    process.env.JWT_ACCESS_SECRET.length < 32
+  ) {
+    throw new Error(
+      '[FATAL SECURITY MISCONFIGURATION] In production mode, JWT_ACCESS_SECRET must be explicitly set to a cryptographically secure string of at least 32 characters.',
+    );
+  }
+  if (
+    !process.env.JWT_REFRESH_SECRET ||
+    process.env.JWT_REFRESH_SECRET.includes('dev_jwt') ||
+    process.env.JWT_REFRESH_SECRET.length < 32
+  ) {
+    throw new Error(
+      '[FATAL SECURITY MISCONFIGURATION] In production mode, JWT_REFRESH_SECRET must be explicitly set to a cryptographically secure string of at least 32 characters.',
+    );
+  }
+}
